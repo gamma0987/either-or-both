@@ -1,5 +1,21 @@
 # spell-checker: ignore nofile nocapture
 
+prettier_bin := ```
+    if command -V prettier 2>&1 | grep -q 'not found'; then
+        echo -n npx prettier
+    else
+        echo -n prettier
+    fi
+    ```
+
+cspell_bin := ```
+    if command -V cspell 2>&1 | grep -q 'not found'; then
+        echo -n npx cspell
+    else
+        echo -n cspell
+    fi
+    ```
+
 this_dir := `realpath .`
 args := ''
 msrv := '1.74.1'

@@ -1,4 +1,833 @@
-//! The library
+//! `EitherOrBoth` with different types
 
-pub mod different;
-pub mod same;
+use std::ops::{Deref, DerefMut};
+use std::pin::Pin;
+
+/// TODO: DOCS
+pub enum Error {
+    /// TODO: DOCS
+    TryFrom(String),
+}
+
+/// Either left or right can be present
+#[derive(Debug, Clone)]
+pub enum Either<L, R = L> {
+    /// The left value
+    Left(L),
+    /// The right value
+    Right(R),
+}
+
+/// Either left or right or both can be present
+#[derive(Debug, PartialEq, Clone, Eq)]
+pub enum EitherOrBoth<L, R = L> {
+    /// Both values are present
+    Both(L, R),
+    /// The left value
+    Left(L),
+    /// The right value
+    Right(R),
+}
+
+// TODO: Double check that all left (or right) methods have an equivalent right (or left) method
+// TODO: Eagerly versus lazily
+impl<L, R> EitherOrBoth<L, R> {
+    /// Returns true if `Left` or `Both`
+    pub fn has_left(&self) -> bool {
+        match self {
+            Self::Left(_) | Self::Both(_, _) => true,
+            Self::Right(_) => false,
+        }
+    }
+
+    /// Returns true if `Left` or `Both` and the left value matches a predicate
+    pub fn has_left_and<F>(self, f: F) -> bool
+    where
+        F: FnOnce(L) -> bool,
+    {
+        match self {
+            Self::Left(left) | Self::Both(left, _) => f(left),
+            Self::Right(_) => false,
+        }
+    }
+
+    /// Returns true if `Left` or `Both` or the `Right` value matches a predicate
+    pub fn has_left_or<F>(self, f: F) -> bool
+    where
+        F: FnOnce(R) -> bool,
+    {
+        match self {
+            Self::Left(_) | Self::Both(_, _) => true,
+            Self::Right(right) => f(right),
+        }
+    }
+
+    /// Returns true if `Right` or `Both`
+    pub fn has_right(&self) -> bool {
+        match self {
+            Self::Right(_) | Self::Both(_, _) => true,
+            Self::Left(_) => false,
+        }
+    }
+
+    /// Returns true if `Right` or `Both` and the right value matches a predicate
+    pub fn has_right_and<F>(self, f: F) -> bool
+    where
+        F: FnOnce(R) -> bool,
+    {
+        match self {
+            Self::Right(right) | Self::Both(_, right) => f(right),
+            Self::Left(_) => false,
+        }
+    }
+
+    /// Returns true if `Right` or `Both` or the `Left` value matches a predicate
+    pub fn has_right_or<F>(self, f: F) -> bool
+    where
+        F: FnOnce(L) -> bool,
+    {
+        match self {
+            Self::Right(_) | Self::Both(_, _) => true,
+            Self::Left(left) => f(left),
+        }
+    }
+
+    /// Returns true if `Both`
+    pub fn is_both(&self) -> bool {
+        matches!(self, Self::Both(_, _))
+    }
+
+    /// Returns true if `Both` and both values match their respective predicate
+    pub fn is_both_and<F, G>(self, f: F, g: G) -> bool
+    where
+        F: FnOnce(L) -> bool,
+        G: FnOnce(R) -> bool,
+    {
+        match self {
+            Self::Both(left, right) => f(left) && g(right),
+            _ => false,
+        }
+    }
+
+    /// Returns true if `Both` or if `Left` or `Right` match their respective predicate
+    pub fn is_both_or<F, G>(self, f: F, g: G) -> bool
+    where
+        F: FnOnce(L) -> bool,
+        G: FnOnce(R) -> bool,
+    {
+        match self {
+            Self::Both(_, _) => true,
+            Self::Left(left) => f(left),
+            Self::Right(right) => g(right),
+        }
+    }
+
+    /// Returns true if `Left` (but not `Both`)
+    pub fn is_left(&self) -> bool {
+        matches!(self, Self::Left(_))
+    }
+
+    /// Returns true if `Left` (but not `Both`) and it matches a predicate
+    pub fn is_left_and<F>(self, f: F) -> bool
+    where
+        F: FnOnce(L) -> bool,
+    {
+        match self {
+            Self::Left(left) => f(left),
+            _ => false,
+        }
+    }
+
+    /// Returns true if `Left` (but not `Both`) or the right value matches a predicate
+    pub fn is_left_or<F>(self, f: F) -> bool
+    where
+        F: FnOnce(R) -> bool,
+    {
+        match self {
+            Self::Left(_) => true,
+            Self::Both(_, right) | Self::Right(right) => f(right),
+        }
+    }
+
+    /// Returns true if `Right` (but not `Both`)
+    pub fn is_right(&self) -> bool {
+        matches!(self, Self::Right(_))
+    }
+
+    /// Returns true if `right` (but not `Both`) and it matches a predicate
+    pub fn is_right_and<F>(self, f: F) -> bool
+    where
+        F: FnOnce(R) -> bool,
+    {
+        match self {
+            Self::Right(right) => f(right),
+            _ => false,
+        }
+    }
+
+    /// Returns true if `right` (but not `Both`) or the right value matches a predicate
+    pub fn is_right_or<F>(self, f: F) -> bool
+    where
+        F: FnOnce(L) -> bool,
+    {
+        match self {
+            Self::Right(_) => true,
+            Self::Both(left, _) | Self::Left(left) => f(left),
+        }
+    }
+
+    /// Converts from `&EitherOrBoth<L, R>` to `EitherOrBoth<&L, &R>`
+    pub fn as_ref(&self) -> EitherOrBoth<&L, &R> {
+        match self {
+            Self::Both(left, right) => EitherOrBoth::Both(left, right),
+            Self::Left(left) => EitherOrBoth::Left(left),
+            Self::Right(right) => EitherOrBoth::Right(right),
+        }
+    }
+
+    /// Converts from `&mut EitherOrBoth<L, R>` to `EitherOrBoth<&mut L, &mut R>`
+    pub fn as_mut(&mut self) -> EitherOrBoth<&mut L, &mut R> {
+        match self {
+            Self::Both(left, right) => EitherOrBoth::Both(left, right),
+            Self::Left(left) => EitherOrBoth::Left(left),
+            Self::Right(right) => EitherOrBoth::Right(right),
+        }
+    }
+
+    /// Converts from `EitherOrBoth<L, R>` to `EitherOrBoth<&L::Target, &R::Target>`.
+    ///
+    /// This method leaves the original `EitherOrBoth` unchanged, creating a new one with a
+    /// reference to the original one, additionally coercing the contents via Deref.
+    pub fn as_deref(&self) -> EitherOrBoth<&<L as Deref>::Target, &<R as Deref>::Target>
+    where
+        L: Deref,
+        R: Deref,
+    {
+        self.as_ref().map_both(|l| &**l, |r| &**r)
+    }
+
+    /// Converts from `EitherOrBoth<L, R>` to `EitherOrBoth<&mut L::Target, &mut R::Target>`.
+    ///
+    /// This method leaves the original `EitherOrBoth` unchanged, creating a new one containing a
+    /// mutable reference to the inner type’s `Deref::Target` type.
+    pub fn as_deref_mut(
+        &mut self,
+    ) -> EitherOrBoth<&mut <L as Deref>::Target, &mut <R as Deref>::Target>
+    where
+        L: DerefMut,
+        R: DerefMut,
+    {
+        self.as_mut().map_both(|l| &mut **l, |r| &mut **r)
+    }
+
+    /// Converts from `Pin<&EitherOrBoth<L, R>>` to `EitherOrBoth<Pin<&L>, Pin<&R>>`.
+    pub fn as_pin_ref(self: Pin<&Self>) -> EitherOrBoth<Pin<&L>, Pin<&R>> {
+        // SAFETY: `x` is guaranteed to be pinned because it comes from `self` which is pinned.
+        unsafe {
+            match Pin::get_ref(self) {
+                Self::Both(left, right) => {
+                    EitherOrBoth::Both(Pin::new_unchecked(left), Pin::new_unchecked(right))
+                }
+                Self::Left(left) => EitherOrBoth::Left(Pin::new_unchecked(left)),
+                Self::Right(right) => EitherOrBoth::Right(Pin::new_unchecked(right)),
+            }
+        }
+    }
+
+    /// Converts from `Pin<&mut EitherOrBoth<L, R>>` to `EitherOrBoth<Pin<&mut L>, Pin<&mut R>>`.
+    pub fn as_pin_mut(self: Pin<&mut Self>) -> EitherOrBoth<Pin<&mut L>, Pin<&mut R>> {
+        // SAFETY: `get_unchecked_mut` is never used to move the `EitherOrBoth` inside `self`. `x`
+        // is guaranteed to be pinned because it comes from `self` which is pinned.
+        unsafe {
+            match Pin::get_unchecked_mut(self) {
+                Self::Both(left, right) => {
+                    EitherOrBoth::Both(Pin::new_unchecked(left), Pin::new_unchecked(right))
+                }
+                Self::Left(left) => EitherOrBoth::Left(Pin::new_unchecked(left)),
+                Self::Right(right) => EitherOrBoth::Right(Pin::new_unchecked(right)),
+            }
+        }
+    }
+
+    /// Returns the contained `Both` values consuming `self`
+    ///
+    /// # Panics
+    ///
+    /// Panics if only a `Left` or `Right` value is present with a custom panic message provided by
+    /// `msg`
+    pub fn expect_both(self, msg: &str) -> (L, R) {
+        self.both().expect(msg)
+    }
+
+    /// Returns the contained left value if `Left` or `Both` consuming `self`
+    ///
+    /// # Panics
+    ///
+    /// Panics if there is no left value present with a custom panic message provided by `msg`
+    pub fn expect_left(self, msg: &str) -> L {
+        self.left().expect(msg)
+    }
+
+    /// Returns the contained right value if `Right` or `Both` consuming `self`
+    ///
+    /// # Panics
+    ///
+    /// Panics if there is no right value present with a custom panic message provided by `msg`
+    pub fn expect_right(self, msg: &str) -> R {
+        self.right().expect(msg)
+    }
+
+    /// Returns the contained `Both` value as tuple consuming `self`
+    pub fn unwrap_both(self) -> (L, R) {
+        self.both().unwrap()
+    }
+
+    /// Returns the contained left value consuming `self`
+    pub fn unwrap_left(self) -> L {
+        self.left().unwrap()
+    }
+
+    /// Returns the contained right value consuming `self`
+    pub fn unwrap_right(self) -> R {
+        self.right().unwrap()
+    }
+
+    /// If both values are present, return `Some` containing the values otherwise return `None`
+    pub fn both(self) -> Option<(L, R)> {
+        match self {
+            Self::Both(left, right) => Some((left, right)),
+            _ => None,
+        }
+    }
+
+    /// If a left value is present, return `Some` containing the value otherwise return `None`
+    pub fn left(self) -> Option<L> {
+        match self {
+            Self::Left(left) | Self::Both(left, _) => Some(left),
+            Self::Right(_) => None,
+        }
+    }
+
+    /// Returns [`Self::left`] as reference
+    pub fn left_ref(&self) -> Option<&L> {
+        self.as_ref().left()
+    }
+
+    // TODO: More like `or`?
+    /// Returns `Right` otherwise returns `other`
+    pub fn left_and<T>(self, other: EitherOrBoth<T, R>) -> EitherOrBoth<T, R> {
+        match self {
+            Self::Left(_) | Self::Both(_, _) => other,
+            Self::Right(right) => EitherOrBoth::Right(right),
+        }
+    }
+
+    /// Returns `Right` otherwise calls `f` with the left value and returns the result
+    pub fn left_and_then<T>(self, f: fn(L) -> EitherOrBoth<T, R>) -> EitherOrBoth<T, R> {
+        match self {
+            Self::Left(left) | Self::Both(left, _) => f(left),
+            Self::Right(right) => EitherOrBoth::Right(right),
+        }
+    }
+
+    /// Returns the `Left` value in a `Some` if present otherwise `None`
+    pub fn only_left(self) -> Option<L> {
+        match self {
+            Self::Left(left) => Some(left),
+            _ => None,
+        }
+    }
+
+    /// If a right value is present, return `Some` containing the value otherwise return `None`
+    pub fn right(self) -> Option<R> {
+        match self {
+            Self::Right(right) | Self::Both(_, right) => Some(right),
+            Self::Left(_) => None,
+        }
+    }
+
+    /// Returns [`Self::right`] as reference
+    pub fn right_ref(&self) -> Option<&R> {
+        self.as_ref().right()
+    }
+
+    // TODO: Check this and the `left_and` methods
+    /// Returns `Left` otherwise returns `other`
+    pub fn right_and<T>(self, other: EitherOrBoth<L, T>) -> EitherOrBoth<L, T> {
+        match self {
+            Self::Right(_) | Self::Both(_, _) => other,
+            Self::Left(left) => EitherOrBoth::Left(left),
+        }
+    }
+
+    /// Returns `Left` otherwise calls `f` with the right value and returns the result
+    pub fn right_and_then<T>(self, f: fn(R) -> EitherOrBoth<L, T>) -> EitherOrBoth<L, T> {
+        match self {
+            Self::Right(right) | Self::Both(_, right) => f(right),
+            Self::Left(right) => EitherOrBoth::Left(right),
+        }
+    }
+
+    /// Returns the `Right` value in a `Some` if present otherwise `None`
+    pub fn only_right(self) -> Option<R> {
+        match self {
+            Self::Right(right) => Some(right),
+            _ => None,
+        }
+    }
+
+    /// Returns both values if present, otherwise returns `Some` with the `Left` or `Right` value
+    pub fn unzip(self) -> (Option<L>, Option<R>) {
+        match self {
+            Self::Both(left, right) => (Some(left), Some(right)),
+            Self::Left(left) => (Some(left), None),
+            Self::Right(right) => (None, Some(right)),
+        }
+    }
+
+    /// Like [`Self::left_and_right`] but returning references instead of consuming `EitherOrBoth`
+    pub fn unzip_ref(&self) -> (Option<&L>, Option<&R>) {
+        self.as_ref().unzip()
+    }
+
+    /// Converts `EitherOrBoth<L, R>` to `EitherOrBoth<R, L>`.
+    pub fn flip(self) -> EitherOrBoth<R, L> {
+        match self {
+            Self::Both(left, right) => EitherOrBoth::Both(right, left),
+            Self::Left(left) => EitherOrBoth::Right(left),
+            Self::Right(right) => EitherOrBoth::Left(right),
+        }
+    }
+
+    /// Applies mapping functions to the left and right values returning the result
+    pub fn map_both<T, U>(self, f: fn(L) -> T, g: fn(R) -> U) -> EitherOrBoth<T, U> {
+        match self {
+            Self::Both(left, right) => EitherOrBoth::Both(f(left), g(right)),
+            Self::Left(left) => EitherOrBoth::Left(f(left)),
+            Self::Right(right) => EitherOrBoth::Right(g(right)),
+        }
+    }
+
+    /// Applies a mapping function to the left value in `Both` or `Left` and returns the result
+    pub fn map_left<F, T>(self, f: F) -> EitherOrBoth<T, R>
+    where
+        F: FnOnce(L) -> T,
+    {
+        match self {
+            Self::Both(left, right) => EitherOrBoth::Both(f(left), right),
+            Self::Left(left) => EitherOrBoth::Left(f(left)),
+            Self::Right(right) => EitherOrBoth::Right(right),
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn map_left_or<U, F>(self, default: U, f: F) -> U
+    where
+        F: FnOnce(L) -> U,
+    {
+        match self {
+            Self::Both(left, _) | Self::Left(left) => f(left),
+            Self::Right(_) => default,
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn map_left_or_default<T, F>(self, f: F) -> T
+    where
+        T: Default,
+        F: FnOnce(L) -> T,
+    {
+        self.map_left_or_else(T::default, f)
+    }
+
+    /// TODO: DOCS
+    pub fn map_left_or_else<U, D, F>(self, default: D, f: F) -> U
+    where
+        D: FnOnce() -> U,
+        F: FnOnce(L) -> U,
+    {
+        match self {
+            Self::Both(left, _) | Self::Left(left) => f(left),
+            Self::Right(_) => default(),
+        }
+    }
+
+    /// Applies a mapping function to the right value in `Both` or `Right` and returns the result
+    pub fn map_right<T>(self, f: fn(R) -> T) -> EitherOrBoth<L, T> {
+        match self {
+            Self::Both(left, right) => EitherOrBoth::Both(left, f(right)),
+            Self::Left(left) => EitherOrBoth::Left(left),
+            Self::Right(right) => EitherOrBoth::Right(f(right)),
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn map_right_or<U, F>(self, default: U, f: F) -> U
+    where
+        F: FnOnce(R) -> U,
+    {
+        match self {
+            Self::Both(_, right) | Self::Right(right) => f(right),
+            Self::Left(_) => default,
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn map_right_or_default<T, F>(self, f: F) -> T
+    where
+        T: Default,
+        F: FnOnce(R) -> T,
+    {
+        self.map_right_or_else(T::default, f)
+    }
+
+    /// TODO: DOCS
+    pub fn map_right_or_else<U, D, F>(self, default: D, f: F) -> U
+    where
+        D: FnOnce() -> U,
+        F: FnOnce(R) -> U,
+    {
+        match self {
+            Self::Both(_, right) | Self::Right(right) => f(right),
+            Self::Left(_) => default(),
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn inspect_both<F, G>(self, f: F, g: G) -> Self
+    where
+        F: FnOnce(&L),
+        G: FnOnce(&R),
+    {
+        match &self {
+            Self::Both(left, right) => {
+                f(left);
+                g(right);
+            }
+            Self::Left(left) => f(left),
+            Self::Right(right) => g(right),
+        }
+
+        self
+    }
+
+    /// TODO: DOCS
+    pub fn inspect_left<F>(self, f: F) -> Self
+    where
+        F: FnOnce(&L),
+    {
+        match &self {
+            Self::Both(left, _) | Self::Left(left) => f(left),
+            Self::Right(_) => {}
+        }
+
+        self
+    }
+
+    /// TODO: DOCS
+    pub fn inspect_right<F>(self, f: F) -> Self
+    where
+        F: FnOnce(&R),
+    {
+        match &self {
+            Self::Both(_, right) | Self::Right(right) => f(right),
+            Self::Left(_) => {}
+        }
+
+        self
+    }
+
+    /// Returns `Both` if present otherwise the missing value supplied by `left` or `right`
+    ///
+    /// TODO: Eagerly versus lazily
+    pub fn or(self, left: L, right: R) -> (L, R) {
+        match self {
+            Self::Both(left, right) => (left, right),
+            Self::Left(left) => (left, right),
+            Self::Right(right) => (left, right),
+        }
+    }
+
+    /// Returns `Both` if present otherwise the missing default value
+    pub fn or_default(self) -> (L, R)
+    where
+        L: Default,
+        R: Default,
+    {
+        match self {
+            Self::Both(left, right) => (left, right),
+            Self::Left(left) => (left, R::default()),
+            Self::Right(right) => (L::default(), right),
+        }
+    }
+
+    /// Returns `Both` if present otherwise computes the missing value
+    ///
+    /// TODO: Eagerly versus lazily
+    pub fn or_else<F, G>(self, f: F, g: G) -> (L, R)
+    where
+        F: FnOnce() -> L,
+        G: FnOnce() -> R,
+    {
+        match self {
+            Self::Both(left, right) => (left, right),
+            Self::Left(left) => (left, g()),
+            Self::Right(right) => (f(), right),
+        }
+    }
+
+    // pub fn unzip(self) -> (Option<L>, Option<R>) {
+    //
+    // }
+
+    /// TODO: DOCS
+    pub fn insert_left(&mut self, left: L) -> &mut L {
+        match self {
+            Self::Both(old_left, _) | Self::Left(old_left) => {
+                *old_left = left;
+                old_left
+            }
+            Self::Right(right) => {
+                // SAFETY: The pointer is valid for reading and writing since it comes from a
+                // (mutable) rust reference
+                unsafe {
+                    let right = std::ptr::read(right);
+                    std::ptr::write(self, Self::Both(left, right));
+                    // This is safe since we just filled the left value
+                    self.as_mut().left().unwrap_unchecked()
+                }
+            }
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn insert_right(&mut self, right: R) -> &mut R {
+        match self {
+            Self::Both(_, old_right) | Self::Right(old_right) => {
+                *old_right = right;
+                old_right
+            }
+            Self::Left(left) => {
+                // SAFETY: The pointer is valid for reading and writing since it comes from a
+                // (mutable) rust reference
+                unsafe {
+                    let left = std::ptr::read(left);
+                    std::ptr::write(self, Self::Both(left, right));
+                    // This is safe since we just filled the right value
+                    self.as_mut().right().unwrap_unchecked()
+                }
+            }
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn left_or_insert(&mut self, value: L) -> &mut L {
+        self.left_or_insert_with(|| value)
+    }
+
+    /// TODO: DOCS
+    pub fn left_or_insert_default(&mut self) -> &mut L
+    where
+        L: Default,
+    {
+        self.left_or_insert_with(L::default)
+    }
+
+    /// TODO: DOCS
+    pub fn left_or_insert_with<F>(&mut self, f: F) -> &mut L
+    where
+        F: FnOnce() -> L,
+    {
+        match self {
+            Self::Both(left, _) | Self::Left(left) => left,
+            Self::Right(_) => self.insert_left(f()),
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn right_or_insert(&mut self, value: R) -> &mut R {
+        self.right_or_insert_with(|| value)
+    }
+
+    /// TODO: DOCS
+    pub fn right_or_insert_default(&mut self) -> &mut R
+    where
+        R: Default,
+    {
+        self.right_or_insert_with(R::default)
+    }
+
+    /// TODO: DOCS
+    pub fn right_or_insert_with<F>(&mut self, f: F) -> &mut R
+    where
+        F: FnOnce() -> R,
+    {
+        match self {
+            Self::Both(_, right) | Self::Right(right) => right,
+            Self::Left(_) => self.insert_right(f()),
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn replace_left(&mut self, value: L) -> Self {
+        // SAFETY: Reading from a rust reference is safe
+        let old = unsafe { std::ptr::read(self) };
+        match self {
+            Self::Both(left, _) | Self::Left(left) => {
+                *left = value;
+                old
+            }
+            Self::Right(_) => old,
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn replace_right(&mut self, value: R) -> Self {
+        // SAFETY: Reading from a rust reference is safe
+        let old = unsafe { std::ptr::read(self) };
+        match self {
+            Self::Both(_, right) | Self::Right(right) => {
+                *right = value;
+                old
+            }
+            Self::Left(_) => old,
+        }
+    }
+}
+
+impl<T> EitherOrBoth<T, T> {
+    /// TODO: DOCS
+    pub fn inspect<F>(self, f: F) -> Self
+    where
+        F: Fn(&T),
+    {
+        match &self {
+            Self::Both(left, right) => {
+                f(left);
+                f(right);
+            }
+            Self::Left(left) => f(left),
+            Self::Right(right) => f(right),
+        }
+
+        self
+    }
+
+    /// TODO: DOCS
+    pub fn map<F, U>(self, f: F) -> EitherOrBoth<U, U>
+    where
+        F: Fn(T) -> U,
+    {
+        match self {
+            Self::Both(left, right) => EitherOrBoth::Both(f(left), f(right)),
+            Self::Left(left) => EitherOrBoth::Left(f(left)),
+            Self::Right(right) => EitherOrBoth::Right(f(right)),
+        }
+    }
+}
+
+impl<L, R> EitherOrBoth<&L, &R> {
+    /// TODO: DOCS
+    pub fn cloned(self) -> EitherOrBoth<L, R>
+    where
+        L: Clone,
+        R: Clone,
+    {
+        match self {
+            Self::Both(left, right) => EitherOrBoth::Both(left.clone(), right.clone()),
+            Self::Left(left) => EitherOrBoth::Left(left.clone()),
+            Self::Right(right) => EitherOrBoth::Right(right.clone()),
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn copied(self) -> EitherOrBoth<L, R>
+    where
+        L: Copy,
+        R: Copy,
+    {
+        match self {
+            Self::Both(left, right) => EitherOrBoth::Both(*left, *right),
+            Self::Left(left) => EitherOrBoth::Left(*left),
+            Self::Right(right) => EitherOrBoth::Right(*right),
+        }
+    }
+}
+
+impl<L, R> EitherOrBoth<&mut L, &mut R> {
+    /// TODO: DOCS
+    pub fn cloned(self) -> EitherOrBoth<L, R>
+    where
+        L: Clone,
+        R: Clone,
+    {
+        match self {
+            Self::Both(left, right) => EitherOrBoth::Both(left.clone(), right.clone()),
+            Self::Left(left) => EitherOrBoth::Left(left.clone()),
+            Self::Right(right) => EitherOrBoth::Right(right.clone()),
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn copied(self) -> EitherOrBoth<L, R>
+    where
+        L: Copy,
+        R: Copy,
+    {
+        match self {
+            Self::Both(left, right) => EitherOrBoth::Both(*left, *right),
+            Self::Left(left) => EitherOrBoth::Left(*left),
+            Self::Right(right) => EitherOrBoth::Right(*right),
+        }
+    }
+}
+
+impl<L, R> TryFrom<(Option<L>, Option<R>)> for EitherOrBoth<L, R> {
+    type Error = Error;
+
+    fn try_from(value: (Option<L>, Option<R>)) -> Result<Self, Self::Error> {
+        match value {
+            (None, None) => Err(Error::TryFrom(
+                "Either the left, right or both values must be present".to_owned(),
+            )),
+            (None, Some(right)) => Ok(Self::Right(right)),
+            (Some(left), None) => Ok(Self::Left(left)),
+            (Some(left), Some(right)) => Ok(Self::Both(left, right)),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use rstest::rstest;
+
+    use super::*;
+
+    #[test]
+    fn test_map() {
+        // struct NotClone;
+        // let either = EitherOrBoth::<NotClone, NotClone>::Left(NotClone);
+        // let either = EitherOrBoth::Right(NotClone);
+
+        // let either = EitherOrBoth::Both("a", "b");
+        // let new = either.map(ToOwned::to_owned);
+
+        // let either = EitherOrBoth::Both("a", "b".to_owned());
+        // let new = either.map(ToOwned::to_owned);
+    }
+
+    #[rstest]
+    #[case::left(EitherOrBoth::Left(1), 2, EitherOrBoth::Left(2))]
+    #[case::right(EitherOrBoth::Right(1), 2, EitherOrBoth::Right(1))]
+    #[case::both(EitherOrBoth::Both(1, 2), 3, EitherOrBoth::Both(3, 2))]
+    fn test_replace_left(
+        #[case] mut either: EitherOrBoth<u64, u64>,
+        #[case] value: u64,
+        #[case] expected_new: EitherOrBoth<u64, u64>,
+    ) {
+        let cloned = either.clone();
+        let old = either.replace_left(value);
+        assert_eq!(old, cloned);
+        assert_eq!(either, expected_new);
+    }
+}
