@@ -744,18 +744,41 @@ impl<T> EitherOrBoth<T, T> {
         }
     }
 
+    /// TODO: double ended iterator
     /// TODO: DOCS
-    pub fn iter(
-        &self,
-    ) -> EitherOrBoth<<&T as IntoIterator>::IntoIter, <&T as IntoIterator>::IntoIter>
+    pub fn iter<I>(&self) -> ChainedIterEitherOrBoth<'_, '_, I>
     where
-        for<'a> &'a T: IntoIterator,
+        for<'a> &'a T: IntoIterator<Item = &'a I>,
     {
         match self {
-            Self::Both(left, right) => EitherOrBoth::Both(left.into_iter(), right.into_iter()),
-            Self::Left(left) => EitherOrBoth::Left(left.into_iter()),
-            Self::Right(right) => EitherOrBoth::Right(right.into_iter()),
+            Self::Both(left, right) => ChainedIterEitherOrBoth::new(left.into_iter().chain(right)),
+            Self::Left(left) => ChainedIterEitherOrBoth::new(left.into_iter()),
+            Self::Right(right) => ChainedIterEitherOrBoth::new(right.into_iter()),
         }
+    }
+}
+
+/// TODO: DOCS
+pub struct ChainedIterEitherOrBoth<'iter, 'item, I> {
+    iter: Box<dyn Iterator<Item = &'item I> + 'iter>,
+}
+
+impl<'iter, 'item, I: 'item> ChainedIterEitherOrBoth<'iter, 'item, I> {
+    pub(crate) fn new<T>(iter: T) -> Self
+    where
+        T: Iterator<Item = &'item I> + 'iter,
+    {
+        Self {
+            iter: Box::new(iter),
+        }
+    }
+}
+
+impl<'item, I> Iterator for ChainedIterEitherOrBoth<'_, 'item, I> {
+    type Item = &'item I;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next()
     }
 }
 
@@ -815,6 +838,7 @@ impl<L, R> EitherOrBoth<&mut L, &mut R> {
     }
 }
 
+/// TODO: feature either and then make this dependent on the feature
 impl<L, R> From<Either<L, R>> for EitherOrBoth<L, R> {
     fn from(value: Either<L, R>) -> Self {
         match value {
