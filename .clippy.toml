@@ -1,7 +1,7 @@
 msrv = "1.67.1"
 module-item-order-groupings = [
   [
-    "macro",
+    "macros",
     [
       "macro",
     ],

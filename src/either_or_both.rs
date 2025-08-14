@@ -5,6 +5,7 @@ use std::pin::Pin;
 
 use crate::either::Either;
 use crate::error::Error;
+use crate::iter::{ChainedIterEitherOrBoth, SwapIterEitherOrBoth};
 
 /// Either left or right or both can be present
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
@@ -362,6 +363,7 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
+    // TODO: remove, same for left_ref
     /// Returns [`Self::right`] as reference
     pub fn right_ref(&self) -> Option<&R> {
         self.as_ref().right()
@@ -408,6 +410,45 @@ impl<L, R> EitherOrBoth<L, R> {
             Self::Left(left) => EitherOrBoth::Right(left),
             Self::Right(right) => EitherOrBoth::Left(right),
         }
+    }
+
+    /// TODO: DOCS
+    pub fn into_iter_swap(
+        self,
+    ) -> SwapIterEitherOrBoth<<L as IntoIterator>::IntoIter, <R as IntoIterator>::IntoIter>
+    where
+        L: IntoIterator,
+        R: IntoIterator,
+    {
+        SwapIterEitherOrBoth::new(self.map_both(IntoIterator::into_iter, IntoIterator::into_iter))
+    }
+
+    /// TODO: DOCS
+    pub fn iter_swap(
+        &self,
+    ) -> SwapIterEitherOrBoth<<&L as IntoIterator>::IntoIter, <&R as IntoIterator>::IntoIter>
+    where
+        for<'a> &'a L: IntoIterator,
+        for<'a> &'a R: IntoIterator,
+    {
+        SwapIterEitherOrBoth::new(
+            self.as_ref()
+                .map_both(IntoIterator::into_iter, IntoIterator::into_iter),
+        )
+    }
+
+    /// TODO: DOCS
+    pub fn iter_swap_mut(
+        &mut self,
+    ) -> SwapIterEitherOrBoth<<&mut L as IntoIterator>::IntoIter, <&mut R as IntoIterator>::IntoIter>
+    where
+        for<'a> &'a mut L: IntoIterator,
+        for<'a> &'a mut R: IntoIterator,
+    {
+        SwapIterEitherOrBoth::new(
+            self.as_mut()
+                .map_both(IntoIterator::into_iter, IntoIterator::into_iter),
+        )
     }
 
     /// Applies mapping functions to the left and right values returning the result
@@ -744,41 +785,46 @@ impl<T> EitherOrBoth<T, T> {
         }
     }
 
-    /// TODO: double ended iterator
     /// TODO: DOCS
-    pub fn iter<I>(&self) -> ChainedIterEitherOrBoth<'_, '_, I>
-    where
-        for<'a> &'a T: IntoIterator<Item = &'a I>,
+    pub fn iter<'iter>(&'iter self) -> ChainedIterEitherOrBoth<<&'iter T as IntoIterator>::IntoIter> where
+        &'iter T: IntoIterator,
     {
-        match self {
-            Self::Both(left, right) => ChainedIterEitherOrBoth::new(left.into_iter().chain(right)),
-            Self::Left(left) => ChainedIterEitherOrBoth::new(left.into_iter()),
-            Self::Right(right) => ChainedIterEitherOrBoth::new(right.into_iter()),
-        }
+        ChainedIterEitherOrBoth::new(self.as_ref().map(IntoIterator::into_iter))
+    }
+
+    /// TODO: DOCS
+    pub fn iter_mut<'iter>(&'iter mut self) -> ChainedIterEitherOrBoth<<&'iter mut T as IntoIterator>::IntoIter> where
+        &'iter mut T: IntoIterator,
+    {
+        ChainedIterEitherOrBoth::new(self.as_mut().map(IntoIterator::into_iter))
     }
 }
 
-/// TODO: DOCS
-pub struct ChainedIterEitherOrBoth<'iter, 'item, I> {
-    iter: Box<dyn Iterator<Item = &'item I> + 'iter>,
-}
+// TODO: Implement `IntoIterator` for EitherOrBoth<L, R> with SwapIterEitherOrBoth
+impl<T> IntoIterator for EitherOrBoth<T, T> where T: IntoIterator {
+    type Item = T::Item;
+    type IntoIter = ChainedIterEitherOrBoth<<T as IntoIterator>::IntoIter>;
 
-impl<'iter, 'item, I: 'item> ChainedIterEitherOrBoth<'iter, 'item, I> {
-    pub(crate) fn new<T>(iter: T) -> Self
-    where
-        T: Iterator<Item = &'item I> + 'iter,
-    {
-        Self {
-            iter: Box::new(iter),
-        }
+    fn into_iter(self) -> Self::IntoIter {
+        ChainedIterEitherOrBoth::new(self.map(IntoIterator::into_iter))
     }
 }
 
-impl<'item, I> Iterator for ChainedIterEitherOrBoth<'_, 'item, I> {
-    type Item = &'item I;
+impl<'iter, T> IntoIterator for &'iter EitherOrBoth<T, T> where &'iter T: IntoIterator {
+    type Item = <&'iter T as IntoIterator>::Item;
+    type IntoIter = ChainedIterEitherOrBoth<<&'iter T as IntoIterator>::IntoIter>;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next()
+    fn into_iter(self) -> Self::IntoIter {
+        ChainedIterEitherOrBoth::new(self.as_ref().map(IntoIterator::into_iter))
+    }
+}
+
+impl<'iter, T> IntoIterator for &'iter mut EitherOrBoth<T, T> where &'iter mut T: IntoIterator {
+    type Item = <&'iter mut T as IntoIterator>::Item;
+    type IntoIter = ChainedIterEitherOrBoth<<&'iter mut T as IntoIterator>::IntoIter>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        ChainedIterEitherOrBoth::new(self.as_mut().map(IntoIterator::into_iter))
     }
 }
 
