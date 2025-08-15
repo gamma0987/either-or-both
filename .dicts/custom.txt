@@ -11,4 +11,5 @@ rstest
 rustc
 rustls
 rustsec
+vecdeque
 webpki
