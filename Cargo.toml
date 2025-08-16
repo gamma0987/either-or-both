@@ -21,7 +21,11 @@ version = "0.1.0"
 c_repr = []
 default = ["either", "std"]
 either = []
+serde = ["dep:serde"]
 std = []
+
+[dependencies]
+serde = { version = "1", optional = true, features = ["derive"] }
 
 [dev-dependencies]
 rstest = "0.26"

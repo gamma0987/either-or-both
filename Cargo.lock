@@ -59,6 +59,7 @@ name = "either-or-both"
 version = "0.1.0"
 dependencies = [
  "rstest",
+ "serde",
 ]
 
 [[package]]

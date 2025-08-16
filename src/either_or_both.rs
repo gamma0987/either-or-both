@@ -16,6 +16,8 @@ use crate::iter::{
 /// Either left or right or both can be present
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 #[cfg_attr(feature = "c_repr", repr(C))]
+#[cfg_attr(feature = "serde", allow(clippy::unsafe_derive_deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum EitherOrBoth<L, R = L> {
     /// Both values are present
     Both(L, R),
