@@ -228,9 +228,7 @@ where
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         match self.0.as_mut() {
-            EitherOrBoth::Both(left, right) => {
-                (left.next_back(), right.next_back()).try_into().ok()
-            }
+            EitherOrBoth::Both(left, right) => (left.next_back(), right.next_back()).try_into().ok(),
             EitherOrBoth::Left(left) => left.next_back().map(EitherOrBoth::Left),
             EitherOrBoth::Right(right) => right.next_back().map(EitherOrBoth::Right),
         }
@@ -270,7 +268,7 @@ where
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.0
             .as_ref()
-            .map_both(Iterator::size_hint, Iterator::size_hint)
+            .bimap(Iterator::size_hint, Iterator::size_hint)
             .reduce(|(l_lower, l_upper), (r_lower, r_upper)| {
                 (
                     // TODO: min or max?

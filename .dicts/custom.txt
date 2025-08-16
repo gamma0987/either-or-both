@@ -1,3 +1,6 @@
+biconsume
+biinspect
+bimap
 bumpversion
 clippy
 dotgraph
