@@ -348,30 +348,6 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// TODO: DOCS
-    pub fn left_or(self, other: L) -> L {
-        self.left_or_else(|| other)
-    }
-
-    /// TODO: DOCS
-    pub fn left_or_else<F>(self, f: F) -> L
-    where
-        F: FnOnce() -> L,
-    {
-        match self {
-            Self::Both(left, _) | Self::Left(left) => left,
-            Self::Right(_) => f(),
-        }
-    }
-
-    /// TODO: DOCS
-    pub fn left_or_default(self) -> L
-    where
-        L: Default,
-    {
-        self.left_or_else(L::default)
-    }
-
     /// Returns the `Left` value in a `Some` if present otherwise `None`
     pub fn only_left(self) -> Option<L> {
         match self {
@@ -406,28 +382,6 @@ impl<L, R> EitherOrBoth<L, R> {
             Self::Right(right) | Self::Both(_, right) => f(right),
             Self::Left(left) => EitherOrBoth::Left(left),
         }
-    }
-
-    /// TODO: DOCS
-    pub fn right_or(self, other: R) -> R {
-        self.right_or_else(|| other)
-    }
-
-    // TODO: These `or` methods are very easy to achieve with `right()`
-    /// TODO: DOCS
-    pub fn right_or_else<F>(self, f: F) -> R
-    where
-        F: FnOnce() -> R,
-    {
-        self.right().unwrap_or_else(f)
-    }
-
-    /// TODO: DOCS
-    pub fn right_or_default(self) -> R
-    where
-        R: Default,
-    {
-        self.right_or_else(R::default)
     }
 
     /// Returns the `Right` value in a `Some` if present otherwise `None`
@@ -746,12 +700,14 @@ impl<L, R> EitherOrBoth<L, R> {
                 old_left
             }
             Self::Right(right) => {
-                // SAFETY: The pointer is valid for reading and writing since it comes from a
-                // (mutable) rust reference
+                // SAFETY: The pointers are valid for reading and writing since they (right and self)
+                // comes from a reference. See other comments below.
                 unsafe {
+                    // This bitwise copy is safe since we're about to overwrite all of self without
+                    // using `right` again.
                     let right = std::ptr::read(right);
                     std::ptr::write(self, Self::Both(left, right));
-                    // This is safe since we just filled the left value
+                    // This is safe since we just filled the `left` value
                     self.as_mut().left().unwrap_unchecked()
                 }
             }
@@ -766,9 +722,11 @@ impl<L, R> EitherOrBoth<L, R> {
                 old_right
             }
             Self::Left(left) => {
-                // SAFETY: The pointer is valid for reading and writing since it comes from a
-                // (mutable) rust reference
+                // SAFETY: The pointers are valid for reading and writing since they (left and self)
+                // comes from a reference. See other comments below.
                 unsafe {
+                    // This bitwise copy is safe since we're about to overwrite all of self without
+                    // using `left` again.
                     let left = std::ptr::read(left);
                     std::ptr::write(self, Self::Both(left, right));
                     // This is safe since we just filled the right value
@@ -827,31 +785,32 @@ impl<L, R> EitherOrBoth<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn replace_left(&mut self, value: L) -> Self {
-        // SAFETY: Reading from a rust reference is safe
-        let old = unsafe { std::ptr::read(self) };
+    pub fn replace_any(&mut self, left: L, right: R) -> Self {
         match self {
-            Self::Both(left, _) | Self::Left(left) => {
-                *left = value;
+            Self::Both(old_left, old_right) => {
+                let old_left = std::mem::replace(old_left, left);
+                let old_right = std::mem::replace(old_right, right);
+                Self::Both(old_left, old_right)
             }
-            Self::Right(_) => {}
+            Self::Left(old_left) => Self::Left(std::mem::replace(old_left, left)),
+            Self::Right(old_right) => Self::Right(std::mem::replace(old_right, right)),
         }
-
-        old
     }
 
     /// TODO: DOCS
-    pub fn replace_right(&mut self, value: R) -> Self {
-        // SAFETY: Reading from a rust reference is safe
-        let old = unsafe { std::ptr::read(self) };
+    pub fn replace_left(&mut self, value: L) -> Option<L> {
         match self {
-            Self::Both(_, right) | Self::Right(right) => {
-                *right = value;
-            }
-            Self::Left(_) => {}
+            Self::Both(left, _) | Self::Left(left) => Some(std::mem::replace(left, value)),
+            Self::Right(_) => None,
         }
+    }
 
-        old
+    /// TODO: DOCS
+    pub fn replace_right(&mut self, value: R) -> Option<R> {
+        match self {
+            Self::Both(_, right) | Self::Right(right) => Some(std::mem::replace(right, value)),
+            Self::Left(_) => None,
+        }
     }
 
     /// TODO: DOCS
@@ -1194,18 +1153,16 @@ mod tests {
     }
 
     #[rstest]
-    #[case::left(EitherOrBoth::Left(1), 2, EitherOrBoth::Left(2))]
-    #[case::right(EitherOrBoth::Right(1), 2, EitherOrBoth::Right(1))]
-    #[case::both(EitherOrBoth::Both(1, 2), 3, EitherOrBoth::Both(3, 2))]
+    #[case::left(EitherOrBoth::Left(1), 2, Some(1))]
+    #[case::right(EitherOrBoth::Right(1), 2, None)]
+    #[case::both(EitherOrBoth::Both(1, 2), 3, Some(1))]
     fn test_replace_left(
         #[case] mut either: EitherOrBoth<u64, u64>,
         #[case] value: u64,
-        #[case] expected_new: EitherOrBoth<u64, u64>,
+        #[case] expected: Option<u64>,
     ) {
-        let cloned = either;
         let old = either.replace_left(value);
-        assert_eq!(old, cloned);
-        assert_eq!(either, expected_new);
+        assert_eq!(old, expected);
     }
 
     #[test]
