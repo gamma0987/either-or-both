@@ -15,7 +15,7 @@ pub struct IntoIterEitherOrBoth<T>(Items<T>);
 
 /// TODO: DOCS
 #[derive(Debug, Clone)]
-pub struct Items<T> {
+struct Items<T> {
     either: EitherOrBoth<Option<T>, Option<T>>,
 }
 
@@ -95,6 +95,7 @@ impl<T> IntoIterEitherOrBoth<T> {
 }
 
 impl<T> DoubleEndedIterator for IntoIterEitherOrBoth<T> {
+    #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         self.0.next_back()
     }
@@ -106,10 +107,12 @@ impl<T> FusedIterator for IntoIterEitherOrBoth<T> {}
 impl<T> Iterator for IntoIterEitherOrBoth<T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         self.0.next()
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.0.size_hint()
     }
@@ -132,6 +135,7 @@ impl<T> Default for Items<T> {
 }
 
 impl<T> DoubleEndedIterator for Items<T> {
+    #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         match self.either.as_mut() {
             EitherOrBoth::Both(_, right) | EitherOrBoth::Right(right) if right.is_some() => {
@@ -150,6 +154,8 @@ impl<T> FusedIterator for Items<T> {}
 
 impl<T> Iterator for Items<T> {
     type Item = T;
+
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         match self.either.as_mut() {
             EitherOrBoth::Both(left, _) | EitherOrBoth::Left(left) if left.is_some() => left.take(),
@@ -179,6 +185,7 @@ impl<'a, T> IterEitherOrBoth<'a, T> {
 }
 
 impl<T> DoubleEndedIterator for IterEitherOrBoth<'_, T> {
+    #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         self.0.next_back()
     }
@@ -190,10 +197,12 @@ impl<T> FusedIterator for IterEitherOrBoth<'_, T> {}
 impl<'a, T> Iterator for IterEitherOrBoth<'a, T> {
     type Item = &'a T;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         self.0.next()
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.0.size_hint()
     }
@@ -206,6 +215,7 @@ impl<'a, T> IterMutEitherOrBoth<'a, T> {
 }
 
 impl<T> DoubleEndedIterator for IterMutEitherOrBoth<'_, T> {
+    #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         self.0.next_back()
     }
@@ -217,10 +227,12 @@ impl<T> FusedIterator for IterMutEitherOrBoth<'_, T> {}
 impl<'a, T> Iterator for IterMutEitherOrBoth<'a, T> {
     type Item = &'a mut T;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         self.0.next()
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.0.size_hint()
     }
