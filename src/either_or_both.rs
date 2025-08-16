@@ -12,6 +12,7 @@ use crate::iter::{
 
 /// Either left or right or both can be present
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
+#[cfg_attr(feature = "c_repr", repr(C))]
 pub enum EitherOrBoth<L, R = L> {
     /// Both values are present
     Both(L, R),
@@ -21,6 +22,7 @@ pub enum EitherOrBoth<L, R = L> {
     Right(R),
 }
 
+// TODO: Implement as_slice when c_repr
 // TODO: Double check that all left (or right) methods have an equivalent right (or left) method
 // TODO: Eagerly versus lazily
 impl<L, R> EitherOrBoth<L, R> {
