@@ -653,6 +653,30 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
+    /// TODO: DOCS
+    pub fn ok(self) -> Result<R, L> {
+        match self {
+            Self::Both(left, _) | Self::Left(left) => Err(left),
+            Self::Right(right) => Ok(right),
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn ok_or(self, error: L) -> Result<R, L> {
+        self.ok_or_else(|| error)
+    }
+
+    /// TODO: DOCS
+    pub fn ok_or_else<F>(self, error: F) -> Result<R, L>
+    where
+        F: FnOnce() -> L,
+    {
+        match self {
+            Self::Both(_, _) | Self::Left(_) => Err(error()),
+            Self::Right(ok) => Ok(ok),
+        }
+    }
+
     /// Returns `Both` if present otherwise the missing value supplied by `left` or `right`
     ///
     /// TODO: Eagerly versus lazily
