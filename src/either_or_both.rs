@@ -4,7 +4,7 @@ use core::ops::{Deref, DerefMut};
 use core::pin::Pin;
 use core::{mem, ptr};
 #[cfg(feature = "std")]
-use std::vec::Vec;
+use std::{vec, vec::Vec};
 
 use crate::either::Either;
 use crate::error::Error;
@@ -962,52 +962,6 @@ impl<T> EitherOrBoth<T, T> {
     }
 }
 
-#[cfg(feature = "std")]
-impl<L, R> FromIterator<EitherOrBoth<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
-    fn from_iter<T: IntoIterator<Item = EitherOrBoth<L, R>>>(iter: T) -> Self {
-        use std::vec;
-
-        let mut left_vec: Vec<L> = vec![];
-        let mut right_vec: Vec<R> = vec![];
-        for item in iter {
-            item.biconsume(|l| left_vec.push(l), |r| right_vec.push(r));
-        }
-
-        match (left_vec.is_empty(), right_vec.is_empty()) {
-            (true, true) | (false, false) => Self::Both(left_vec, right_vec),
-            (true, false) => Self::Right(right_vec),
-            (false, true) => Self::Left(left_vec),
-        }
-    }
-}
-
-impl<T> IntoIterator for EitherOrBoth<T, T> {
-    type Item = T;
-    type IntoIter = IntoIterEitherOrBoth<T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        IntoIterEitherOrBoth::new(self)
-    }
-}
-
-impl<'a, T> IntoIterator for &'a EitherOrBoth<T, T> {
-    type Item = &'a T;
-    type IntoIter = IterEitherOrBoth<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        IterEitherOrBoth::new(self)
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut EitherOrBoth<T, T> {
-    type Item = &'a mut T;
-    type IntoIter = IterMutEitherOrBoth<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        IterMutEitherOrBoth::new(self)
-    }
-}
-
 impl<L, R> EitherOrBoth<&L, &R> {
     /// TODO: DOCS
     pub fn cloned(self) -> EitherOrBoth<L, R>
@@ -1112,6 +1066,50 @@ impl<L, R, E> EitherOrBoth<Result<L, E>, Result<R, E>> {
         F: Fn(E) -> X,
     {
         self.bimap(|l| l.map_err(&f), |r| r.map_err(&f))
+    }
+}
+
+impl<T> IntoIterator for EitherOrBoth<T, T> {
+    type Item = T;
+    type IntoIter = IntoIterEitherOrBoth<T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        IntoIterEitherOrBoth::new(self)
+    }
+}
+
+impl<'a, T> IntoIterator for &'a EitherOrBoth<T, T> {
+    type Item = &'a T;
+    type IntoIter = IterEitherOrBoth<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        IterEitherOrBoth::new(self)
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut EitherOrBoth<T, T> {
+    type Item = &'a mut T;
+    type IntoIter = IterMutEitherOrBoth<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        IterMutEitherOrBoth::new(self)
+    }
+}
+
+#[cfg(feature = "std")]
+impl<L, R> FromIterator<EitherOrBoth<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
+    fn from_iter<T: IntoIterator<Item = EitherOrBoth<L, R>>>(iter: T) -> Self {
+        let mut left_vec: Vec<L> = vec![];
+        let mut right_vec: Vec<R> = vec![];
+        for item in iter {
+            item.biconsume(|l| left_vec.push(l), |r| right_vec.push(r));
+        }
+
+        match (left_vec.is_empty(), right_vec.is_empty()) {
+            (true, true) | (false, false) => Self::Both(left_vec, right_vec),
+            (true, false) => Self::Right(right_vec),
+            (false, true) => Self::Left(left_vec),
+        }
     }
 }
 
