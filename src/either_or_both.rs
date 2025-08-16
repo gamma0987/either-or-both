@@ -293,6 +293,7 @@ impl<L, R> EitherOrBoth<L, R> {
         self.only_right().expect(msg)
     }
 
+    // TODO: unchecked versions, don't use options as intermediary. match is better
     /// Returns the contained `Both` value as tuple consuming `self`
     pub fn unwrap_both(self) -> (L, R) {
         self.both().unwrap()
@@ -485,10 +486,7 @@ impl<L, R> EitherOrBoth<L, R> {
     where
         F: FnOnce(L) -> U,
     {
-        match self {
-            Self::Both(left, _) | Self::Left(left) => f(left),
-            Self::Right(_) => default,
-        }
+        self.map_left_or_else(|| default, f)
     }
 
     /// TODO: DOCS
@@ -889,15 +887,7 @@ impl<T> EitherOrBoth<T, T> {
     where
         F: Fn(&T),
     {
-        match &self {
-            Self::Both(left, right) => {
-                f(left);
-                f(right);
-            }
-            Self::Left(left) => f(left),
-            Self::Right(right) => f(right),
-        }
-
+        self.as_ref().consume(f);
         self
     }
 
@@ -1021,6 +1011,24 @@ impl<L, R> EitherOrBoth<&mut L, &mut R> {
 }
 
 impl<L, R> EitherOrBoth<Option<L>, Option<R>> {
+    /// TODO: DOCS, does it make sense?
+    pub fn bitranspose<F, G>(self, f: F, g: G) -> Option<EitherOrBoth<L, R>>
+    where
+        F: FnOnce() -> L,
+        G: FnOnce() -> R,
+    {
+        match self {
+            Self::Both(left, right) => match (left, right) {
+                (Some(left), Some(right)) => Some(EitherOrBoth::Both(left, right)),
+                (Some(left), None) => Some(EitherOrBoth::Both(left, g())),
+                (None, Some(right)) => Some(EitherOrBoth::Both(f(), right)),
+                (None, None) => None,
+            },
+            Self::Left(left) => left.map(EitherOrBoth::Left),
+            Self::Right(right) => right.map(EitherOrBoth::Right),
+        }
+    }
+
     /// TODO: DOCS
     pub fn transpose(self) -> Option<EitherOrBoth<L, R>> {
         match self {
@@ -1034,6 +1042,7 @@ impl<L, R> EitherOrBoth<Option<L>, Option<R>> {
     }
 }
 
+// TODO: bimap_ok
 impl<L, R, E1, E2> EitherOrBoth<Result<L, E1>, Result<R, E2>> {
     /// TODO: DOCS
     pub fn bimap_err<F, G, X1, X2>(self, f: F, g: G) -> EitherOrBoth<Result<L, X1>, Result<R, X2>>
