@@ -1,8 +1,7 @@
 //! Implementations of iterators for `EitherOrBoth`
 // TODO: Improve Performance. Use #[inline] where possible
 
-use std::collections::VecDeque;
-use std::iter::FusedIterator;
+use core::iter::FusedIterator;
 
 use crate::either_or_both::EitherOrBoth;
 
@@ -16,7 +15,9 @@ pub struct IntoIterEitherOrBoth<T>(Items<T>);
 
 /// TODO: DOCS
 #[derive(Debug, Clone)]
-pub struct Items<T>(VecDeque<T>);
+pub struct Items<T> {
+    either: EitherOrBoth<Option<T>, Option<T>>,
+}
 
 /// TODO: DOCS
 #[derive(Debug, Clone, Default)]
@@ -116,47 +117,58 @@ impl<T> Iterator for IntoIterEitherOrBoth<T> {
 
 impl<T> From<EitherOrBoth<T>> for Items<T> {
     fn from(value: EitherOrBoth<T>) -> Self {
-        match value {
-            EitherOrBoth::Both(left, right) => Self(VecDeque::from([left, right])),
-            EitherOrBoth::Left(side) | EitherOrBoth::Right(side) => Self(VecDeque::from([side])),
+        Self {
+            either: value.map(Some),
         }
     }
 }
 
 impl<T> Default for Items<T> {
     fn default() -> Self {
-        Self(VecDeque::default())
+        Self {
+            either: EitherOrBoth::Left(None),
+        }
     }
 }
 
 impl<T> DoubleEndedIterator for Items<T> {
     fn next_back(&mut self) -> Option<Self::Item> {
-        self.0.pop_back()
+        match self.either.as_mut() {
+            EitherOrBoth::Both(_, right) | EitherOrBoth::Right(right) if right.is_some() => {
+                right.take()
+            }
+            EitherOrBoth::Both(left, None) | EitherOrBoth::Left(left) if left.is_some() => {
+                left.take()
+            }
+            _ => None,
+        }
     }
 }
 
-impl<T> ExactSizeIterator for Items<T> {
-    fn len(&self) -> usize {
-        let (lower, upper) = self.size_hint();
-        // Note: This assertion is overly defensive, but it checks the invariant
-        // guaranteed by the trait. If this trait were rust-internal,
-        // we could use debug_assert!; assert_eq! will check all Rust user
-        // implementations too.
-        std::assert_eq!(upper, Some(lower));
-        lower
-    }
-}
+impl<T> ExactSizeIterator for Items<T> {}
 impl<T> FusedIterator for Items<T> {}
 
 impl<T> Iterator for Items<T> {
     type Item = T;
-
     fn next(&mut self) -> Option<Self::Item> {
-        self.0.pop_front()
+        match self.either.as_mut() {
+            EitherOrBoth::Both(left, _) | EitherOrBoth::Left(left) if left.is_some() => left.take(),
+            EitherOrBoth::Both(None, right) | EitherOrBoth::Right(right) if right.is_some() => {
+                right.take()
+            }
+            _ => None,
+        }
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        self.0.iter().size_hint()
+        match &self.either {
+            EitherOrBoth::Both(Some(_), Some(_)) => (2, Some(2)),
+            EitherOrBoth::Left(Some(_))
+            | EitherOrBoth::Right(Some(_))
+            | EitherOrBoth::Both(None, Some(_))
+            | EitherOrBoth::Both(Some(_), None) => (1, Some(1)),
+            _ => (0, Some(0)),
+        }
     }
 }
 

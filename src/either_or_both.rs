@@ -1,7 +1,10 @@
 //! `EitherOrBoth` with different types
 
-use std::ops::{Deref, DerefMut};
-use std::pin::Pin;
+use core::ops::{Deref, DerefMut};
+use core::pin::Pin;
+use core::{mem, ptr};
+#[cfg(feature = "std")]
+use std::vec::Vec;
 
 use crate::either::Either;
 use crate::error::Error;
@@ -22,7 +25,6 @@ pub enum EitherOrBoth<L, R = L> {
     Right(R),
 }
 
-// TODO: Implement as_slice when c_repr
 // TODO: Double check that all left (or right) methods have an equivalent right (or left) method
 // TODO: Eagerly versus lazily
 impl<L, R> EitherOrBoth<L, R> {
@@ -731,8 +733,8 @@ impl<L, R> EitherOrBoth<L, R> {
                 unsafe {
                     // This bitwise copy is safe since we're about to overwrite all of self without
                     // using `right` again.
-                    let right = std::ptr::read(right);
-                    std::ptr::write(self, Self::Both(left, right));
+                    let right = ptr::read(right);
+                    ptr::write(self, Self::Both(left, right));
                     // This is safe since we just filled the `left` value
                     self.as_mut().left().unwrap_unchecked()
                 }
@@ -753,8 +755,8 @@ impl<L, R> EitherOrBoth<L, R> {
                 unsafe {
                     // This bitwise copy is safe since we're about to overwrite all of self without
                     // using `left` again.
-                    let left = std::ptr::read(left);
-                    std::ptr::write(self, Self::Both(left, right));
+                    let left = ptr::read(left);
+                    ptr::write(self, Self::Both(left, right));
                     // This is safe since we just filled the right value
                     self.as_mut().right().unwrap_unchecked()
                 }
@@ -814,19 +816,19 @@ impl<L, R> EitherOrBoth<L, R> {
     pub fn replace_any(&mut self, left: L, right: R) -> Self {
         match self {
             Self::Both(old_left, old_right) => {
-                let old_left = std::mem::replace(old_left, left);
-                let old_right = std::mem::replace(old_right, right);
+                let old_left = mem::replace(old_left, left);
+                let old_right = mem::replace(old_right, right);
                 Self::Both(old_left, old_right)
             }
-            Self::Left(old_left) => Self::Left(std::mem::replace(old_left, left)),
-            Self::Right(old_right) => Self::Right(std::mem::replace(old_right, right)),
+            Self::Left(old_left) => Self::Left(mem::replace(old_left, left)),
+            Self::Right(old_right) => Self::Right(mem::replace(old_right, right)),
         }
     }
 
     /// TODO: DOCS
     pub fn replace_left(&mut self, value: L) -> Option<L> {
         match self {
-            Self::Both(left, _) | Self::Left(left) => Some(std::mem::replace(left, value)),
+            Self::Both(left, _) | Self::Left(left) => Some(mem::replace(left, value)),
             Self::Right(_) => None,
         }
     }
@@ -834,7 +836,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// TODO: DOCS
     pub fn replace_right(&mut self, value: R) -> Option<R> {
         match self {
-            Self::Both(_, right) | Self::Right(right) => Some(std::mem::replace(right, value)),
+            Self::Both(_, right) | Self::Right(right) => Some(mem::replace(right, value)),
             Self::Left(_) => None,
         }
     }
@@ -960,8 +962,11 @@ impl<T> EitherOrBoth<T, T> {
     }
 }
 
+#[cfg(feature = "std")]
 impl<L, R> FromIterator<EitherOrBoth<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
     fn from_iter<T: IntoIterator<Item = EitherOrBoth<L, R>>>(iter: T) -> Self {
+        use std::vec;
+
         let mut left_vec: Vec<L> = vec![];
         let mut right_vec: Vec<R> = vec![];
         for item in iter {
@@ -1149,9 +1154,7 @@ impl<L, R> TryFrom<(Option<L>, Option<R>)> for EitherOrBoth<L, R> {
 
     fn try_from(value: (Option<L>, Option<R>)) -> Result<Self, Self::Error> {
         match value {
-            (None, None) => Err(Error::TryFrom(
-                "Either the left, right or both values must be present".to_owned(),
-            )),
+            (None, None) => Err(Error::TryFromOptions),
             (None, Some(right)) => Ok(Self::Right(right)),
             (Some(left), None) => Ok(Self::Left(left)),
             (Some(left), Some(right)) => Ok(Self::Both(left, right)),

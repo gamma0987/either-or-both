@@ -20,7 +20,16 @@ default = ["std"]
 std = []
 
 [dev-dependencies]
+iai-callgrind = "0.16.1"
 rstest = "0.26"
+
+[profile.bench]
+debug = true
+
+[[bench]]
+harness = false
+name = "iai_callgrind"
+path = "benches/iai_callgrind.rs"
 
 [lints.rust]
 missing_docs = "warn"
@@ -84,6 +93,7 @@ return_self_not_must_use = "allow"
 same_name_method = "warn"
 semicolon_inside_block = "warn"
 single_option_map = "warn"
+std_instead_of_core = "warn"
 str_to_string = "warn"
 string_lit_chars_any = "warn"
 string_to_string = "warn"

@@ -2,6 +2,7 @@ biconsume
 biinspect
 bimap
 bumpversion
+callgrind
 clippy
 dotgraph
 dotgraphs
