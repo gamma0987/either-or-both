@@ -1,4 +1,4 @@
-//! The integration tests
+//! Tests for `EitherOrBoth`
 
 use either_or_both::EitherOrBoth;
 
