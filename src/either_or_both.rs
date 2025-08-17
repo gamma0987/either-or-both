@@ -27,6 +27,12 @@ use crate::iter::{
     SwapIterEitherOrBoth,
 };
 
+// TODO: FromIterator<Either>
+// TODO: PartialOrd, Ord
+// TODO: From<&'a EitherOrBoth> for EitherOrBoth<&'a L, &'a R>, same for mut, See Option
+// TODO: From<T> for EitherOrBoth<T>: Move into a new EitherOrBoth. See Option
+// TODO: Product and Sum if L, R are Iterator (see Option)
+// TODO: All of the above also for `Either`
 /// Either left or right or both can be present
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 #[cfg_attr(feature = "c_repr", repr(C))]

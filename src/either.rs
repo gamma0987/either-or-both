@@ -17,7 +17,10 @@ use crate::iter_either::{IterEither, SwapIterEither};
 // TODO: Docs are partially still from EitherOrBoth
 
 /// Either left or right can be present
-#[derive(Debug, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
+#[cfg_attr(feature = "c_repr", repr(C))]
+#[cfg_attr(feature = "serde", allow(clippy::unsafe_derive_deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Either<L, R = L> {
     /// The left value
     Left(L),
@@ -25,8 +28,7 @@ pub enum Either<L, R = L> {
     Right(R),
 }
 
-// TODO: Double check that all generics are used (especially F)
-// TODO: iterators
+// TODO: Double check that all generics are used (especially F), also in EitherOrBoth, iter.rs, ...
 // TODO: Something like add_left replacing the left value if Left and if Right -> EitherOrBoth::Both
 impl<L, R> Either<L, R> {
     /// TODO: DOCS
@@ -81,6 +83,16 @@ impl<L, R> Either<L, R> {
             Self::Right(_) => true,
             Self::Left(left) => f(left),
         }
+    }
+
+    /// TODO: DOCS, keep?
+    pub fn from_left(value: L) -> Self {
+        Self::Left(value)
+    }
+
+    /// TODO: DOCS, keep?
+    pub fn from_right(value: R) -> Self {
+        Self::Right(value)
     }
 
     /// TODO: DOCS
@@ -765,6 +777,18 @@ impl<T, E1, E2> Either<Result<T, E1>, Result<T, E2>> {
             Self::Left(left) => left.map_err(Either::Left),
             Self::Right(right) => right.map_err(Either::Right),
         }
+    }
+}
+
+impl<'a, L, R> From<&'a Either<L, R>> for Either<&'a L, &'a R> {
+    fn from(value: &'a Either<L, R>) -> Self {
+        value.as_ref()
+    }
+}
+
+impl<'a, L, R> From<&'a mut Either<L, R>> for Either<&'a mut L, &'a mut R> {
+    fn from(value: &'a mut Either<L, R>) -> Self {
+        value.as_mut()
     }
 }
 
