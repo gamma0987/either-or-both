@@ -71,7 +71,7 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         match self.0.as_mut() {
             EitherOrBoth::Both(left, right) => left.next().or_else(|| right.next()),
-            EitherOrBoth::Left(side) | EitherOrBoth::Right(side) => side.next(),
+            EitherOrBoth::Left(iter) | EitherOrBoth::Right(iter) => iter.next(),
         }
     }
 

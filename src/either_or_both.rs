@@ -443,7 +443,7 @@ impl<L, R> EitherOrBoth<L, R> {
         SwapIterEitherOrBoth::new(self.bimap(IntoIterator::into_iter, IntoIterator::into_iter))
     }
 
-    /// TODO: DOCS
+    /// TODO: DOCS, instead of for<'a> use `iter_swap<'a>`
     pub fn iter_swap(
         &self,
     ) -> SwapIterEitherOrBoth<<&L as IntoIterator>::IntoIter, <&R as IntoIterator>::IntoIter>
