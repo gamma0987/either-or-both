@@ -1,11 +1,25 @@
 //! `EitherOrBoth` with different types
 
+macro_rules! try_each {
+    ($src:expr, $( $methods:tt )*) => {
+        match $src {
+            Self::Both(left, right) => {
+                left $($methods)*?;
+                right $($methods)*
+            },
+            Self::Left(left) => left $($methods)*,
+            Self::Right(right) => right $($methods)*,
+        }
+    };
+}
+
 use core::ops::{Deref, DerefMut};
 use core::pin::Pin;
 use core::{mem, ptr};
 #[cfg(feature = "std")]
 use std::{vec, vec::Vec};
 
+#[cfg(feature = "either")]
 use crate::either::Either;
 use crate::error::Error;
 use crate::iter::{
@@ -27,6 +41,7 @@ pub enum EitherOrBoth<L, R = L> {
     Right(R),
 }
 
+// TODO: Check if there are methods which make use of Either, synergy!
 // TODO: Double check that all left (or right) methods have an equivalent right (or left) method
 // TODO: Eagerly versus lazily
 impl<L, R> EitherOrBoth<L, R> {
@@ -1124,7 +1139,7 @@ impl<L, R> FromIterator<EitherOrBoth<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
     }
 }
 
-/// TODO: feature either and then make this dependent on the feature
+#[cfg(feature = "either")]
 impl<L, R> From<Either<L, R>> for EitherOrBoth<L, R> {
     fn from(value: Either<L, R>) -> Self {
         match value {
@@ -1168,6 +1183,22 @@ impl<L, R> TryFrom<(Option<L>, Option<R>)> for EitherOrBoth<L, R> {
             (Some(left), None) => Ok(Self::Left(left)),
             (Some(left), Some(right)) => Ok(Self::Both(left, right)),
         }
+    }
+}
+
+// TODO: CONTINUE implementing other traits
+#[cfg(feature = "std")]
+impl<L, R> std::io::Write for EitherOrBoth<L, R>
+where
+    L: std::io::Write,
+    R: std::io::Write,
+{
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        try_each!(self, .write(buf))
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        try_each!(self, .flush())
     }
 }
 

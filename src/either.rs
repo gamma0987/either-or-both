@@ -1,8 +1,16 @@
 //! The `Either` enum
+macro_rules! each {
+    ($src:expr, $( $methods:tt )*) => {
+        match $src {
+            Self::Left(left) => left $($methods)*,
+            Self::Right(right) => right $($methods)*,
+        }
+    };
+}
 
-use core::mem;
 use core::ops::{Deref, DerefMut};
 use core::pin::Pin;
+use core::{fmt, mem};
 
 // TODO: Docs are partially still from EitherOrBoth
 
@@ -708,6 +716,32 @@ impl<L, R> From<Result<R, L>> for Either<L, R> {
             Ok(ok) => Self::Right(ok),
             Err(err) => Self::Left(err),
         }
+    }
+}
+
+// TODO: CONTINUE implementing useful traits
+impl<L, R> fmt::Write for Either<L, R>
+where
+    L: fmt::Write,
+    R: fmt::Write,
+{
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        each!(self, .write_str(s))
+    }
+}
+
+#[cfg(feature = "std")]
+impl<L, R> std::io::Write for Either<L, R>
+where
+    L: std::io::Write,
+    R: std::io::Write,
+{
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        each!(self, .write(buf))
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        each!(self, .flush())
     }
 }
 
