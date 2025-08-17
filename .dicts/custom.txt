@@ -1,6 +1,8 @@
 biconsume
 biinspect
 bimap
+bireduce
+bitranspose
 bumpversion
 callgrind
 clippy
