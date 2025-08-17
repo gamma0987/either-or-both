@@ -12,6 +12,8 @@ use core::ops::{Deref, DerefMut};
 use core::pin::Pin;
 use core::{fmt, mem};
 
+use crate::iter_either::{IterEither, SwapIterEither};
+
 // TODO: Docs are partially still from EitherOrBoth
 
 /// Either left or right can be present
@@ -23,6 +25,7 @@ pub enum Either<L, R = L> {
     Right(R),
 }
 
+// TODO: Double check that all generics are used (especially F)
 // TODO: iterators
 // TODO: Something like add_left replacing the left value if Left and if Right -> EitherOrBoth::Both
 impl<L, R> Either<L, R> {
@@ -256,6 +259,45 @@ impl<L, R> Either<L, R> {
             Self::Left(left) => Either::Right(left),
             Self::Right(right) => Either::Left(right),
         }
+    }
+
+    /// TODO: DOCS
+    pub fn into_iter_swap(
+        self,
+    ) -> SwapIterEither<<L as IntoIterator>::IntoIter, <R as IntoIterator>::IntoIter>
+    where
+        L: IntoIterator,
+        R: IntoIterator,
+    {
+        SwapIterEither::new(self.bimap(IntoIterator::into_iter, IntoIterator::into_iter))
+    }
+
+    /// TODO: DOCS
+    pub fn iter_swap<'a>(
+        &'a self,
+    ) -> SwapIterEither<<&'a L as IntoIterator>::IntoIter, <&'a R as IntoIterator>::IntoIter>
+    where
+        &'a L: IntoIterator,
+        &'a R: IntoIterator,
+    {
+        SwapIterEither::new(
+            self.as_ref()
+                .bimap(IntoIterator::into_iter, IntoIterator::into_iter),
+        )
+    }
+
+    /// TODO: DOCS
+    pub fn iter_swap_mut<'a>(
+        &'a mut self,
+    ) -> SwapIterEither<<&'a mut L as IntoIterator>::IntoIter, <&'a mut R as IntoIterator>::IntoIter>
+    where
+        &'a mut L: IntoIterator,
+        &'a mut R: IntoIterator,
+    {
+        SwapIterEither::new(
+            self.as_mut()
+                .bimap(IntoIterator::into_iter, IntoIterator::into_iter),
+        )
     }
 
     /// TODO: DOCS
@@ -567,6 +609,22 @@ impl<T> Either<T, T> {
     }
 
     /// TODO: DOCS
+    pub fn iter<'a>(&'a self) -> IterEither<<&'a T as IntoIterator>::IntoIter>
+    where
+        &'a T: IntoIterator,
+    {
+        IterEither::new(self.as_ref().map(IntoIterator::into_iter))
+    }
+
+    /// TODO: DOCS
+    pub fn iter_mut<'a>(&'a mut self) -> IterEither<<&'a mut T as IntoIterator>::IntoIter>
+    where
+        &'a mut T: IntoIterator,
+    {
+        IterEither::new(self.as_mut().map(IntoIterator::into_iter))
+    }
+
+    /// TODO: DOCS
     pub fn map<F, U>(self, f: F) -> Either<U, U>
     where
         F: Fn(T) -> U,
@@ -578,7 +636,7 @@ impl<T> Either<T, T> {
     }
 
     /// TODO: DOCS
-    pub fn reduce<F>(self) -> T {
+    pub fn reduce(self) -> T {
         match self {
             Self::Left(left) => left,
             Self::Right(right) => right,
@@ -719,6 +777,43 @@ impl<L, R> From<Result<R, L>> for Either<L, R> {
     }
 }
 
+impl<T> IntoIterator for Either<T>
+where
+    T: IntoIterator,
+{
+    type Item = T::Item;
+    type IntoIter = IterEither<<T as IntoIterator>::IntoIter>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        IterEither::new(self.map(IntoIterator::into_iter))
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Either<T>
+where
+    &'a T: IntoIterator,
+{
+    type Item = <&'a T as IntoIterator>::Item;
+    type IntoIter = IterEither<<&'a T as IntoIterator>::IntoIter>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        IterEither::new(self.as_ref().map(IntoIterator::into_iter))
+    }
+}
+
+// TODO: STOPPED with iterators, but they should be finished
+impl<'a, T> IntoIterator for &'a mut Either<T>
+where
+    &'a mut T: IntoIterator,
+{
+    type Item = <&'a mut T as IntoIterator>::Item;
+    type IntoIter = IterEither<<&'a mut T as IntoIterator>::IntoIter>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        IterEither::new(self.as_mut().map(IntoIterator::into_iter))
+    }
+}
+
 // TODO: CONTINUE implementing useful traits
 impl<L, R> fmt::Write for Either<L, R>
 where
@@ -749,4 +844,15 @@ where
 #[track_caller]
 fn unwrap_failed(msg: &str) -> ! {
     panic!("{msg}");
+}
+
+#[test]
+fn test_iter() {
+    // use std::vec;
+    // use std::vec::Vec;
+    //
+    // let mut either: Either<Vec<i32>, Vec<i32>> = Either::Left(vec![1, 2]);
+    // for e in &mut either {
+    //     *e = 1;
+    // }
 }
