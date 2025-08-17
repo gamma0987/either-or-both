@@ -1,0 +1,5 @@
+[profile.coverage]
+inherits = "dev"
+lto = false
+debug = true
+opt-level = 0
