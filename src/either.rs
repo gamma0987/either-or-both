@@ -188,7 +188,9 @@ impl<L, R> Either<L, R> {
         match self {
             Self::Left(left) => left,
             // SAFETY: the safety contract must be upheld by the caller.
+            // cov:excl-start
             Self::Right(_) => unsafe { core::hint::unreachable_unchecked() },
+            // cov:excl-stop
         }
     }
 
@@ -206,7 +208,9 @@ impl<L, R> Either<L, R> {
     pub unsafe fn unwrap_right_unchecked(self) -> R {
         match self {
             // SAFETY: the safety contract must be upheld by the caller.
+            // cov:excl-start
             Self::Left(_) => unsafe { core::hint::unreachable_unchecked() },
+            // cov:excl-stop
             Self::Right(right) => right,
         }
     }
@@ -407,40 +411,61 @@ impl<L, R> Either<L, R> {
     /// TODO: DOCS
     pub fn biinspect<F, G>(self, f: F, g: G) -> Self
     where
-        F: FnOnce(&L),
-        G: FnOnce(&R),
+        F: Fn(&L),
+        G: Fn(&R),
     {
-        self.as_ref().biconsume(f, g);
+        match &self {
+            Self::Left(left) => f(left),
+            Self::Right(right) => g(right),
+        }
         self
     }
 
     /// TODO: DOCS
     pub fn inspect_left<F>(self, f: F) -> Self
     where
-        F: FnOnce(&L),
+        F: Fn(&L),
     {
-        self.as_ref().consume_left(f);
+        match &self {
+            Self::Left(left) => f(left),
+            Self::Right(_) => {}
+        }
         self
     }
 
     /// TODO: DOCS
     pub fn inspect_right<F>(self, f: F) -> Self
     where
-        F: FnOnce(&R),
+        F: Fn(&R),
     {
-        self.as_ref().consume_right(f);
+        match &self {
+            Self::Left(_) => {}
+            Self::Right(right) => f(right),
+        }
         self
     }
 
     /// TODO: DOCS
-    pub fn biconsume<F, G>(self, f: F, g: G)
+    pub fn biconsume<F, G>(self, mut f: F, mut g: G)
     where
-        F: FnOnce(L),
-        G: FnOnce(R),
+        F: FnMut(L),
+        G: FnMut(R),
     {
         match self {
             Self::Left(left) => f(left),
             Self::Right(right) => g(right),
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn biconsume_with<F, G, Acc>(self, acc: Acc, f: F, g: G)
+    where
+        F: FnOnce(Acc, L),
+        G: FnOnce(Acc, R),
+    {
+        match self {
+            Self::Left(left) => f(acc, left),
+            Self::Right(right) => g(acc, right),
         }
     }
 
@@ -479,7 +504,7 @@ impl<L, R> Either<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn reduce_left<F, T>(self, f: F) -> L
+    pub fn reduce_left<F>(self, f: F) -> L
     where
         F: FnOnce(R) -> L,
     {
@@ -490,7 +515,7 @@ impl<L, R> Either<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn reduce_right<F, T>(self, f: F) -> R
+    pub fn reduce_right<F>(self, f: F) -> R
     where
         F: FnOnce(L) -> R,
     {
@@ -601,9 +626,9 @@ impl<L, R> Either<L, R> {
 
 impl<T> Either<T, T> {
     /// TODO: DOCS
-    pub fn consume<F>(self, f: F)
+    pub fn consume<F>(self, mut f: F)
     where
-        F: Fn(T),
+        F: FnMut(T),
     {
         match self {
             Self::Left(left) => f(left),
@@ -616,7 +641,11 @@ impl<T> Either<T, T> {
     where
         F: Fn(&T),
     {
-        self.as_ref().consume(f);
+        match &self {
+            Self::Left(left) => f(left),
+            Self::Right(right) => f(right),
+        }
+
         self
     }
 
@@ -652,6 +681,17 @@ impl<T> Either<T, T> {
         match self {
             Self::Left(left) => left,
             Self::Right(right) => right,
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn reduce_map<F, U>(self, f: F) -> U
+    where
+        F: FnOnce(T) -> U,
+    {
+        match self {
+            Self::Left(left) => f(left),
+            Self::Right(right) => f(right),
         }
     }
 }
@@ -720,24 +760,6 @@ impl<L, R> Either<Option<L>, Option<R>> {
 
 impl<L, R, E1, E2> Either<Result<L, E1>, Result<R, E2>> {
     /// TODO: DOCS
-    pub fn bimap_err<F, G, X1, X2>(self, f: F, g: G) -> Either<Result<L, X1>, Result<R, X2>>
-    where
-        F: FnOnce(E1) -> X1,
-        G: FnOnce(E2) -> X2,
-    {
-        self.bimap(|l| l.map_err(f), |r| r.map_err(g))
-    }
-
-    /// TODO: DOCS
-    pub fn bimap_ok<F, G, T, U>(self, f: F, g: G) -> Either<Result<T, E1>, Result<U, E2>>
-    where
-        F: FnOnce(L) -> T,
-        G: FnOnce(R) -> U,
-    {
-        self.bimap(|l| l.map(f), |r| r.map(g))
-    }
-
-    /// TODO: DOCS
     pub fn transpose(self) -> Result<Either<L, R>, Either<E1, E2>> {
         match self {
             Self::Left(left) => match left {
@@ -759,14 +781,6 @@ impl<L, R, E> Either<Result<L, E>, Result<R, E>> {
             Self::Left(left) => left.map(Either::Left),
             Self::Right(right) => right.map(Either::Right),
         }
-    }
-
-    /// TODO: DOCS
-    pub fn map_err<F, X>(self, f: F) -> Either<Result<L, X>, Result<R, X>>
-    where
-        F: Fn(E) -> X,
-    {
-        self.bimap(|l| l.map_err(&f), |r| r.map_err(&f))
     }
 }
 
@@ -868,15 +882,4 @@ where
 #[track_caller]
 fn unwrap_failed(msg: &str) -> ! {
     panic!("{msg}");
-}
-
-#[test]
-fn test_iter() {
-    // use std::vec;
-    // use std::vec::Vec;
-    //
-    // let mut either: Either<Vec<i32>, Vec<i32>> = Either::Left(vec![1, 2]);
-    // for e in &mut either {
-    //     *e = 1;
-    // }
 }

@@ -14,22 +14,13 @@ impl<T> IterEither<T> {
     }
 }
 
-impl<T> Default for IterEither<T>
-where
-    T: Default,
-{
-    fn default() -> Self {
-        Self(Either::Left(T::default()))
-    }
-}
-
 impl<T> DoubleEndedIterator for IterEither<T>
 where
     T: DoubleEndedIterator,
 {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
-        self.0.as_mut().map(DoubleEndedIterator::next_back).reduce()
+        self.0.as_mut().reduce_map(DoubleEndedIterator::next_back)
     }
 }
 
@@ -44,12 +35,12 @@ where
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        self.0.as_mut().map(Iterator::next).reduce()
+        self.0.as_mut().reduce_map(Iterator::next)
     }
 
     #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        self.0.as_ref().map(Iterator::size_hint).reduce()
+        self.0.as_ref().reduce_map(Iterator::size_hint)
     }
 }
 
@@ -109,7 +100,6 @@ where
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.0
             .as_ref()
-            .bimap(Iterator::size_hint, Iterator::size_hint)
-            .reduce()
+            .bireduce(Iterator::size_hint, Iterator::size_hint)
     }
 }

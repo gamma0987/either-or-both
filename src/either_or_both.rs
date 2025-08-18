@@ -27,12 +27,16 @@ use crate::iter::{
     SwapIterEitherOrBoth,
 };
 
-// TODO: FromIterator<Either>
+// TODO: Check if there are methods which make use of Either, synergy!
+// TODO: Double check that all left (or right) methods have an equivalent right (or left) method
+// TODO: Eagerly versus lazily
+// TODO: FromIterator<Either> for EitherOrBoth<Vec<L>, Vec<R>>
 // TODO: PartialOrd, Ord
 // TODO: From<&'a EitherOrBoth> for EitherOrBoth<&'a L, &'a R>, same for mut, See Option
 // TODO: From<T> for EitherOrBoth<T>: Move into a new EitherOrBoth. See Option
 // TODO: Product and Sum if L, R are Iterator (see Option)
-// TODO: All of the above also for `Either`
+// TODO: All of the above check also for `Either`
+
 /// Either left or right or both can be present
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 #[cfg_attr(feature = "c_repr", repr(C))]
@@ -47,9 +51,6 @@ pub enum EitherOrBoth<L, R = L> {
     Right(R),
 }
 
-// TODO: Check if there are methods which make use of Either, synergy!
-// TODO: Double check that all left (or right) methods have an equivalent right (or left) method
-// TODO: Eagerly versus lazily
 impl<L, R> EitherOrBoth<L, R> {
     /// Returns true if `Left` or `Both`
     pub fn has_left(&self) -> bool {
@@ -572,6 +573,7 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
+    // TODO: The inspect methods should use Fn instead of FnOnce. See `Either`
     /// TODO: DOCS
     pub fn biinspect<F, G>(self, f: F, g: G) -> Self
     where
@@ -616,6 +618,7 @@ impl<L, R> EitherOrBoth<L, R> {
         self
     }
 
+    // TODO: all consume methods should take `FnMut` like in `Either`
     /// TODO: DOCS
     pub fn biconsume<F, G>(self, f: F, g: G)
     where
@@ -654,6 +657,7 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
+    // TODO: In Either these methods are named `reduce` not `fold`
     /// TODO: DOCS
     pub fn bifold_left<F, G, T>(self, f: F, g: G) -> T
     where
@@ -888,6 +892,7 @@ impl<L, R> EitherOrBoth<L, R> {
 }
 
 impl<T> EitherOrBoth<T, T> {
+    // TODO: `FnMut`
     /// TODO: DOCS
     pub fn consume<F>(self, f: F)
     where
@@ -908,6 +913,7 @@ impl<T> EitherOrBoth<T, T> {
     where
         F: Fn(&T),
     {
+        // TODO: Don't use consume
         self.as_ref().consume(f);
         self
     }
