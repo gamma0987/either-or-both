@@ -98,6 +98,10 @@ test:
 test-doc:
     DOCS_RS=1 cargo test --all-features --doc
 
+[group('test')]
+test-hack:
+    cargo hack --workspace --feature-powerset test
+
 # Generate the coverage of tests (Uses: 'cargo', 'grcov')
 [group('coverage')]
 coverage:

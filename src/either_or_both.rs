@@ -618,7 +618,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self
     }
 
-    // TODO: all consume methods should take `FnMut` like in `Either`
+    // TODO: all consume methods should take `FnMut` like in `Either`?
+    // TODO: Rename to biapply, ... like in `Either`
     /// TODO: DOCS
     pub fn biconsume<F, G>(self, f: F, g: G)
     where
@@ -1198,13 +1199,14 @@ impl<L, R> TryFrom<(Option<L>, Option<R>)> for EitherOrBoth<L, R> {
     }
 }
 
-// TODO: CONTINUE implementing other traits
+// TODO: CONTINUE implementing other traits if possible
 #[cfg(feature = "std")]
 impl<L, R> std::io::Write for EitherOrBoth<L, R>
 where
     L: std::io::Write,
     R: std::io::Write,
 {
+    // TODO: The result can be double the usize?
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         try_each!(self, .write(buf))
     }

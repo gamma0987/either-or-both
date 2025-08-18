@@ -1,4 +1,4 @@
-use std::io::{Cursor, Write};
+use std::io::{BufRead, Cursor, Read, Seek, SeekFrom, Write};
 
 use either_or_both::Either;
 use rstest::rstest;
@@ -24,4 +24,32 @@ fn impl_io_write(
     assert_eq!(either, expected);
 
     either.flush().unwrap();
+}
+
+#[rstest]
+#[case::left(Either::Left(Cursor::new(String::from("hello\nworld"))))]
+#[case::left(Either::Right(Cursor::new(String::from("hello\nworld"))))]
+fn impl_buf_read(#[case] mut either: Either<Cursor<String>>) {
+    let mut buffer = String::new();
+    let size = either.read_line(&mut buffer).unwrap();
+    assert_eq!(buffer, "hello\n");
+    assert_eq!(size, 6);
+}
+
+#[rstest]
+#[case::left(Either::Left(Cursor::new(String::from("hello\nworld"))))]
+#[case::left(Either::Right(Cursor::new(String::from("hello\nworld"))))]
+fn impl_read(#[case] mut either: Either<Cursor<String>>) {
+    let mut buffer = String::new();
+    let size = either.read_to_string(&mut buffer).unwrap();
+    assert_eq!(buffer, "hello\nworld");
+    assert_eq!(size, 11);
+}
+
+#[rstest]
+#[case::left(Either::Left(Cursor::new(String::from("hello\nworld"))))]
+#[case::left(Either::Right(Cursor::new(String::from("hello\nworld"))))]
+fn impl_seek(#[case] mut either: Either<Cursor<String>>) {
+    let pos = either.seek(SeekFrom::End(-5)).unwrap();
+    assert_eq!(pos, 6);
 }

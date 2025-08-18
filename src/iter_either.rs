@@ -25,6 +25,7 @@ where
 }
 
 impl<T> ExactSizeIterator for IterEither<T> where T: ExactSizeIterator {}
+
 impl<T> FusedIterator for IterEither<T> where T: FusedIterator {}
 
 impl<T> Iterator for IterEither<T>

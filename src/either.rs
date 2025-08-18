@@ -1,20 +1,33 @@
 //! The `Either` enum
+
 macro_rules! each {
-    ($src:expr, $( $methods:tt )*) => {
+    ($src:expr, $( $rest:tt )*) => {
         match $src {
-            Self::Left(left) => left $($methods)*,
-            Self::Right(right) => right $($methods)*,
+            Self::Left(left) => left $($rest)*,
+            Self::Right(right) => right $($rest)*,
+        }
+    };
+    ($src:expr) => {
+        match $src {
+            Self::Left(left) => left,
+            Self::Right(right) => right,
         }
     };
 }
 
+use core::fmt::Display;
+use core::future::Future;
 use core::ops::{Deref, DerefMut};
 use core::pin::Pin;
 use core::{fmt, mem};
+#[cfg(feature = "std")]
+use std::io::{BufRead, Read, Seek};
 
 use crate::iter_either::{IterEither, SwapIterEither};
+use crate::EitherOrBoth;
 
 // TODO: Docs are partially still from EitherOrBoth
+// TODO: Something like add_left replacing the left value if Left and if Right -> EitherOrBoth::Both
 
 /// Either left or right can be present
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
@@ -28,8 +41,6 @@ pub enum Either<L, R = L> {
     Right(R),
 }
 
-// TODO: Double check that all generics are used (especially F), also in EitherOrBoth, iter.rs, ...
-// TODO: Something like add_left replacing the left value if Left and if Right -> EitherOrBoth::Both
 impl<L, R> Either<L, R> {
     /// TODO: DOCS
     pub fn is_left(&self) -> bool {
@@ -85,17 +96,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// TODO: DOCS, keep?
-    pub fn from_left(value: L) -> Self {
-        Self::Left(value)
-    }
-
-    /// TODO: DOCS, keep?
-    pub fn from_right(value: R) -> Self {
-        Self::Right(value)
-    }
-
     /// TODO: DOCS
+    #[allow(clippy::same_name_method)]
     pub fn as_ref(&self) -> Either<&L, &R> {
         match self {
             Self::Left(left) => Either::Left(left),
@@ -104,6 +106,7 @@ impl<L, R> Either<L, R> {
     }
 
     /// TODO: DOCS
+    #[allow(clippy::same_name_method)]
     pub fn as_mut(&mut self) -> Either<&mut L, &mut R> {
         match self {
             Self::Left(left) => Either::Left(left),
@@ -445,8 +448,8 @@ impl<L, R> Either<L, R> {
         self
     }
 
-    /// TODO: DOCS
-    pub fn biconsume<F, G>(self, mut f: F, mut g: G)
+    /// TODO: DOCS, `FnOnce` or `FnMut`
+    pub fn biapply<F, G>(self, mut f: F, mut g: G)
     where
         F: FnMut(L),
         G: FnMut(R),
@@ -458,7 +461,7 @@ impl<L, R> Either<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn biconsume_with<F, G, Acc>(self, acc: Acc, f: F, g: G)
+    pub fn biapply_with<F, G, Acc>(self, acc: Acc, f: F, g: G)
     where
         F: FnOnce(Acc, L),
         G: FnOnce(Acc, R),
@@ -470,7 +473,7 @@ impl<L, R> Either<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn consume_left<F>(self, f: F)
+    pub fn apply_left<F>(self, f: F)
     where
         F: FnOnce(L),
     {
@@ -481,7 +484,7 @@ impl<L, R> Either<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn consume_right<F>(self, f: F)
+    pub fn apply_right<F>(self, f: F)
     where
         F: FnOnce(R),
     {
@@ -586,18 +589,34 @@ impl<L, R> Either<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn replace_left(&mut self, value: L) -> Option<L> {
+    pub fn add_left(self, left: L) -> EitherOrBoth<L, R> {
         match self {
-            Self::Left(left) => Some(mem::replace(left, value)),
-            Self::Right(_) => None,
+            Self::Left(left) => EitherOrBoth::Left(left),
+            Self::Right(right) => EitherOrBoth::Both(left, right),
         }
     }
 
     /// TODO: DOCS
-    pub fn replace_right(&mut self, value: R) -> Option<R> {
+    pub fn add_right(self, right: R) -> EitherOrBoth<L, R> {
         match self {
-            Self::Right(right) => Some(mem::replace(right, value)),
-            Self::Left(_) => None,
+            Self::Left(left) => EitherOrBoth::Both(left, right),
+            Self::Right(right) => EitherOrBoth::Right(right),
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn inject_left(self, value: L) -> EitherOrBoth<L, R> {
+        match self {
+            Self::Left(_) => EitherOrBoth::Left(value),
+            Self::Right(right) => EitherOrBoth::Both(value, right),
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn inject_right(self, value: R) -> EitherOrBoth<L, R> {
+        match self {
+            Self::Left(left) => EitherOrBoth::Both(left, value),
+            Self::Right(_) => EitherOrBoth::Right(value),
         }
     }
 
@@ -622,13 +641,29 @@ impl<L, R> Either<L, R> {
             Self::Right(_) => self,
         }
     }
+
+    /// TODO: DOCS
+    pub fn replace_left(&mut self, value: L) -> Option<L> {
+        match self {
+            Self::Left(left) => Some(mem::replace(left, value)),
+            Self::Right(_) => None,
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn replace_right(&mut self, value: R) -> Option<R> {
+        match self {
+            Self::Right(right) => Some(mem::replace(right, value)),
+            Self::Left(_) => None,
+        }
+    }
 }
 
 impl<T> Either<T, T> {
-    /// TODO: DOCS
-    pub fn consume<F>(self, mut f: F)
+    /// TODO: DOCS, `FnMut` or `FnOnce`
+    pub fn apply<F>(self, f: F)
     where
-        F: FnMut(T),
+        F: FnOnce(T),
     {
         match self {
             Self::Left(left) => f(left),
@@ -668,7 +703,7 @@ impl<T> Either<T, T> {
     /// TODO: DOCS
     pub fn map<F, U>(self, f: F) -> Either<U, U>
     where
-        F: Fn(T) -> U,
+        F: FnOnce(T) -> U,
     {
         match self {
             Self::Left(left) => Either::Left(f(left)),
@@ -794,6 +829,87 @@ impl<T, E1, E2> Either<Result<T, E1>, Result<T, E2>> {
     }
 }
 
+impl<L, R, T> AsMut<T> for Either<L, R>
+where
+    T: ?Sized,
+    L: AsMut<T>,
+    R: AsMut<T>,
+{
+    fn as_mut(&mut self) -> &mut T {
+        each!(self, .as_mut())
+    }
+}
+
+impl<L, R, T> AsRef<T> for Either<L, R>
+where
+    T: ?Sized,
+    L: AsRef<T>,
+    R: AsRef<T>,
+{
+    fn as_ref(&self) -> &T {
+        each!(self, .as_ref())
+    }
+}
+
+#[cfg(feature = "std")]
+impl<L, R> BufRead for Either<L, R>
+where
+    L: BufRead,
+    R: BufRead,
+{
+    fn fill_buf(&mut self) -> std::io::Result<&[u8]> {
+        each!(self, .fill_buf())
+    }
+
+    fn consume(&mut self, amount: usize) {
+        each!(self, .consume(amount));
+    }
+}
+
+impl<L, R> Deref for Either<L, R>
+where
+    L: Deref<Target = R::Target>,
+    R: Deref,
+{
+    type Target = R::Target;
+
+    fn deref(&self) -> &Self::Target {
+        each!(self)
+    }
+}
+
+impl<L, R> DerefMut for Either<L, R>
+where
+    L: DerefMut<Target = R::Target>,
+    R: DerefMut,
+{
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        each!(self)
+    }
+}
+
+impl<L, R> Display for Either<L, R>
+where
+    L: Display,
+    R: Display,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        each!(self, .fmt(f))
+    }
+}
+
+impl<A, T> Extend<A> for Either<T>
+where
+    T: Extend<A>,
+{
+    fn extend<I>(&mut self, iter: I)
+    where
+        I: IntoIterator<Item = A>,
+    {
+        each!(self, .extend(iter));
+    }
+}
+
 impl<'a, L, R> From<&'a Either<L, R>> for Either<&'a L, &'a R> {
     fn from(value: &'a Either<L, R>) -> Self {
         value.as_ref()
@@ -806,11 +922,30 @@ impl<'a, L, R> From<&'a mut Either<L, R>> for Either<&'a mut L, &'a mut R> {
     }
 }
 
+// TODO: impl From<Either> for Result?? The method ok does this already.
 impl<L, R> From<Result<R, L>> for Either<L, R> {
     fn from(value: Result<R, L>) -> Self {
         match value {
             Ok(ok) => Self::Right(ok),
             Err(err) => Self::Left(err),
+        }
+    }
+}
+
+impl<L, R> Future for Either<L, R>
+where
+    L: Future<Output = R::Output>,
+    R: Future,
+{
+    type Output = R::Output;
+
+    fn poll(
+        self: Pin<&mut Self>,
+        cx: &mut core::task::Context<'_>,
+    ) -> core::task::Poll<Self::Output> {
+        match self.as_pin_mut() {
+            Either::Left(left) => left.poll(cx),
+            Either::Right(right) => right.poll(cx),
         }
     }
 }
@@ -839,7 +974,6 @@ where
     }
 }
 
-// TODO: STOPPED with iterators, but they should be finished
 impl<'a, T> IntoIterator for &'a mut Either<T>
 where
     &'a mut T: IntoIterator,
@@ -852,7 +986,28 @@ where
     }
 }
 
-// TODO: CONTINUE implementing useful traits
+#[cfg(feature = "std")]
+impl<L, R> Read for Either<L, R>
+where
+    L: Read,
+    R: Read,
+{
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        each!(self, .read(buf))
+    }
+}
+
+#[cfg(feature = "std")]
+impl<L, R> Seek for Either<L, R>
+where
+    L: Seek,
+    R: Seek,
+{
+    fn seek(&mut self, pos: std::io::SeekFrom) -> std::io::Result<u64> {
+        each!(self, .seek(pos))
+    }
+}
+
 impl<L, R> fmt::Write for Either<L, R>
 where
     L: fmt::Write,
