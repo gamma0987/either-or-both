@@ -6,7 +6,7 @@ use rstest::rstest;
 #[rstest]
 #[case::left(Either::Left(vec![1, 2]))]
 #[case::right(Either::Right(vec![1, 2]))]
-fn into_iter_either(#[case] either: Either<Vec<i32>, Vec<i32>>) {
+fn into_iter_either(#[case] either: Either<Vec<i32>>) {
     let items = either.into_iter().collect::<Vec<i32>>();
     assert_eq!(items, vec![1, 2]);
 }
@@ -14,7 +14,7 @@ fn into_iter_either(#[case] either: Either<Vec<i32>, Vec<i32>>) {
 #[rstest]
 #[case::left(Either::Left(vec![1, 2]))]
 #[case::right(Either::Right(vec![1, 2]))]
-fn into_iter_either_in_for_loop(#[case] either: Either<Vec<i32>, Vec<i32>>) {
+fn into_iter_either_in_for_loop(#[case] either: Either<Vec<i32>>) {
     let mut items = vec![];
     for i in either {
         items.push(i);
@@ -26,15 +26,38 @@ fn into_iter_either_in_for_loop(#[case] either: Either<Vec<i32>, Vec<i32>>) {
 #[rstest]
 #[case::left(Either::Left(vec![1, 2]))]
 #[case::right(Either::Right(vec![1, 2]))]
-fn iter_either(#[case] either: Either<Vec<i32>, Vec<i32>>) {
+fn iter_either(#[case] either: Either<Vec<i32>>) {
     let items = either.iter().collect::<Vec<&i32>>();
     assert_eq!(items, vec![&1, &2]);
 }
 
 #[rstest]
+#[case::left(Either::Left(vec![1, 2]), (2, Some(2)))]
+#[case::zero(Either::Left(vec![]), (0, Some(0)))]
+#[case::right(Either::Right(vec![1, 2]), (2, Some(2)))]
+fn iter_either_size_hint(
+    #[case] either: Either<Vec<i32>>,
+    #[case] expected: (usize, Option<usize>),
+) {
+    let actual = either.into_iter().size_hint();
+    assert_eq!(actual, expected);
+}
+
+#[rstest]
 #[case::left(Either::Left(vec![1, 2]))]
 #[case::right(Either::Right(vec![1, 2]))]
-fn iter_either_in_for_loop(#[case] either: Either<Vec<i32>, Vec<i32>>) {
+fn iter_either_backwards(#[case] either: Either<Vec<i32>>) {
+    let items = either.iter().rfold(vec![], |mut acc, f| {
+        acc.push(*f);
+        acc
+    });
+    assert_eq!(items, vec![2, 1]);
+}
+
+#[rstest]
+#[case::left(Either::Left(vec![1, 2]))]
+#[case::right(Either::Right(vec![1, 2]))]
+fn iter_either_in_for_loop(#[case] either: Either<Vec<i32>>) {
     let mut items = vec![];
     for i in &either {
         items.push(i);
@@ -46,7 +69,7 @@ fn iter_either_in_for_loop(#[case] either: Either<Vec<i32>, Vec<i32>>) {
 #[rstest]
 #[case::left(Either::Left(vec![1, 2]))]
 #[case::right(Either::Right(vec![1, 2]))]
-fn iter_either_mut(#[case] mut either: Either<Vec<i32>, Vec<i32>>) {
+fn iter_either_mut(#[case] mut either: Either<Vec<i32>>) {
     let items = either.iter_mut().collect::<Vec<&mut i32>>();
     assert_eq!(items, vec![&mut 1, &mut 2]);
 }
@@ -54,7 +77,7 @@ fn iter_either_mut(#[case] mut either: Either<Vec<i32>, Vec<i32>>) {
 #[rstest]
 #[case::left(Either::Left(vec![1, 2]))]
 #[case::right(Either::Right(vec![1, 2]))]
-fn iter_either_mut_in_for_loop(#[case] mut either: Either<Vec<i32>, Vec<i32>>) {
+fn iter_either_mut_in_for_loop(#[case] mut either: Either<Vec<i32>>) {
     let mut items = vec![];
     for i in &mut either {
         items.push(i);
@@ -66,18 +89,15 @@ fn iter_either_mut_in_for_loop(#[case] mut either: Either<Vec<i32>, Vec<i32>>) {
 #[rstest]
 #[case::left(Either::Left(vec![1, 2]), vec![Either::Left(1), Either::Left(2)])]
 #[case::left(Either::Right(vec![1, 2]), vec![Either::Right(1), Either::Right(2)])]
-fn into_iter_swap(#[case] either: Either<Vec<i32>, Vec<i32>>, #[case] expected: Vec<Either<i32>>) {
-    let items = either.into_iter_swap().collect::<Vec<Either<i32, i32>>>();
+fn into_iter_swap(#[case] either: Either<Vec<i32>>, #[case] expected: Vec<Either<i32>>) {
+    let items = either.into_iter_swap().collect::<Vec<Either<i32>>>();
     assert_eq!(items, expected);
 }
 
 #[rstest]
 #[case::left(Either::Left(vec![1, 2]), vec![Either::Left(1), Either::Left(2)])]
 #[case::left(Either::Right(vec![1, 2]), vec![Either::Right(1), Either::Right(2)])]
-fn into_iter_swap_in_for_loop(
-    #[case] either: Either<Vec<i32>, Vec<i32>>,
-    #[case] expected: Vec<Either<i32>>,
-) {
+fn into_iter_swap_in_for_loop(#[case] either: Either<Vec<i32>>, #[case] expected: Vec<Either<i32>>) {
     let mut items = vec![];
     for item in either.into_iter_swap() {
         items.push(item);
@@ -89,18 +109,34 @@ fn into_iter_swap_in_for_loop(
 #[rstest]
 #[case::left(Either::Left(vec![1, 2]), vec![Either::Left(&1), Either::Left(&2)])]
 #[case::left(Either::Right(vec![1, 2]), vec![Either::Right(&1), Either::Right(&2)])]
-fn iter_swap(#[case] either: Either<Vec<i32>, Vec<i32>>, #[case] expected: Vec<Either<&i32>>) {
-    let items = either.iter_swap().collect::<Vec<Either<&i32, &i32>>>();
+fn iter_swap(#[case] either: Either<Vec<i32>>, #[case] expected: Vec<Either<&i32>>) {
+    let items = either.iter_swap().collect::<Vec<Either<&i32>>>();
+    assert_eq!(items, expected);
+}
+
+#[rstest]
+#[case::left(Either::Left(vec![1, 2]), (2, Some(2)))]
+#[case::left(Either::Right(vec![1, 2]), (2, Some(2)))]
+fn iter_swap_size_hint(#[case] either: Either<Vec<i32>>, #[case] expected: (usize, Option<usize>)) {
+    let actual = either.iter_swap().size_hint();
+    assert_eq!(actual, expected);
+}
+
+#[rstest]
+#[case::left(Either::Left(vec![1, 2]), vec![Either::Left(&2), Either::Left(&1)])]
+#[case::left(Either::Right(vec![1, 2]), vec![Either::Right(&2), Either::Right(&1)])]
+fn iter_swap_backwards(#[case] either: Either<Vec<i32>>, #[case] expected: Vec<Either<&i32>>) {
+    let items = either.iter_swap().rfold(vec![], |mut acc, elem| {
+        acc.push(elem);
+        acc
+    });
     assert_eq!(items, expected);
 }
 
 #[rstest]
 #[case::left(Either::Left(vec![1, 2]), vec![Either::Left(&1), Either::Left(&2)])]
 #[case::left(Either::Right(vec![1, 2]), vec![Either::Right(&1), Either::Right(&2)])]
-fn iter_swap_in_for_loop(
-    #[case] either: Either<Vec<i32>, Vec<i32>>,
-    #[case] expected: Vec<Either<&i32>>,
-) {
+fn iter_swap_in_for_loop(#[case] either: Either<Vec<i32>>, #[case] expected: Vec<Either<&i32>>) {
     let mut items = vec![];
     for item in either.iter_swap() {
         items.push(item);
@@ -112,18 +148,13 @@ fn iter_swap_in_for_loop(
 #[rstest]
 #[case::left(Either::Left(vec![1, 2]), vec![Either::Left(1), Either::Left(2)])]
 #[case::left(Either::Right(vec![1, 2]), vec![Either::Right(1), Either::Right(2)])]
-fn iter_swap_mut(
-    #[case] mut either: Either<Vec<i32>, Vec<i32>>,
-    #[case] mut expected: Vec<Either<i32>>,
-) {
+fn iter_swap_mut(#[case] mut either: Either<Vec<i32>>, #[case] mut expected: Vec<Either<i32>>) {
     let expected = expected
         .iter_mut()
         .map(Either::as_mut)
-        .collect::<Vec<Either<&mut i32, &mut i32>>>();
+        .collect::<Vec<Either<&mut i32>>>();
 
-    let items = either
-        .iter_swap_mut()
-        .collect::<Vec<Either<&mut i32, &mut i32>>>();
+    let items = either.iter_swap_mut().collect::<Vec<Either<&mut i32>>>();
 
     assert_eq!(items, expected);
 }
@@ -132,13 +163,13 @@ fn iter_swap_mut(
 #[case::left(Either::Left(vec![1, 2]), vec![Either::Left(1), Either::Left(2)])]
 #[case::left(Either::Right(vec![1, 2]), vec![Either::Right(1), Either::Right(2)])]
 fn iter_swap_mut_in_for_loop(
-    #[case] mut either: Either<Vec<i32>, Vec<i32>>,
+    #[case] mut either: Either<Vec<i32>>,
     #[case] mut expected: Vec<Either<i32>>,
 ) {
     let expected = expected
         .iter_mut()
         .map(Either::as_mut)
-        .collect::<Vec<Either<&mut i32, &mut i32>>>();
+        .collect::<Vec<Either<&mut i32>>>();
 
     let mut items = vec![];
     for item in either.iter_swap_mut() {
