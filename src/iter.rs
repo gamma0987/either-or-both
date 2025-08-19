@@ -1,5 +1,4 @@
 //! Implementations of iterators for `EitherOrBoth`
-// TODO: Improve Performance. Use #[inline] where possible
 
 use core::iter::FusedIterator;
 

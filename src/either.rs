@@ -26,9 +26,6 @@ use std::io::{BufRead, Read, Seek};
 use crate::iter_either::{IterEither, SwapIterEither};
 use crate::EitherOrBoth;
 
-// TODO: Docs are partially still from EitherOrBoth
-// TODO: Something like add_left replacing the left value if Left and if Right -> EitherOrBoth::Both
-
 /// Either left or right can be present
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 #[cfg_attr(feature = "c_repr", repr(C))]
@@ -922,7 +919,7 @@ impl<'a, L, R> From<&'a mut Either<L, R>> for Either<&'a mut L, &'a mut R> {
     }
 }
 
-// TODO: impl From<Either> for Result?? The method ok does this already.
+// TODO: impl From<Either> for Result? The method ok() does this already.
 impl<L, R> From<Result<R, L>> for Either<L, R> {
     fn from(value: Result<R, L>) -> Self {
         match value {

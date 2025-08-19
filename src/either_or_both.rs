@@ -27,17 +27,6 @@ use crate::iter::{
     SwapIterEitherOrBoth,
 };
 
-// TODO: Double check that all generics are used (especially F), also in iter.rs, ...
-// TODO: Check if there are methods which make use of Either, synergy!
-// TODO: Double check that all left (or right) methods have an equivalent right (or left) method
-// TODO: Eagerly versus lazily
-// TODO: FromIterator<Either> for EitherOrBoth<Vec<L>, Vec<R>>
-// TODO: PartialOrd, Ord
-// TODO: From<&'a EitherOrBoth> for EitherOrBoth<&'a L, &'a R>, same for mut, See Option
-// TODO: From<T> for EitherOrBoth<T>: Move into a new EitherOrBoth. See Option
-// TODO: Product and Sum if L, R are Iterator (see Option)
-// TODO: All of the above check also for `Either`
-
 /// Either left or right or both can be present
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 #[cfg_attr(feature = "c_repr", repr(C))]
@@ -316,7 +305,7 @@ impl<L, R> EitherOrBoth<L, R> {
         self.only_right().expect(msg)
     }
 
-    // TODO: unchecked versions, don't use options as intermediary. match is better
+    // TODO: unchecked versions, don't use options as intermediary. See Either
     /// Returns the contained `Both` value as tuple consuming `self`
     pub fn unwrap_both(self) -> (L, R) {
         self.both().unwrap()
@@ -574,7 +563,6 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    // TODO: The inspect methods should use Fn instead of FnOnce. See `Either`
     /// TODO: DOCS
     pub fn biinspect<F, G>(self, f: F, g: G) -> Self
     where
@@ -619,8 +607,6 @@ impl<L, R> EitherOrBoth<L, R> {
         self
     }
 
-    // TODO: all consume methods should take `FnMut` like in `Either`?
-    // TODO: Rename to biapply, ... like in `Either`
     /// TODO: DOCS
     pub fn biconsume<F, G>(self, f: F, g: G)
     where
@@ -709,8 +695,6 @@ impl<L, R> EitherOrBoth<L, R> {
     }
 
     /// Returns `Both` if present otherwise the missing value supplied by `left` or `right`
-    ///
-    /// TODO: Eagerly versus lazily
     pub fn or(self, left: L, right: R) -> (L, R) {
         match self {
             Self::Both(left, right) => (left, right),
@@ -733,8 +717,6 @@ impl<L, R> EitherOrBoth<L, R> {
     }
 
     /// Returns `Both` if present otherwise computes the missing value
-    ///
-    /// TODO: Eagerly versus lazily
     pub fn or_else<F, G>(self, f: F, g: G) -> (L, R)
     where
         F: FnOnce() -> L,
@@ -1078,7 +1060,7 @@ impl<L, R> EitherOrBoth<&mut L, &mut R> {
 }
 
 impl<L, R> EitherOrBoth<Option<L>, Option<R>> {
-    /// TODO: DOCS, does it make sense?
+    /// TODO: DOCS, check usability
     pub fn bitranspose<F, G>(self, f: F, g: G) -> Option<EitherOrBoth<L, R>>
     where
         F: FnOnce() -> L,
@@ -1109,7 +1091,7 @@ impl<L, R> EitherOrBoth<Option<L>, Option<R>> {
     }
 }
 
-// TODO: bimap_ok
+/// TODO: CLEANUP
 impl<L, R, E1, E2> EitherOrBoth<Result<L, E1>, Result<R, E2>> {
     /// TODO: DOCS
     pub fn bimap_err<F, G, X1, X2>(self, f: F, g: G) -> EitherOrBoth<Result<L, X1>, Result<R, X2>>
@@ -1138,6 +1120,7 @@ impl<L, R, E> EitherOrBoth<Result<L, E>, Result<R, E>> {
         }
     }
 
+    /// TODO: CLEANUP
     /// TODO: DOCS
     pub fn map_err<F, X>(self, f: F) -> EitherOrBoth<Result<L, X>, Result<R, X>>
     where
@@ -1238,7 +1221,6 @@ impl<L, R> TryFrom<(Option<L>, Option<R>)> for EitherOrBoth<L, R> {
     }
 }
 
-// TODO: CONTINUE implementing other traits if possible
 #[cfg(feature = "std")]
 impl<L, R> std::io::Write for EitherOrBoth<L, R>
 where
