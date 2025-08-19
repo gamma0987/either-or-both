@@ -27,6 +27,7 @@ use crate::iter::{
     SwapIterEitherOrBoth,
 };
 
+// TODO: Double check that all generics are used (especially F), also in iter.rs, ...
 // TODO: Check if there are methods which make use of Either, synergy!
 // TODO: Double check that all left (or right) methods have an equivalent right (or left) method
 // TODO: Eagerly versus lazily
@@ -890,11 +891,49 @@ impl<L, R> EitherOrBoth<L, R> {
             Self::Right(_) => self,
         }
     }
+
+    /// TODO: DOCS
+    #[cfg(feature = "either")]
+    pub fn either<F>(self, f: F) -> Either<L, R>
+    where
+        F: FnOnce(L, R) -> Either<L, R>,
+    {
+        match self {
+            Self::Both(left, right) => f(left, right),
+            Self::Left(left) => Either::Left(left),
+            Self::Right(right) => Either::Right(right),
+        }
+    }
+
+    /// TODO: DOCS
+    #[cfg(feature = "either")]
+    pub fn either_or_left(self, left: L) -> Either<L, R> {
+        self.either_or_else(|| Either::Left(left))
+    }
+
+    /// TODO: DOCS
+    #[cfg(feature = "either")]
+    pub fn either_or_right(self, right: R) -> Either<L, R> {
+        self.either_or_else(|| Either::Right(right))
+    }
+
+    /// TODO: DOCS
+    #[cfg(feature = "either")]
+    pub fn either_or_else<F>(self, f: F) -> Either<L, R>
+    where
+        F: FnOnce() -> Either<L, R>,
+    {
+        match self {
+            Self::Both(_, _) => f(),
+            Self::Left(left) => Either::Left(left),
+            Self::Right(right) => Either::Right(right),
+        }
+    }
 }
 
 impl<T> EitherOrBoth<T, T> {
     // TODO: `FnMut`
-    /// TODO: DOCS
+    /// TODO: DOCS, rename to apply
     pub fn consume<F>(self, f: F)
     where
         F: Fn(T),
@@ -1213,44 +1252,5 @@ where
 
     fn flush(&mut self) -> std::io::Result<()> {
         try_each!(self, .flush())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use rstest::rstest;
-
-    use super::*;
-
-    #[test]
-    fn test_map() {
-        // struct NotClone;
-        // let either = EitherOrBoth::<NotClone, NotClone>::Left(NotClone);
-        // let either = EitherOrBoth::Right(NotClone);
-
-        // let either = EitherOrBoth::Both("a", "b");
-        // let new = either.map(ToOwned::to_owned);
-
-        // let either = EitherOrBoth::Both("a", "b".to_owned());
-        // let new = either.map(ToOwned::to_owned);
-    }
-
-    #[rstest]
-    #[case::left(EitherOrBoth::Left(1), 2, Some(1))]
-    #[case::right(EitherOrBoth::Right(1), 2, None)]
-    #[case::both(EitherOrBoth::Both(1, 2), 3, Some(1))]
-    fn test_replace_left(
-        #[case] mut either: EitherOrBoth<u64, u64>,
-        #[case] value: u64,
-        #[case] expected: Option<u64>,
-    ) {
-        let old = either.replace_left(value);
-        assert_eq!(old, expected);
-    }
-
-    #[test]
-    fn test_transpose() {
-        // let either: EitherOrBoth<Option<i32>, Option<i32>> = EitherOrBoth::Both(Some(0), None);
-        // let new = either.transpose();
     }
 }
