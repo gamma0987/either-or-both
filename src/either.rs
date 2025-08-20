@@ -21,10 +21,12 @@ use core::ops::{Deref, DerefMut};
 use core::pin::Pin;
 use core::{fmt, mem};
 #[cfg(feature = "std")]
+use std::error::Error;
+#[cfg(feature = "std")]
 use std::io::{BufRead, Read, Seek};
 
 use crate::iter_either::{IterEither, SwapIterEither};
-use crate::EitherOrBoth;
+use crate::{unwrap_failed, EitherOrBoth};
 
 /// Either left or right can be present
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
@@ -780,6 +782,36 @@ impl<L, R> Either<&mut L, &mut R> {
     }
 }
 
+impl<L1, L2, R1, R2> Either<(L1, R1), (L2, R2)> {
+    /// TODO: DOCS, tests
+    pub fn transpose(self) -> (Either<L1, L2>, Either<R1, R2>) {
+        match self {
+            Self::Left((l1, r1)) => (Either::Left(l1), Either::Left(r1)),
+            Self::Right((l2, r2)) => (Either::Right(l2), Either::Right(r2)),
+        }
+    }
+}
+
+impl<L, R, T> Either<(T, L), (T, R)> {
+    /// TODO: DOCS, tests
+    pub fn transpose_left(self) -> (T, Either<L, R>) {
+        match self {
+            Self::Left((target, left)) => (target, Either::Left(left)),
+            Self::Right((target, right)) => (target, Either::Right(right)),
+        }
+    }
+}
+
+impl<L, R, T> Either<(L, T), (R, T)> {
+    /// TODO: DOCS, tests
+    pub fn transpose_right(self) -> (Either<L, R>, T) {
+        match self {
+            Self::Left((left, target)) => (Either::Left(left), target),
+            Self::Right((right, target)) => (Either::Right(right), target),
+        }
+    }
+}
+
 impl<L, R> Either<Option<L>, Option<R>> {
     /// TODO: DOCS
     pub fn transpose(self) -> Option<Either<L, R>> {
@@ -807,7 +839,7 @@ impl<L, R, E1, E2> Either<Result<L, E1>, Result<R, E2>> {
 }
 
 impl<L, R, E> Either<Result<L, E>, Result<R, E>> {
-    /// TODO: DOCS
+    /// TODO: DOCS, rename to `transpose_err`
     pub fn transpose_ok(self) -> Result<Either<L, R>, E> {
         match self {
             Self::Left(left) => left.map(Either::Left),
@@ -817,7 +849,7 @@ impl<L, R, E> Either<Result<L, E>, Result<R, E>> {
 }
 
 impl<T, E1, E2> Either<Result<T, E1>, Result<T, E2>> {
-    /// TODO: DOCS
+    /// TODO: DOCS, rename to `transpose_ok`, also tests
     pub fn transpose_err(self) -> Result<T, Either<E1, E2>> {
         match self {
             Self::Left(left) => left.map_err(Either::Left),
@@ -895,6 +927,17 @@ where
     }
 }
 
+#[cfg(feature = "std")]
+impl<L, R> Error for Either<L, R>
+where
+    L: Error,
+    R: Error,
+{
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        each!(self, .source())
+    }
+}
+
 impl<A, T> Extend<A> for Either<T>
 where
     T: Extend<A>,
@@ -919,7 +962,6 @@ impl<'a, L, R> From<&'a mut Either<L, R>> for Either<&'a mut L, &'a mut R> {
     }
 }
 
-// TODO: impl From<Either> for Result? The method ok() does this already.
 impl<L, R> From<Result<R, L>> for Either<L, R> {
     fn from(value: Result<R, L>) -> Self {
         match value {
@@ -1028,10 +1070,4 @@ where
     fn flush(&mut self) -> std::io::Result<()> {
         each!(self, .flush())
     }
-}
-
-#[cold]
-#[track_caller]
-fn unwrap_failed(msg: &str) -> ! {
-    panic!("{msg}");
 }

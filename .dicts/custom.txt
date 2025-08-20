@@ -4,6 +4,8 @@ biinspect
 bimap
 bireduce
 bitranspose
+biwrite
+bufs
 bumpversion
 callgrind
 clippy

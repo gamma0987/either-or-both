@@ -15,5 +15,13 @@ pub mod iter_either;
 
 #[cfg(feature = "either")]
 pub use either::Either;
-pub use either_or_both::EitherOrBoth;
+#[cfg(feature = "std")]
+pub use either_or_both::WriteIo;
+pub use either_or_both::{EitherOrBoth, WriteFmt};
 pub use error::Error;
+
+#[cold]
+#[track_caller]
+fn unwrap_failed(msg: &str) -> ! {
+    panic!("{msg}");
+}

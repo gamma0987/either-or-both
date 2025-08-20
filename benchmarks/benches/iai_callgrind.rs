@@ -20,13 +20,19 @@ fn into_iter(either: EitherOrBoth<i32>) -> impl Iterator<Item = i32> {
 }
 
 #[library_benchmark]
-#[benches::some(args = [&EitherOrBoth::Left(1), &EitherOrBoth::Right(2), &EitherOrBoth::Both(1, 2)], setup = setup_iter)]
+#[benches::some(
+    args = [&EitherOrBoth::Left(1), &EitherOrBoth::Right(2), &EitherOrBoth::Both(1, 2)],
+    setup = setup_iter
+)]
 fn iter_next<'a>(mut iter: impl Iterator<Item = &'a i32>) -> Option<&'a i32> {
     black_box(iter.next())
 }
 
 #[library_benchmark]
-#[benches::some(args = [&EitherOrBoth::Left(1), &EitherOrBoth::Right(2), &EitherOrBoth::Both(1, 2)], setup = setup_double_iter)]
+#[benches::some(
+    args = [&EitherOrBoth::Left(1), &EitherOrBoth::Right(2), &EitherOrBoth::Both(1, 2)],
+    setup = setup_double_iter
+)]
 fn iter_next_back<'a>(mut iter: impl DoubleEndedIterator<Item = &'a i32>) -> Option<&'a i32> {
     black_box(iter.next_back())
 }
