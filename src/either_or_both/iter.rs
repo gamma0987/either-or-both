@@ -2,7 +2,7 @@
 
 use core::iter::FusedIterator;
 
-use crate::either_or_both::EitherOrBoth;
+use crate::EitherOrBoth;
 
 /// TODO: DOCS
 #[derive(Debug, Clone)]

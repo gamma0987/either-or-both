@@ -9,15 +9,10 @@ extern crate std;
 mod either;
 mod either_or_both;
 mod error;
-pub mod iter;
-#[cfg(feature = "either")]
-pub mod iter_either;
 
 #[cfg(feature = "either")]
-pub use either::Either;
-#[cfg(feature = "std")]
-pub use either_or_both::WriteIo;
-pub use either_or_both::{EitherOrBoth, WriteFmt};
+pub use either::{iter as iter_either, traits as iter_traits, Either};
+pub use either_or_both::{iter, traits, EitherOrBoth};
 pub use error::Error;
 
 #[cold]
