@@ -175,10 +175,7 @@ impl<L, R> Either<L, R> {
 
     /// TODO: DOCS
     pub fn unwrap_left(self) -> L {
-        match self {
-            Self::Left(left) => left,
-            Self::Right(_) => unwrap_failed("Called `Either::unwrap_left` on a `Right` value"),
-        }
+        self.expect_left("Called `Either::unwrap_left` on a `Right` value")
     }
 
     /// TODO: DOCS
@@ -196,10 +193,7 @@ impl<L, R> Either<L, R> {
 
     /// TODO: DOCS
     pub fn unwrap_right(self) -> R {
-        match self {
-            Self::Left(_) => unwrap_failed("Called `Either::unwrap_right` on a `Left` value"),
-            Self::Right(right) => right,
-        }
+        self.expect_right("Called `Either::unwrap_right` on a `Left` value")
     }
 
     /// TODO: DOCS
@@ -289,12 +283,12 @@ impl<L, R> Either<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn iter_swap<'a>(
-        &'a self,
-    ) -> SwapIterEither<<&'a L as IntoIterator>::IntoIter, <&'a R as IntoIterator>::IntoIter>
+    pub fn iter_swap(
+        &self,
+    ) -> SwapIterEither<<&L as IntoIterator>::IntoIter, <&R as IntoIterator>::IntoIter>
     where
-        &'a L: IntoIterator,
-        &'a R: IntoIterator,
+        for<'a> &'a L: IntoIterator,
+        for<'a> &'a R: IntoIterator,
     {
         SwapIterEither::new(
             self.as_ref()
@@ -303,12 +297,12 @@ impl<L, R> Either<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn iter_swap_mut<'a>(
-        &'a mut self,
-    ) -> SwapIterEither<<&'a mut L as IntoIterator>::IntoIter, <&'a mut R as IntoIterator>::IntoIter>
+    pub fn iter_swap_mut(
+        &mut self,
+    ) -> SwapIterEither<<&mut L as IntoIterator>::IntoIter, <&mut R as IntoIterator>::IntoIter>
     where
-        &'a mut L: IntoIterator,
-        &'a mut R: IntoIterator,
+        for<'a> &'a mut L: IntoIterator,
+        for<'a> &'a mut R: IntoIterator,
     {
         SwapIterEither::new(
             self.as_mut()
@@ -411,8 +405,8 @@ impl<L, R> Either<L, R> {
     /// TODO: DOCS
     pub fn biinspect<F, G>(self, f: F, g: G) -> Self
     where
-        F: Fn(&L),
-        G: Fn(&R),
+        for<'a> F: Fn(&'a L),
+        for<'a> G: Fn(&'a R),
     {
         match &self {
             Self::Left(left) => f(left),
@@ -424,7 +418,7 @@ impl<L, R> Either<L, R> {
     /// TODO: DOCS
     pub fn inspect_left<F>(self, f: F) -> Self
     where
-        F: Fn(&L),
+        for<'a> F: Fn(&'a L),
     {
         match &self {
             Self::Left(left) => f(left),
@@ -436,7 +430,7 @@ impl<L, R> Either<L, R> {
     /// TODO: DOCS
     pub fn inspect_right<F>(self, f: F) -> Self
     where
-        F: Fn(&R),
+        for<'a> F: Fn(&'a R),
     {
         match &self {
             Self::Left(_) => {}
@@ -671,7 +665,7 @@ impl<T> Either<T, T> {
     /// TODO: DOCS
     pub fn inspect<F>(self, f: F) -> Self
     where
-        F: Fn(&T),
+        for<'a> F: Fn(&'a T),
     {
         match &self {
             Self::Left(left) => f(left),
@@ -682,17 +676,17 @@ impl<T> Either<T, T> {
     }
 
     /// TODO: DOCS
-    pub fn iter<'a>(&'a self) -> IterEither<<&'a T as IntoIterator>::IntoIter>
+    pub fn iter(&self) -> IterEither<<&T as IntoIterator>::IntoIter>
     where
-        &'a T: IntoIterator,
+        for<'a> &'a T: IntoIterator,
     {
         IterEither::new(self.as_ref().map(IntoIterator::into_iter))
     }
 
     /// TODO: DOCS
-    pub fn iter_mut<'a>(&'a mut self) -> IterEither<<&'a mut T as IntoIterator>::IntoIter>
+    pub fn iter_mut(&mut self) -> IterEither<<&mut T as IntoIterator>::IntoIter>
     where
-        &'a mut T: IntoIterator,
+        for<'a> &'a mut T: IntoIterator,
     {
         IterEither::new(self.as_mut().map(IntoIterator::into_iter))
     }

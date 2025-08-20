@@ -418,7 +418,6 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    // TODO: More like `or`?
     /// Returns `Right` otherwise returns `other`
     pub fn left_and<T>(self, other: EitherOrBoth<T, R>) -> EitherOrBoth<T, R> {
         match self {
@@ -454,7 +453,6 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    // TODO: Check this and the `left_and` methods
     /// Returns `Left` otherwise returns `other`
     pub fn right_and<T>(self, other: EitherOrBoth<L, T>) -> EitherOrBoth<L, T> {
         match self {
@@ -511,7 +509,7 @@ impl<L, R> EitherOrBoth<L, R> {
         SwapIterEitherOrBoth::new(self.bimap(IntoIterator::into_iter, IntoIterator::into_iter))
     }
 
-    /// TODO: DOCS, instead of for<'a> use `iter_swap<'a>`
+    /// TODO: DOCS
     pub fn iter_swap(
         &self,
     ) -> SwapIterEitherOrBoth<<&L as IntoIterator>::IntoIter, <&R as IntoIterator>::IntoIter>
@@ -625,8 +623,8 @@ impl<L, R> EitherOrBoth<L, R> {
     /// TODO: DOCS
     pub fn biinspect<F, G>(self, f: F, g: G) -> Self
     where
-        F: FnOnce(&L),
-        G: FnOnce(&R),
+        for<'a> F: FnOnce(&'a L),
+        for<'a> G: FnOnce(&'a R),
     {
         match &self {
             Self::Both(left, right) => {
@@ -643,7 +641,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// TODO: DOCS
     pub fn inspect_left<F>(self, f: F) -> Self
     where
-        F: FnOnce(&L),
+        for<'a> F: FnOnce(&'a L),
     {
         match &self {
             Self::Both(left, _) | Self::Left(left) => f(left),
@@ -656,7 +654,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// TODO: DOCS
     pub fn inspect_right<F>(self, f: F) -> Self
     where
-        F: FnOnce(&R),
+        for<'a> F: FnOnce(&'a R),
     {
         match &self {
             Self::Both(_, right) | Self::Right(right) => f(right),
@@ -667,7 +665,7 @@ impl<L, R> EitherOrBoth<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn biconsume<F, G>(self, f: F, g: G)
+    pub fn biapply<F, G>(self, f: F, g: G)
     where
         F: FnOnce(L),
         G: FnOnce(R),
@@ -683,7 +681,7 @@ impl<L, R> EitherOrBoth<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn consume_left<F>(self, f: F)
+    pub fn apply_left<F>(self, f: F)
     where
         F: FnOnce(L),
     {
@@ -694,7 +692,7 @@ impl<L, R> EitherOrBoth<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn consume_right<F>(self, f: F)
+    pub fn apply_right<F>(self, f: F)
     where
         F: FnOnce(R),
     {
@@ -953,11 +951,10 @@ impl<L, R> EitherOrBoth<L, R> {
 }
 
 impl<T> EitherOrBoth<T, T> {
-    // TODO: `FnMut`
-    /// TODO: DOCS, rename to apply
-    pub fn consume<F>(self, f: F)
+    /// TODO: DOCS
+    pub fn apply<F>(self, mut f: F)
     where
-        F: Fn(T),
+        F: FnMut(T),
     {
         match self {
             Self::Both(left, right) => {
@@ -972,10 +969,16 @@ impl<T> EitherOrBoth<T, T> {
     /// TODO: DOCS
     pub fn inspect<F>(self, f: F) -> Self
     where
-        F: Fn(&T),
+        for<'a> F: Fn(&'a T),
     {
-        // TODO: Don't use consume
-        self.as_ref().consume(f);
+        match &self {
+            Self::Both(left, right) => {
+                f(left);
+                f(right);
+            }
+            Self::Left(left) => f(left),
+            Self::Right(right) => f(right),
+        }
         self
     }
 
@@ -1018,21 +1021,17 @@ impl<T> EitherOrBoth<T, T> {
     }
 
     /// TODO: DOCS
-    pub fn iter_chain<'iter>(
-        &'iter self,
-    ) -> ChainedIterEitherOrBoth<<&'iter T as IntoIterator>::IntoIter>
+    pub fn iter_chain(&self) -> ChainedIterEitherOrBoth<<&T as IntoIterator>::IntoIter>
     where
-        &'iter T: IntoIterator,
+        for<'a> &'a T: IntoIterator,
     {
         ChainedIterEitherOrBoth::new(self.as_ref().map(IntoIterator::into_iter))
     }
 
     /// TODO: DOCS
-    pub fn iter_chain_mut<'iter>(
-        &'iter mut self,
-    ) -> ChainedIterEitherOrBoth<<&'iter mut T as IntoIterator>::IntoIter>
+    pub fn iter_chain_mut(&mut self) -> ChainedIterEitherOrBoth<<&mut T as IntoIterator>::IntoIter>
     where
-        &'iter mut T: IntoIterator,
+        for<'a> &'a mut T: IntoIterator,
     {
         ChainedIterEitherOrBoth::new(self.as_mut().map(IntoIterator::into_iter))
     }

@@ -43,7 +43,7 @@ impl<L, R> FromIterator<EitherOrBoth<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
         let (left, right) =
             iter.into_iter()
                 .fold((vec![], vec![]), |(mut left, mut right), either_or_both| {
-                    either_or_both.biconsume(|l| left.push(l), |r| right.push(r));
+                    either_or_both.biapply(|l| left.push(l), |r| right.push(r));
                     (left, right)
                 });
 
