@@ -3,6 +3,7 @@
 #[cfg(feature = "either")]
 mod either;
 mod either_or_both;
+mod either_or_both_same_type;
 #[cfg(feature = "std")]
 mod either_or_both_std;
 #[cfg(all(feature = "either", feature = "std"))]
