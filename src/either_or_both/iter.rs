@@ -1,4 +1,4 @@
-//! Implementations of iterators for `EitherOrBoth`
+//! Iterators for [`EitherOrBoth`]
 
 use core::iter::FusedIterator;
 

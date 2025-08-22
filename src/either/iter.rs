@@ -1,4 +1,4 @@
-//! The iterators for `Either`
+//! Iterators for [`Either`]
 
 use core::iter::FusedIterator;
 

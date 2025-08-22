@@ -27,15 +27,15 @@ use Either::*;
 
 use crate::{unwrap_failed, EitherOrBoth};
 
-/// Either left or right can be present
+/// Represent values with two possibilities. `Either` can be either `Left` or `Right`
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 #[cfg_attr(feature = "c_repr", repr(C))]
 #[cfg_attr(feature = "serde", allow(clippy::unsafe_derive_deserialize))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Either<L, R = L> {
-    /// The left value
+    /// Represent a left value
     Left(L),
-    /// The right value
+    /// Represent a right value
     Right(R),
 }
 
@@ -44,12 +44,36 @@ impl<L, R> Either<L, R> {
     // Boolish
     ////////////////////////////////////////////////////////////////////////////////
 
-    /// TODO: DOCS
+    /// Returns true if `Left`
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use either_or_both::Either;
+    ///
+    /// let either = Either::<u8>::Left(1);
+    /// assert!(either.is_left());
+    ///
+    /// let either = Either::<u8>::Right(1);
+    /// assert!(!either.is_left());
+    /// ```
     pub fn is_left(&self) -> bool {
         matches!(self, Self::Left(_))
     }
 
-    /// Returns true if `Left` and it matches a predicate
+    /// Returns true if `Left` and the left value matches a predicate
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use either_or_both::Either;
+    ///
+    /// let either: Either<u8> = Either::Left(1);
+    /// assert!(either.is_left_and(|l| l == 1));
+    ///
+    /// let either: Either<u8> = Either::Right(1);
+    /// assert!(!either.is_left_and(|l| l == 1));
+    /// ```
     pub fn is_left_and<F>(self, f: F) -> bool
     where
         F: FnOnce(L) -> bool,
@@ -60,7 +84,7 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns true if `Left` or the right value matches a predicate
+    /// Returns true if `Left` or if `Right`, the right value matches a predicate
     pub fn is_left_or<F>(self, f: F) -> bool
     where
         F: FnOnce(R) -> bool,
@@ -71,12 +95,12 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// TODO: DOCS
+    /// Returns true if `Right`
     pub fn is_right(&self) -> bool {
         matches!(self, Self::Right(_))
     }
 
-    /// Returns true if `Right` and it matches a predicate
+    /// Returns true if `Right` and the right value matches a predicate
     pub fn is_right_and<F>(self, f: F) -> bool
     where
         F: FnOnce(R) -> bool,
@@ -87,7 +111,7 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns true if `Right` or the right value matches a predicate
+    /// Returns true if `Right` or if `Left`, the left value matches a predicate
     pub fn is_right_or<F>(self, f: F) -> bool
     where
         F: FnOnce(L) -> bool,
@@ -102,7 +126,7 @@ impl<L, R> Either<L, R> {
     // As reference conversions
     ////////////////////////////////////////////////////////////////////////////////
 
-    /// TODO: DOCS
+    /// Converts from `&Either<L, R>` to `Either<&L, &R>`
     #[allow(clippy::same_name_method)]
     pub fn as_ref(&self) -> Either<&L, &R> {
         match self {

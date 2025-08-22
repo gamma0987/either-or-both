@@ -3,7 +3,7 @@
 use core::fmt::Display;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
-/// TODO: DOCS
+/// The error if converting from a 2-tuple of `Options` to [`crate::EitherOrBoth`] fails
 pub struct TryFromOptionsError;
 
 impl Display for TryFromOptionsError {

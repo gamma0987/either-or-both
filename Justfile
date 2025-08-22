@@ -86,7 +86,7 @@ build package:
 # Build the documentation (Uses: 'cargo')
 [group('build')]
 build-docs:
-    DOCS_RS=1 cargo doc --all-features --no-deps --workspace --document-private-items
+    DOCS_RS=1 cargo doc --all-features --no-deps --workspace
 
 # Run all tests in a package. (Uses: 'cargo')
 [group('test')]

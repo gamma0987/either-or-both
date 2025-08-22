@@ -39,17 +39,17 @@ use EitherOrBoth::*;
 use crate::either::Either;
 use crate::unwrap_failed;
 
-/// Either left or right or both can be present
+/// Represent values that have either a `Left` or `Right` value or `Both` values
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 #[cfg_attr(feature = "c_repr", repr(C))]
 #[cfg_attr(feature = "serde", allow(clippy::unsafe_derive_deserialize))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum EitherOrBoth<L, R = L> {
-    /// Both values are present
+    /// Represents a value from both sides
     Both(L, R),
-    /// The left value
+    /// Represents a value from the left side
     Left(L),
-    /// The right value
+    /// Represents a value from the right side
     Right(R),
 }
 
