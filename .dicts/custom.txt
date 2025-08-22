@@ -5,6 +5,7 @@ bimap
 bireduce
 bitranspose
 biwrite
+boolish
 bufs
 bumpversion
 callgrind

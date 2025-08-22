@@ -12,18 +12,19 @@ use core::task::Poll;
 
 use either_or_both::{Either, EitherOrBoth};
 use rstest::rstest;
+use Either::*;
 
 #[rstest]
-#[case::left(Either::Left(1), true)]
-#[case::right(Either::Right('c'), false)]
+#[case::left(Left(1), true)]
+#[case::right(Right('c'), false)]
 fn is_left(#[case] either: Either<i32, char>, #[case] expected: bool) {
     assert_eq!(either.is_left(), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(1), |i| i == 1, true)]
-#[case::left_when_false(Either::Left(1), |i| i != 1, false)]
-#[case::right(Either::Right('c'), |i| i == 1, false)]
+#[case::left(Left(1), |i| i == 1, true)]
+#[case::left_when_false(Left(1), |i| i != 1, false)]
+#[case::right(Right('c'), |i| i == 1, false)]
 fn is_left_and(
     #[case] either: Either<i32, char>,
     #[case] and: fn(i32) -> bool,
@@ -33,9 +34,9 @@ fn is_left_and(
 }
 
 #[rstest]
-#[case::left(Either::Left(1), |c| c == 'c', true)]
-#[case::right_when_true(Either::Right('c'), |c| c == 'c', true)]
-#[case::right_when_false(Either::Right('c'), |c| c != 'c', false)]
+#[case::left(Left(1), |c| c == 'c', true)]
+#[case::right_when_true(Right('c'), |c| c == 'c', true)]
+#[case::right_when_false(Right('c'), |c| c != 'c', false)]
 fn is_left_or(
     #[case] either: Either<i32, char>,
     #[case] or: fn(char) -> bool,
@@ -45,16 +46,16 @@ fn is_left_or(
 }
 
 #[rstest]
-#[case::left(Either::Left(1), false)]
-#[case::right(Either::Right('c'), true)]
+#[case::left(Left(1), false)]
+#[case::right(Right('c'), true)]
 fn is_right(#[case] either: Either<i32, char>, #[case] expected: bool) {
     assert_eq!(either.is_right(), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(1), |c| c == 'c', false)]
-#[case::right_when_true(Either::Right('c'), |c| c == 'c', true)]
-#[case::right_when_false(Either::Right('c'), |c| c != 'c', false)]
+#[case::left(Left(1), |c| c == 'c', false)]
+#[case::right_when_true(Right('c'), |c| c == 'c', true)]
+#[case::right_when_false(Right('c'), |c| c != 'c', false)]
 fn is_right_and(
     #[case] either: Either<i32, char>,
     #[case] and: fn(char) -> bool,
@@ -64,9 +65,9 @@ fn is_right_and(
 }
 
 #[rstest]
-#[case::left_when_true(Either::Left(1), |i| i == 1, true)]
-#[case::left_when_false(Either::Left(1), |i| i != 1, false)]
-#[case::right(Either::Right('c'), |i| i == 1, true)]
+#[case::left_when_true(Left(1), |i| i == 1, true)]
+#[case::left_when_false(Left(1), |i| i != 1, false)]
+#[case::right(Right('c'), |i| i == 1, true)]
 fn is_right_or(
     #[case] either: Either<i32, char>,
     #[case] or: fn(i32) -> bool,
@@ -76,28 +77,22 @@ fn is_right_or(
 }
 
 #[rstest]
-#[case::left(&Either::Left(1), Either::Left(&1))]
-#[case::right(&Either::Right(1), Either::Right(&1))]
+#[case::left(&Left(1), Left(&1))]
+#[case::right(&Right(1), Right(&1))]
 fn as_ref(#[case] either: &Either<i32>, #[case] expected: Either<&i32>) {
     assert_eq!(either.as_ref(), expected);
 }
 
 #[rstest]
-#[case::left(&mut Either::Left(1), Either::Left(&mut 1))]
-#[case::right(&mut Either::Right(1), Either::Right(&mut 1))]
+#[case::left(&mut Left(1), Left(&mut 1))]
+#[case::right(&mut Right(1), Right(&mut 1))]
 fn as_mut(#[case] either: &mut Either<i32>, #[case] expected: Either<&mut i32>) {
     assert_eq!(either.as_mut(), expected);
 }
 
 #[rstest]
-#[case::left(
-    Either::Left(String::from("hello")),
-    Either::Left(String::from("HELLO"))
-)]
-#[case::right(
-    Either::Right(String::from("hello")),
-    Either::Right(String::from("HELLO"))
-)]
+#[case::left(Left(String::from("hello")), Left(String::from("HELLO")))]
+#[case::right(Right(String::from("hello")), Right(String::from("HELLO")))]
 fn impl_as_mut(#[case] mut either: Either<String>, #[case] expected: Either<String>) {
     let string: &mut str = AsMut::as_mut(&mut either);
     string.make_ascii_uppercase();
@@ -105,14 +100,8 @@ fn impl_as_mut(#[case] mut either: Either<String>, #[case] expected: Either<Stri
 }
 
 #[rstest]
-#[case::left(
-    Either::Left(String::from("hello")),
-    Either::Left(String::from("HELLO"))
-)]
-#[case::right(
-    Either::Right(String::from("hello")),
-    Either::Right(String::from("HELLO"))
-)]
+#[case::left(Left(String::from("hello")), Left(String::from("HELLO")))]
+#[case::right(Right(String::from("hello")), Right(String::from("HELLO")))]
 fn impl_as_deref_mut(#[case] mut either: Either<String>, #[case] expected: Either<String>) {
     let mut string: Either<&mut String> = either.as_mut();
     string.make_ascii_uppercase();
@@ -120,37 +109,34 @@ fn impl_as_deref_mut(#[case] mut either: Either<String>, #[case] expected: Eithe
 }
 
 #[rstest]
-#[case::left(Either::Left(String::from("hello")))]
-#[case::right(Either::Right(String::from("hello")))]
+#[case::left(Left(String::from("hello")))]
+#[case::right(Right(String::from("hello")))]
 fn impl_as_ref(#[case] either: Either<String>) {
     let string: &str = AsRef::as_ref(&either);
     assert!(string.is_ascii());
 }
 
 #[rstest]
-#[case::left(Either::Left(String::from("hello")))]
-#[case::right(Either::Right(String::from("hello")))]
+#[case::left(Left(String::from("hello")))]
+#[case::right(Right(String::from("hello")))]
 fn impl_as_deref(#[case] either: Either<String>) {
     let string: Either<&String> = either.as_ref();
     assert!(string.is_ascii());
 }
 
 #[rstest]
-#[case::left(Either::Left(String::from("left")), Either::Left("left"))]
-#[case::right(Either::Right(String::from("right")), Either::Right("right"))]
+#[case::left(Left(String::from("left")), Left("left"))]
+#[case::right(Right(String::from("right")), Right("right"))]
 fn as_deref(#[case] either: Either<String>, #[case] expected: Either<&str>) {
     assert_eq!(either.as_deref(), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(String::from("left")), Either::Left(String::from("LEFT")))]
-#[case::right(
-    Either::Right(String::from("right")),
-    Either::Right(String::from("RIGHT"))
-)]
+#[case::left(Left(String::from("left")), Left(String::from("LEFT")))]
+#[case::right(Right(String::from("right")), Right(String::from("RIGHT")))]
 fn as_deref_mut(#[case] mut either: Either<String>, #[case] expected: Either<String>) {
     match either.as_deref_mut() {
-        Either::Left(item) | Either::Right(item) => item.make_ascii_uppercase(),
+        Left(item) | Right(item) => item.make_ascii_uppercase(),
     }
 
     assert_eq!(either, expected);
@@ -158,61 +144,61 @@ fn as_deref_mut(#[case] mut either: Either<String>, #[case] expected: Either<Str
 
 #[test]
 fn as_pin_ref() {
-    let value = Either::Left::<i32>(10);
+    let value = Left::<i32>(10);
     let pinned = Pin::new(&value);
-    assert_eq!(pinned.as_pin_ref(), Either::Left(Pin::new(&10)));
+    assert_eq!(pinned.as_pin_ref(), Left(Pin::new(&10)));
 
-    let value = Either::Right::<i32>(10);
+    let value = Right::<i32>(10);
     let pinned = Pin::new(&value);
-    assert_eq!(pinned.as_pin_ref(), Either::Right(Pin::new(&10)));
+    assert_eq!(pinned.as_pin_ref(), Right(Pin::new(&10)));
 }
 
 #[test]
 fn as_pin_mut() {
-    let mut value = Either::Left::<i32>(10);
+    let mut value = Left::<i32>(10);
     let pinned = Pin::new(&mut value);
-    assert_eq!(pinned.as_pin_mut(), Either::Left(Pin::new(&mut 10)));
+    assert_eq!(pinned.as_pin_mut(), Left(Pin::new(&mut 10)));
 
-    let mut value = Either::Right::<i32>(10);
+    let mut value = Right::<i32>(10);
     let pinned = Pin::new(&mut value);
-    assert_eq!(pinned.as_pin_mut(), Either::Right(Pin::new(&mut 10)));
+    assert_eq!(pinned.as_pin_mut(), Right(Pin::new(&mut 10)));
 }
 
 #[rstest]
-#[case::left(Either::Left(10), 10)]
+#[case::left(Left(10), 10)]
 #[should_panic = "should be left"]
-#[case::right(Either::Right(10), 10)]
+#[case::right(Right(10), 10)]
 fn expect_left(#[case] either: Either<i32>, #[case] expected: i32) {
     assert_eq!(either.expect_left("should be left"), expected);
 }
 
 #[rstest]
-#[case::right(Either::Right(10), 10)]
+#[case::right(Right(10), 10)]
 #[should_panic = "should be right"]
-#[case::left(Either::Left(10), 10)]
+#[case::left(Left(10), 10)]
 fn expect_right(#[case] either: Either<i32>, #[case] expected: i32) {
     assert_eq!(either.expect_right("should be right"), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), 10)]
+#[case::left(Left(10), 10)]
 #[should_panic = "Called `Either::unwrap_left` on a `Right` value"]
-#[case::right(Either::Right(10), 10)]
+#[case::right(Right(10), 10)]
 fn unwrap_left(#[case] either: Either<i32>, #[case] expected: i32) {
     assert_eq!(either.unwrap_left(), expected);
 }
 
 #[rstest]
-#[case::right(Either::Right(10), 10)]
+#[case::right(Right(10), 10)]
 #[should_panic = "Called `Either::unwrap_right` on a `Left` value"]
-#[case::left(Either::Left(10), 10)]
+#[case::left(Left(10), 10)]
 fn unwrap_right(#[case] either: Either<i32>, #[case] expected: i32) {
     assert_eq!(either.unwrap_right(), expected);
 }
 
 #[test]
 fn unwrap_left_unchecked() {
-    let either = Either::Left::<i32>(10);
+    let either = Left::<i32>(10);
     // SAFETY: This is a test for safety
     unsafe {
         assert_eq!(either.unwrap_left_unchecked(), 10);
@@ -221,7 +207,7 @@ fn unwrap_left_unchecked() {
 
 #[test]
 fn unwrap_right_unchecked() {
-    let either = Either::Right::<i32>(10);
+    let either = Right::<i32>(10);
     // SAFETY: This is a test for safety
     unsafe {
         assert_eq!(either.unwrap_right_unchecked(), 10);
@@ -229,15 +215,15 @@ fn unwrap_right_unchecked() {
 }
 
 #[rstest]
-#[case::left(Either::Left(10), Some(10))]
-#[case::right(Either::Right(10), None)]
+#[case::left(Left(10), Some(10))]
+#[case::right(Right(10), None)]
 fn left(#[case] either: Either<i32>, #[case] expected: Option<i32>) {
     assert_eq!(either.left(), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), Either::Left(5), Either::Left(5))]
-#[case::right(Either::Right('c'), Either::Left(5), Either::Right('c'))]
+#[case::left(Left(10), Left(5), Left(5))]
+#[case::right(Right('c'), Left(5), Right('c'))]
 fn left_and(
     #[case] either: Either<i32, char>,
     #[case] other: Either<i32, char>,
@@ -247,25 +233,22 @@ fn left_and(
 }
 
 #[rstest]
-#[case::left(Either::Left(10), Either::Left('m'))]
-#[case::right(Either::Right('c'), Either::Right('c'))]
+#[case::left(Left(10), Left('m'))]
+#[case::right(Right('c'), Right('c'))]
 fn left_and_then(#[case] either: Either<u8, char>, #[case] expected: Either<char>) {
-    assert_eq!(
-        either.left_and_then(|i| Either::Left((b'c' + i) as char)),
-        expected
-    );
+    assert_eq!(either.left_and_then(|i| Left((b'c' + i) as char)), expected);
 }
 
 #[rstest]
-#[case::right(Either::Right(10), Some(10))]
-#[case::left(Either::Left(10), None)]
+#[case::right(Right(10), Some(10))]
+#[case::left(Left(10), None)]
 fn right(#[case] either: Either<i32>, #[case] expected: Option<i32>) {
     assert_eq!(either.right(), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), Either::Right('m'), Either::Left(10))]
-#[case::right(Either::Right('c'), Either::Right('m'), Either::Right('m'))]
+#[case::left(Left(10), Right('m'), Left(10))]
+#[case::right(Right('c'), Right('m'), Right('m'))]
 fn right_and(
     #[case] either: Either<i32, char>,
     #[case] other: Either<i32, char>,
@@ -275,32 +258,29 @@ fn right_and(
 }
 
 #[rstest]
-#[case::left(Either::Left(10), Either::Left(10))]
-#[case::right(Either::Right('c'), Either::Right(104))]
+#[case::left(Left(10), Left(10))]
+#[case::right(Right('c'), Right(104))]
 fn right_and_then(#[case] either: Either<u8, char>, #[case] expected: Either<u8>) {
-    assert_eq!(
-        either.right_and_then(|c| Either::Right(c as u8 + 5)),
-        expected
-    );
+    assert_eq!(either.right_and_then(|c| Right(c as u8 + 5)), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), Either::Right(10))]
-#[case::right(Either::Right('c'), Either::Left('c'))]
+#[case::left(Left(10), Right(10))]
+#[case::right(Right('c'), Left('c'))]
 fn flip(#[case] either: Either<u8, char>, #[case] expected: Either<char, u8>) {
     assert_eq!(either.flip(), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), Either::Left(20))]
-#[case::right(Either::Right(20), Either::Right(30))]
+#[case::left(Left(10), Left(20))]
+#[case::right(Right(20), Right(30))]
 fn map(#[case] either: Either<i32>, #[case] expected: Either<i32>) {
     assert_eq!(either.map(|i| i + 10), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), Either::Left(20))]
-#[case::right(Either::Right('c'), Either::Right('m'))]
+#[case::left(Left(10), Left(20))]
+#[case::right(Right('c'), Right('m'))]
 fn bimap(#[case] either: Either<i32, char>, #[case] expected: Either<i32, char>) {
     assert_eq!(
         either.bimap(|i| i + 10, |c| (c as u8 + 10) as char),
@@ -309,43 +289,43 @@ fn bimap(#[case] either: Either<i32, char>, #[case] expected: Either<i32, char>)
 }
 
 #[rstest]
-#[case::left(Either::Left(10), Either::Left(20))]
-#[case::right(Either::Right('c'), Either::Right('c'))]
+#[case::left(Left(10), Left(20))]
+#[case::right(Right('c'), Right('c'))]
 fn map_left(#[case] either: Either<i32, char>, #[case] expected: Either<i32, char>) {
     assert_eq!(either.map_left(|i| i + 10), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), 20)]
-#[case::right(Either::Right('c'), 30)]
+#[case::left(Left(10), 20)]
+#[case::right(Right('c'), 30)]
 fn map_left_or(#[case] either: Either<i32, char>, #[case] expected: i32) {
     assert_eq!(either.map_left_or(30, |i| i + 10), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), 20)]
-#[case::right(Either::Right('c'), 0)]
+#[case::left(Left(10), 20)]
+#[case::right(Right('c'), 0)]
 fn map_left_or_default(#[case] either: Either<i32, char>, #[case] expected: i32) {
     assert_eq!(either.map_left_or_default(|i| i + 10), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), 20)]
-#[case::right(Either::Right('c'), 30)]
+#[case::left(Left(10), 20)]
+#[case::right(Right('c'), 30)]
 fn map_left_or_else(#[case] either: Either<i32, char>, #[case] expected: i32) {
     assert_eq!(either.map_left_or_else(|| 30, |i| i + 10), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), Either::Left(10))]
-#[case::right(Either::Right('c'), Either::Right('m'))]
+#[case::left(Left(10), Left(10))]
+#[case::right(Right('c'), Right('m'))]
 fn map_right(#[case] either: Either<i32, char>, #[case] expected: Either<i32, char>) {
     assert_eq!(either.map_right(|c| (c as u8 + 10) as char), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), 'x')]
-#[case::right(Either::Right('c'), 'm')]
+#[case::left(Left(10), 'x')]
+#[case::right(Right('c'), 'm')]
 fn map_right_or(#[case] either: Either<i32, char>, #[case] expected: char) {
     assert_eq!(
         either.map_right_or('x', |c| (c as u8 + 10) as char),
@@ -354,8 +334,8 @@ fn map_right_or(#[case] either: Either<i32, char>, #[case] expected: char) {
 }
 
 #[rstest]
-#[case::left(Either::Left(10), '\0')]
-#[case::right(Either::Right('c'), 'm')]
+#[case::left(Left(10), '\0')]
+#[case::right(Right('c'), 'm')]
 fn map_right_or_default(#[case] either: Either<i32, char>, #[case] expected: char) {
     assert_eq!(
         either.map_right_or_default(|c| (c as u8 + 10) as char),
@@ -364,8 +344,8 @@ fn map_right_or_default(#[case] either: Either<i32, char>, #[case] expected: cha
 }
 
 #[rstest]
-#[case::left(Either::Left(10), 'x')]
-#[case::right(Either::Right('c'), 'm')]
+#[case::left(Left(10), 'x')]
+#[case::right(Right('c'), 'm')]
 fn map_right_or_else(#[case] either: Either<i32, char>, #[case] expected: char) {
     assert_eq!(
         either.map_right_or_else(|| 'x', |c| (c as u8 + 10) as char),
@@ -374,8 +354,8 @@ fn map_right_or_else(#[case] either: Either<i32, char>, #[case] expected: char) 
 }
 
 #[rstest]
-#[case::left(Either::Left(10), 10)]
-#[case::right(Either::Right(20), 20)]
+#[case::left(Left(10), 10)]
+#[case::right(Right(20), 20)]
 fn inspect(#[case] either: Either<i32>, #[case] expected: i32) {
     // The assertion is a side effect to provoke a panic and is not part of the test assertions
     let actual = either.inspect(|i| assert_eq!(*i, expected));
@@ -383,8 +363,8 @@ fn inspect(#[case] either: Either<i32>, #[case] expected: i32) {
 }
 
 #[rstest]
-#[case::left(Either::Left(10), Some(10), None)]
-#[case::right(Either::Right('c'), None, Some('c'))]
+#[case::left(Left(10), Some(10), None)]
+#[case::right(Right('c'), None, Some('c'))]
 fn biinspect(
     #[case] either: Either<i32, char>,
     #[case] expected_left: Option<i32>,
@@ -398,24 +378,24 @@ fn biinspect(
 }
 
 #[rstest]
-#[case::left(Either::Left(10), Some(10))]
-#[case::right(Either::Right('c'), None)]
+#[case::left(Left(10), Some(10))]
+#[case::right(Right('c'), None)]
 fn inspect_left(#[case] either: Either<i32, char>, #[case] expected_left: Option<i32>) {
     let actual = either.inspect_left(|l| assert_eq!(Some(*l), expected_left));
     assert_eq!(actual, either);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), None)]
-#[case::right(Either::Right('c'), Some('c'))]
+#[case::left(Left(10), None)]
+#[case::right(Right('c'), Some('c'))]
 fn inspect_right(#[case] either: Either<i32, char>, #[case] expected_right: Option<char>) {
     let actual = either.inspect_right(|r| assert_eq!(Some(*r), expected_right));
     assert_eq!(actual, either);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), Some(10))]
-#[case::right(Either::Right(20), Some(20))]
+#[case::left(Left(10), Some(10))]
+#[case::right(Right(20), Some(20))]
 fn apply(#[case] either: Either<i32>, #[case] expected: Option<i32>) {
     let mut option = None;
     either.apply(|i| option = Some(i));
@@ -424,8 +404,8 @@ fn apply(#[case] either: Either<i32>, #[case] expected: Option<i32>) {
 }
 
 #[rstest]
-#[case::left(Either::Left(10), Some(10), None)]
-#[case::right(Either::Right('c'), None, Some('c'))]
+#[case::left(Left(10), Some(10), None)]
+#[case::right(Right('c'), None, Some('c'))]
 fn biapply(
     #[case] either: Either<i32, char>,
     #[case] expected_left: Option<i32>,
@@ -440,8 +420,8 @@ fn biapply(
 }
 
 #[rstest]
-#[case::left(Either::Left(10), vec![10])]
-#[case::right(Either::Right('c'), vec![99])]
+#[case::left(Left(10), vec![10])]
+#[case::right(Right('c'), vec![99])]
 fn biapply_with(#[case] either: Either<i32, char>, #[case] expected: Vec<i32>) {
     let mut items = vec![];
     either.biapply_with(
@@ -454,8 +434,8 @@ fn biapply_with(#[case] either: Either<i32, char>, #[case] expected: Vec<i32>) {
 }
 
 #[rstest]
-#[case::left(Either::Left(10), vec![10])]
-#[case::right(Either::Right('c'), vec![])]
+#[case::left(Left(10), vec![10])]
+#[case::right(Right('c'), vec![])]
 fn biapply_left(#[case] either: Either<i32, char>, #[case] expected: Vec<i32>) {
     let mut items = vec![];
     either.apply_left(|l| items.push(l));
@@ -464,8 +444,8 @@ fn biapply_left(#[case] either: Either<i32, char>, #[case] expected: Vec<i32>) {
 }
 
 #[rstest]
-#[case::left(Either::Left(10), vec![])]
-#[case::right(Either::Right('c'), vec![99])]
+#[case::left(Left(10), vec![])]
+#[case::right(Right('c'), vec![99])]
 fn biapply_right(#[case] either: Either<i32, char>, #[case] expected: Vec<i32>) {
     let mut items = vec![];
     either.apply_right(|r| items.push(r as i32));
@@ -474,22 +454,22 @@ fn biapply_right(#[case] either: Either<i32, char>, #[case] expected: Vec<i32>) 
 }
 
 #[rstest]
-#[case::left(Either::Left(10), 10)]
-#[case::right(Either::Right(20), 20)]
+#[case::left(Left(10), 10)]
+#[case::right(Right(20), 20)]
 fn reduce(#[case] either: Either<i32>, #[case] expected: i32) {
     assert_eq!(either.reduce(), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), 20)]
-#[case::right(Either::Right(20), 30)]
+#[case::left(Left(10), 20)]
+#[case::right(Right(20), 30)]
 fn reduce_map(#[case] either: Either<i32>, #[case] expected: i32) {
     assert_eq!(either.reduce_map(|i| i + 10), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(10), "10")]
-#[case::right(Either::Right('c'), "c")]
+#[case::left(Left(10), "10")]
+#[case::right(Right('c'), "c")]
 fn bireduce(#[case] either: Either<i32, char>, #[case] expected: String) {
     assert_eq!(
         either.bireduce(|i| i.to_string(), |c| c.to_string()),
@@ -498,92 +478,92 @@ fn bireduce(#[case] either: Either<i32, char>, #[case] expected: String) {
 }
 
 #[rstest]
-#[case::left(Either::Left(10), 10)]
-#[case::right(Either::Right('c'), 99)]
+#[case::left(Left(10), 10)]
+#[case::right(Right('c'), 99)]
 fn reduce_left(#[case] either: Either<i32, char>, #[case] expected: i32) {
     assert_eq!(either.reduce_left(|c| c as i32), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(109), 'm')]
-#[case::right(Either::Right('c'), 'c')]
+#[case::left(Left(109), 'm')]
+#[case::right(Right('c'), 'c')]
 fn reduce_right(#[case] either: Either<u8, char>, #[case] expected: char) {
     assert_eq!(either.reduce_right(|i| i as char), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left("error message".to_owned()), Err("error message".to_owned()))]
-#[case::right(Either::Right(10), Ok(10))]
+#[case::left(Left("error message".to_owned()), Err("error message".to_owned()))]
+#[case::right(Right(10), Ok(10))]
 fn ok(#[case] either: Either<String, i32>, #[case] expected: Result<i32, String>) {
     assert_eq!(either.ok(), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left("error message".to_owned()), Err("other".to_owned()))]
-#[case::right(Either::Right(10), Ok(10))]
+#[case::left(Left("error message".to_owned()), Err("other".to_owned()))]
+#[case::right(Right(10), Ok(10))]
 fn ok_or(#[case] either: Either<String, i32>, #[case] expected: Result<i32, String>) {
     assert_eq!(either.ok_or("other".to_owned()), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left("error message".to_owned()), Err("other".to_owned()))]
-#[case::right(Either::Right(10), Ok(10))]
+#[case::left(Left("error message".to_owned()), Err("other".to_owned()))]
+#[case::right(Right(10), Ok(10))]
 fn ok_or_else(#[case] either: Either<String, i32>, #[case] expected: Result<i32, String>) {
     assert_eq!(either.ok_or_else(|| "other".to_owned()), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(109), (109, 'm'))]
-#[case::right(Either::Right('c'), (200, 'c'))]
+#[case::left(Left(109), (109, 'm'))]
+#[case::right(Right('c'), (200, 'c'))]
 fn or(#[case] either: Either<u8, char>, #[case] expected: (u8, char)) {
     assert_eq!(either.or(200, 'm'), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(109), (109, 'm'))]
-#[case::right(Either::Right('c'), (200, 'c'))]
+#[case::left(Left(109), (109, 'm'))]
+#[case::right(Right('c'), (200, 'c'))]
 fn or_else(#[case] either: Either<u8, char>, #[case] expected: (u8, char)) {
     assert_eq!(either.or_else(|| 200, || 'm'), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(109), (109, '\0'))]
-#[case::right(Either::Right('c'), (0, 'c'))]
+#[case::left(Left(109), (109, '\0'))]
+#[case::right(Right('c'), (0, 'c'))]
 fn or_default(#[case] either: Either<u8, char>, #[case] expected: (u8, char)) {
     assert_eq!(either.or_default(), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(109), EitherOrBoth::Left(109))]
-#[case::right(Either::Right('c'), EitherOrBoth::Both(200, 'c'))]
+#[case::left(Left(109), EitherOrBoth::Left(109))]
+#[case::right(Right('c'), EitherOrBoth::Both(200, 'c'))]
 fn add_left(#[case] either: Either<u8, char>, #[case] expected: EitherOrBoth<u8, char>) {
     assert_eq!(either.add_left(200), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(109), EitherOrBoth::Both(109, 'm'))]
-#[case::right(Either::Right('c'), EitherOrBoth::Right('c'))]
+#[case::left(Left(109), EitherOrBoth::Both(109, 'm'))]
+#[case::right(Right('c'), EitherOrBoth::Right('c'))]
 fn add_right(#[case] either: Either<u8, char>, #[case] expected: EitherOrBoth<u8, char>) {
     assert_eq!(either.add_right('m'), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(109), EitherOrBoth::Left(200))]
-#[case::right(Either::Right('c'), EitherOrBoth::Both(200, 'c'))]
+#[case::left(Left(109), EitherOrBoth::Left(200))]
+#[case::right(Right('c'), EitherOrBoth::Both(200, 'c'))]
 fn inject_left(#[case] either: Either<u8, char>, #[case] expected: EitherOrBoth<u8, char>) {
     assert_eq!(either.inject_left(200), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(109), EitherOrBoth::Both(109, 'm'))]
-#[case::right(Either::Right('c'), EitherOrBoth::Right('m'))]
+#[case::left(Left(109), EitherOrBoth::Both(109, 'm'))]
+#[case::right(Right('c'), EitherOrBoth::Right('m'))]
 fn inject_right(#[case] either: Either<u8, char>, #[case] expected: EitherOrBoth<u8, char>) {
     assert_eq!(either.inject_right('m'), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(109), Some(109), Either::Left(200))]
-#[case::right(Either::Right('c'), None, Either::Right('c'))]
+#[case::left(Left(109), Some(109), Left(200))]
+#[case::right(Right('c'), None, Right('c'))]
 fn replace_left(
     #[case] mut either: Either<u8, char>,
     #[case] expected: Option<u8>,
@@ -594,8 +574,8 @@ fn replace_left(
 }
 
 #[rstest]
-#[case::left(Either::Left(109), None, Either::Left(109))]
-#[case::right(Either::Right('c'), Some('c'), Either::Right('m'))]
+#[case::left(Left(109), None, Left(109))]
+#[case::right(Right('c'), Some('c'), Right('m'))]
 fn replace_right(
     #[case] mut either: Either<u8, char>,
     #[case] expected: Option<char>,
@@ -606,59 +586,89 @@ fn replace_right(
 }
 
 #[rstest]
-#[case::left(Either::Left(109), Either::Left(109))]
-#[case::right(Either::Right('c'), Either::Left(99))]
+#[case::left(Left(109), Left(109))]
+#[case::right(Right('c'), Left(99))]
 fn into_left(#[case] either: Either<u8, char>, #[case] expected: Either<u8, char>) {
     assert_eq!(either.into_left(|c| c as u8), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(109), Either::Right('m'))]
-#[case::right(Either::Right('c'), Either::Right('c'))]
+#[case::left(Left(109), Right('m'))]
+#[case::right(Right('c'), Right('c'))]
 fn into_right(#[case] either: Either<u8, char>, #[case] expected: Either<u8, char>) {
     assert_eq!(either.into_right(|i| i as char), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(&109), Either::Left(109))]
-#[case::right(Either::Right(&20), Either::Right(20))]
+#[case::left(Left(&109), Left(109))]
+#[case::right(Right(&20), Right(20))]
 fn cloned(#[case] either: Either<&i32>, #[case] expected: Either<i32>) {
     assert_eq!(either.cloned(), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(&mut 109), Either::Left(109))]
-#[case::right(Either::Right(&mut 20), Either::Right(20))]
+#[case::left(Left(&mut 109), Left(109))]
+#[case::right(Right(&mut 20), Right(20))]
 fn cloned_mut(#[case] either: Either<&mut i32>, #[case] expected: Either<i32>) {
     assert_eq!(either.cloned(), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(&109), Either::Left(109))]
-#[case::right(Either::Right(&20), Either::Right(20))]
+#[case::left(Left(&109), Left(109))]
+#[case::right(Right(&20), Right(20))]
 fn copied(#[case] either: Either<&i32>, #[case] expected: Either<i32>) {
     assert_eq!(either.copied(), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(&mut 109), Either::Left(109))]
-#[case::right(Either::Right(&mut 20), Either::Right(20))]
+#[case::left(Left(&mut 109), Left(109))]
+#[case::right(Right(&mut 20), Right(20))]
 fn copied_mut(#[case] either: Either<&mut i32>, #[case] expected: Either<i32>) {
     assert_eq!(either.copied(), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(Some(10)), Some(Either::Left(10)))]
-#[case::right(Either::Right(Some(10)), Some(Either::Right(10)))]
+#[case::left(Left((1, 'c')), (Left(1), Left('c')))]
+#[case::right(Right((-2, 10)), (Right(-2), Right(10)))]
+fn transpose_tuples(
+    #[case] either: Either<(u8, char), (i32, u64)>,
+    #[case] expected: (Either<u8, i32>, Either<char, u64>),
+) {
+    assert_eq!(either.transpose(), expected);
+}
+
+#[rstest]
+#[case::left(Left((1, 'c')), (1, Left('c')))]
+#[case::right(Right((2, 10)), (2, Right(10)))]
+fn transpose_left(
+    #[case] either: Either<(u8, char), (u8, u64)>,
+    #[case] expected: (u8, Either<char, u64>),
+) {
+    assert_eq!(either.transpose_left(), expected);
+}
+
+#[rstest]
+#[case::left(Left((1, 'c')), (Left(1), 'c'))]
+#[case::right(Right((-2, 'm')), (Right(-2), 'm'))]
+fn transpose_right(
+    #[case] either: Either<(u8, char), (i32, char)>,
+    #[case] expected: (Either<u8, i32>, char),
+) {
+    assert_eq!(either.transpose_right(), expected);
+}
+
+#[rstest]
+#[case::left(Left(Some(10)), Some(Left(10)))]
+#[case::right(Right(Some(10)), Some(Right(10)))]
 fn transpose_option(#[case] either: Either<Option<i32>>, #[case] expected: Option<Either<i32>>) {
     assert_eq!(either.transpose(), expected);
 }
 
 #[rstest]
-#[case::left_ok(Either::Left(Ok(-10)), Ok(Either::Left(-10)))]
-#[case::left_err(Either::Left(Err("10")), Err(Either::Left("10")))]
-#[case::right(Either::Right(Ok(10)), Ok(Either::Right(10)))]
-#[case::right_err(Either::Right(Err('c')), Err(Either::Right('c')))]
+#[case::left_ok(Left(Ok(-10)), Ok(Left(-10)))]
+#[case::left_err(Left(Err("10")), Err(Left("10")))]
+#[case::right(Right(Ok(10)), Ok(Right(10)))]
+#[case::right_err(Right(Err('c')), Err(Right('c')))]
 fn transpose_result(
     #[case] either: Either<Result<i32, &str>, Result<u8, char>>,
     #[case] expected: Result<Either<i32, u8>, Either<&str, char>>,
@@ -667,10 +677,10 @@ fn transpose_result(
 }
 
 #[rstest]
-#[case::left_ok(Either::Left(Ok(-10)), Ok(Either::Left(-10)))]
-#[case::left_err(Either::Left(Err("10")), Err("10"))]
-#[case::right(Either::Right(Ok(10)), Ok(Either::Right(10)))]
-#[case::right_err(Either::Right(Err("20")), Err("20"))]
+#[case::left_ok(Left(Ok(-10)), Ok(Left(-10)))]
+#[case::left_err(Left(Err("10")), Err("10"))]
+#[case::right(Right(Ok(10)), Ok(Right(10)))]
+#[case::right_err(Right(Err("20")), Err("20"))]
 fn transpose_ok(
     #[case] either: Either<Result<i32, &str>, Result<u8, &str>>,
     #[case] expected: Result<Either<i32, u8>, &str>,
@@ -679,10 +689,10 @@ fn transpose_ok(
 }
 
 #[rstest]
-#[case::left_ok(Either::Left(Ok(-10)), Ok(-10))]
-#[case::left_err(Either::Left(Err("10")), Err(Either::Left("10")))]
-#[case::right(Either::Right(Ok(10)), Ok(10))]
-#[case::right_err(Either::Right(Err('c')), Err(Either::Right('c')))]
+#[case::left_ok(Left(Ok(-10)), Ok(-10))]
+#[case::left_err(Left(Err("10")), Err(Left("10")))]
+#[case::right(Right(Ok(10)), Ok(10))]
+#[case::right_err(Right(Err('c')), Err(Right('c')))]
 fn transpose_err(
     #[case] either: Either<Result<i32, &str>, Result<i32, char>>,
     #[case] expected: Result<i32, Either<&str, char>>,
@@ -691,29 +701,29 @@ fn transpose_err(
 }
 
 #[rstest]
-#[case::left(&Either::Left(10), Either::Left(&10))]
-#[case::left(&Either::Right('c'), Either::Right(&'c'))]
+#[case::left(&Left(10), Left(&10))]
+#[case::left(&Right('c'), Right(&'c'))]
 fn from_ref(#[case] either: &Either<u8, char>, #[case] expected: Either<&u8, &char>) {
     assert_eq!(Either::from(either), expected);
 }
 
 #[rstest]
-#[case::left(&mut Either::Left(10), Either::Left(&mut 10))]
-#[case::left(&mut Either::Right('c'), Either::Right(&mut 'c'))]
+#[case::left(&mut Left(10), Left(&mut 10))]
+#[case::left(&mut Right('c'), Right(&mut 'c'))]
 fn from_mut(#[case] either: &mut Either<u8, char>, #[case] expected: Either<&mut u8, &mut char>) {
     assert_eq!(Either::from(either), expected);
 }
 
 #[rstest]
-#[case::ok(Ok(10), Either::Right(10))]
-#[case::err(Err("some error"), Either::Left("some error"))]
+#[case::ok(Ok(10), Right(10))]
+#[case::err(Err("some error"), Left("some error"))]
 fn from_result(#[case] result: Result<i32, &str>, #[case] expected: Either<&str, i32>) {
     assert_eq!(Either::from(result), expected);
 }
 
 #[rstest]
-#[case::left(Either::Left(String::new()), Either::Left("some".to_owned()))]
-#[case::right(Either::Right(String::new()), Either::Right("some".to_owned()))]
+#[case::left(Left(String::new()), Left("some".to_owned()))]
+#[case::right(Right(String::new()), Right("some".to_owned()))]
 fn impl_fmt_write(#[case] either: Either<String>, #[case] expected: Either<String>) {
     let mut cloned = either.clone();
     cloned.write_str("some").unwrap();
@@ -725,15 +735,15 @@ fn impl_fmt_write(#[case] either: Either<String>, #[case] expected: Either<Strin
 }
 
 #[rstest]
-#[case::left(Either::Left("hello"))]
-#[case::right(Either::Right("hello"))]
+#[case::left(Left("hello"))]
+#[case::right(Right("hello"))]
 fn impl_fmt_display(#[case] either: Either<&str>) {
     assert_eq!(either.to_string(), String::from("hello"));
 }
 
 #[rstest]
-#[case::left(Either::Left(vec![1]), Either::Left(vec![1, 2, 3]))]
-#[case::right(Either::Right(vec![1]), Either::Right(vec![1, 2, 3]))]
+#[case::left(Left(vec![1]), Left(vec![1, 2, 3]))]
+#[case::right(Right(vec![1]), Right(vec![1, 2, 3]))]
 fn impl_extend(#[case] mut either: Either<Vec<u8>>, #[case] expected: Either<Vec<u8>>) {
     either.extend(vec![2, 3]);
     assert_eq!(either, expected);
@@ -749,8 +759,8 @@ impl Future for FutureTest {
 }
 
 #[rstest]
-#[case::left(Either::Left(FutureTest(1)))]
-#[case::right(Either::Right(FutureTest(1)))]
+#[case::left(Left(FutureTest(1)))]
+#[case::right(Right(FutureTest(1)))]
 #[tokio::test]
 async fn impl_future(#[case] either: Either<FutureTest>) {
     let r = either.await;

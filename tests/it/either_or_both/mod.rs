@@ -4,6 +4,7 @@ mod iter;
 mod same_type;
 #[cfg(feature = "std")]
 mod std;
+mod traits;
 
 use core::pin::Pin;
 
