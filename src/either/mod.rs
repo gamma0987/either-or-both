@@ -23,6 +23,7 @@ use core::ops::{Deref, DerefMut};
 use core::pin::Pin;
 
 use iter::{IterEither, SwapIterEither};
+use Either::*;
 
 use crate::{unwrap_failed, EitherOrBoth};
 
@@ -97,8 +98,8 @@ impl<L, R> Either<L, R> {
     #[allow(clippy::same_name_method)]
     pub fn as_ref(&self) -> Either<&L, &R> {
         match self {
-            Self::Left(left) => Either::Left(left),
-            Self::Right(right) => Either::Right(right),
+            Self::Left(left) => Left(left),
+            Self::Right(right) => Right(right),
         }
     }
 
@@ -106,8 +107,8 @@ impl<L, R> Either<L, R> {
     #[allow(clippy::same_name_method)]
     pub fn as_mut(&mut self) -> Either<&mut L, &mut R> {
         match self {
-            Self::Left(left) => Either::Left(left),
-            Self::Right(right) => Either::Right(right),
+            Self::Left(left) => Left(left),
+            Self::Right(right) => Right(right),
         }
     }
 
@@ -140,8 +141,8 @@ impl<L, R> Either<L, R> {
         // SAFETY: `x` is guaranteed to be pinned because it comes from `self` which is pinned.
         unsafe {
             match Pin::get_ref(self) {
-                Self::Left(left) => Either::Left(Pin::new_unchecked(left)),
-                Self::Right(right) => Either::Right(Pin::new_unchecked(right)),
+                Self::Left(left) => Left(Pin::new_unchecked(left)),
+                Self::Right(right) => Right(Pin::new_unchecked(right)),
             }
         }
     }
@@ -151,8 +152,8 @@ impl<L, R> Either<L, R> {
         // SAFETY: `x` is guaranteed to be pinned because it comes from `self` which is pinned.
         unsafe {
             match Pin::get_unchecked_mut(self) {
-                Self::Left(left) => Either::Left(Pin::new_unchecked(left)),
-                Self::Right(right) => Either::Right(Pin::new_unchecked(right)),
+                Self::Left(left) => Left(Pin::new_unchecked(left)),
+                Self::Right(right) => Right(Pin::new_unchecked(right)),
             }
         }
     }
@@ -221,7 +222,7 @@ impl<L, R> Either<L, R> {
     pub fn left_and<T>(self, other: Either<T, R>) -> Either<T, R> {
         match self {
             Self::Left(_) => other,
-            Self::Right(right) => Either::Right(right),
+            Self::Right(right) => Right(right),
         }
     }
 
@@ -232,7 +233,7 @@ impl<L, R> Either<L, R> {
     {
         match self {
             Self::Left(left) => f(left),
-            Self::Right(right) => Either::Right(right),
+            Self::Right(right) => Right(right),
         }
     }
 
@@ -247,7 +248,7 @@ impl<L, R> Either<L, R> {
     /// TODO: DOCS
     pub fn right_and<T>(self, other: Either<L, T>) -> Either<L, T> {
         match self {
-            Self::Left(left) => Either::Left(left),
+            Self::Left(left) => Left(left),
             Self::Right(_) => other,
         }
     }
@@ -258,7 +259,7 @@ impl<L, R> Either<L, R> {
         F: FnOnce(R) -> Either<L, T>,
     {
         match self {
-            Self::Left(left) => Either::Left(left),
+            Self::Left(left) => Left(left),
             Self::Right(right) => f(right),
         }
     }
@@ -266,8 +267,8 @@ impl<L, R> Either<L, R> {
     /// Converts `Either<L, R>` to `Either<R, L>`.
     pub fn flip(self) -> Either<R, L> {
         match self {
-            Self::Left(left) => Either::Right(left),
-            Self::Right(right) => Either::Left(right),
+            Self::Left(left) => Right(left),
+            Self::Right(right) => Left(right),
         }
     }
 
@@ -317,8 +318,8 @@ impl<L, R> Either<L, R> {
         G: FnOnce(R) -> U,
     {
         match self {
-            Self::Left(left) => Either::Left(f(left)),
-            Self::Right(right) => Either::Right(g(right)),
+            Self::Left(left) => Left(f(left)),
+            Self::Right(right) => Right(g(right)),
         }
     }
 
@@ -328,8 +329,8 @@ impl<L, R> Either<L, R> {
         F: FnOnce(L) -> T,
     {
         match self {
-            Self::Left(left) => Either::Left(f(left)),
-            Self::Right(right) => Either::Right(right),
+            Self::Left(left) => Left(f(left)),
+            Self::Right(right) => Right(right),
         }
     }
 
@@ -368,8 +369,8 @@ impl<L, R> Either<L, R> {
         F: FnOnce(R) -> T,
     {
         match self {
-            Self::Left(left) => Either::Left(left),
-            Self::Right(right) => Either::Right(f(right)),
+            Self::Left(left) => Left(left),
+            Self::Right(right) => Right(f(right)),
         }
     }
 
@@ -452,10 +453,10 @@ impl<L, R> Either<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn biapply_with<F, G, Acc>(self, acc: Acc, f: F, g: G)
+    pub fn biapply_with<F, G, Acc>(self, acc: Acc, mut f: F, mut g: G)
     where
-        F: FnOnce(Acc, L),
-        G: FnOnce(Acc, R),
+        F: FnMut(Acc, L),
+        G: FnMut(Acc, R),
     {
         match self {
             Self::Left(left) => f(acc, left),
@@ -464,9 +465,9 @@ impl<L, R> Either<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn apply_left<F>(self, f: F)
+    pub fn apply_left<F>(self, mut f: F)
     where
-        F: FnOnce(L),
+        F: FnMut(L),
     {
         match self {
             Self::Left(left) => f(left),
@@ -475,9 +476,9 @@ impl<L, R> Either<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn apply_right<F>(self, f: F)
+    pub fn apply_right<F>(self, mut f: F)
     where
-        F: FnOnce(R),
+        F: FnMut(R),
     {
         match self {
             Self::Right(right) => f(right),
@@ -651,10 +652,10 @@ impl<L, R> Either<L, R> {
 }
 
 impl<T> Either<T, T> {
-    /// TODO: DOCS, `FnMut` or `FnOnce`
-    pub fn apply<F>(self, f: F)
+    /// TODO: DOCS, `apply_with`
+    pub fn apply<F>(self, mut f: F)
     where
-        F: FnOnce(T),
+        F: FnMut(T),
     {
         match self {
             Self::Left(left) => f(left),
@@ -697,8 +698,8 @@ impl<T> Either<T, T> {
         F: FnOnce(T) -> U,
     {
         match self {
-            Self::Left(left) => Either::Left(f(left)),
-            Self::Right(right) => Either::Right(f(right)),
+            Self::Left(left) => Left(f(left)),
+            Self::Right(right) => Right(f(right)),
         }
     }
 
@@ -730,8 +731,8 @@ impl<L, R> Either<&L, &R> {
         R: Clone,
     {
         match self {
-            Self::Left(left) => Either::Left(left.clone()),
-            Self::Right(right) => Either::Right(right.clone()),
+            Self::Left(left) => Left(left.clone()),
+            Self::Right(right) => Right(right.clone()),
         }
     }
 
@@ -742,8 +743,8 @@ impl<L, R> Either<&L, &R> {
         R: Copy,
     {
         match self {
-            Self::Left(left) => Either::Left(*left),
-            Self::Right(right) => Either::Right(*right),
+            Self::Left(left) => Left(*left),
+            Self::Right(right) => Right(*right),
         }
     }
 }
@@ -756,8 +757,8 @@ impl<L, R> Either<&mut L, &mut R> {
         R: Clone,
     {
         match self {
-            Self::Left(left) => Either::Left(left.clone()),
-            Self::Right(right) => Either::Right(right.clone()),
+            Self::Left(left) => Left(left.clone()),
+            Self::Right(right) => Right(right.clone()),
         }
     }
 
@@ -768,8 +769,8 @@ impl<L, R> Either<&mut L, &mut R> {
         R: Copy,
     {
         match self {
-            Self::Left(left) => Either::Left(*left),
-            Self::Right(right) => Either::Right(*right),
+            Self::Left(left) => Left(*left),
+            Self::Right(right) => Right(*right),
         }
     }
 }
@@ -778,8 +779,8 @@ impl<L1, L2, R1, R2> Either<(L1, R1), (L2, R2)> {
     /// TODO: DOCS, tests
     pub fn transpose(self) -> (Either<L1, L2>, Either<R1, R2>) {
         match self {
-            Self::Left((l1, r1)) => (Either::Left(l1), Either::Left(r1)),
-            Self::Right((l2, r2)) => (Either::Right(l2), Either::Right(r2)),
+            Self::Left((l1, r1)) => (Left(l1), Left(r1)),
+            Self::Right((l2, r2)) => (Right(l2), Right(r2)),
         }
     }
 }
@@ -788,8 +789,8 @@ impl<L, R, T> Either<(T, L), (T, R)> {
     /// TODO: DOCS, tests
     pub fn transpose_left(self) -> (T, Either<L, R>) {
         match self {
-            Self::Left((target, left)) => (target, Either::Left(left)),
-            Self::Right((target, right)) => (target, Either::Right(right)),
+            Self::Left((target, left)) => (target, Left(left)),
+            Self::Right((target, right)) => (target, Right(right)),
         }
     }
 }
@@ -798,8 +799,8 @@ impl<L, R, T> Either<(L, T), (R, T)> {
     /// TODO: DOCS, tests
     pub fn transpose_right(self) -> (Either<L, R>, T) {
         match self {
-            Self::Left((left, target)) => (Either::Left(left), target),
-            Self::Right((right, target)) => (Either::Right(right), target),
+            Self::Left((left, target)) => (Left(left), target),
+            Self::Right((right, target)) => (Right(right), target),
         }
     }
 }
@@ -808,8 +809,8 @@ impl<L, R> Either<Option<L>, Option<R>> {
     /// TODO: DOCS
     pub fn transpose(self) -> Option<Either<L, R>> {
         match self {
-            Self::Left(left) => left.map(Either::Left),
-            Self::Right(right) => right.map(Either::Right),
+            Self::Left(left) => left.map(Left),
+            Self::Right(right) => right.map(Right),
         }
     }
 }
@@ -819,12 +820,12 @@ impl<L, R, E1, E2> Either<Result<L, E1>, Result<R, E2>> {
     pub fn transpose(self) -> Result<Either<L, R>, Either<E1, E2>> {
         match self {
             Self::Left(left) => match left {
-                Ok(ok) => Ok(Either::Left(ok)),
-                Err(err) => Err(Either::Left(err)),
+                Ok(ok) => Ok(Left(ok)),
+                Err(err) => Err(Left(err)),
             },
             Self::Right(right) => match right {
-                Ok(ok) => Ok(Either::Right(ok)),
-                Err(err) => Err(Either::Right(err)),
+                Ok(ok) => Ok(Right(ok)),
+                Err(err) => Err(Right(err)),
             },
         }
     }
@@ -834,8 +835,8 @@ impl<L, R, E> Either<Result<L, E>, Result<R, E>> {
     /// TODO: DOCS, rename to `transpose_err`
     pub fn transpose_ok(self) -> Result<Either<L, R>, E> {
         match self {
-            Self::Left(left) => left.map(Either::Left),
-            Self::Right(right) => right.map(Either::Right),
+            Self::Left(left) => left.map(Left),
+            Self::Right(right) => right.map(Right),
         }
     }
 }
@@ -844,8 +845,8 @@ impl<T, E1, E2> Either<Result<T, E1>, Result<T, E2>> {
     /// TODO: DOCS, rename to `transpose_ok`, also tests
     pub fn transpose_err(self) -> Result<T, Either<E1, E2>> {
         match self {
-            Self::Left(left) => left.map_err(Either::Left),
-            Self::Right(right) => right.map_err(Either::Right),
+            Self::Left(left) => left.map_err(Left),
+            Self::Right(right) => right.map_err(Right),
         }
     }
 }
