@@ -5,29 +5,29 @@ use core::iter::FusedIterator;
 use crate::EitherOrBoth;
 
 /// TODO: DOCS
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ChainedIterEitherOrBoth<T>(EitherOrBoth<T, T>);
 
 /// TODO: DOCS
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct IntoIterEitherOrBoth<T>(Items<T>);
 
 /// TODO: DOCS
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 struct Items<T> {
-    either: EitherOrBoth<Option<T>, Option<T>>,
+    inner: EitherOrBoth<Option<T>, Option<T>>,
 }
 
 /// TODO: DOCS
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct IterEitherOrBoth<'a, T: 'a>(Items<&'a T>);
 
 /// TODO: DOCS
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq, Eq)]
 pub struct IterMutEitherOrBoth<'a, T: 'a>(Items<&'a mut T>);
 
 /// TODO: DOCS
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SwapIterEitherOrBoth<L, R>(EitherOrBoth<L, R>);
 
 impl<T> ChainedIterEitherOrBoth<T> {
@@ -120,7 +120,7 @@ impl<T> Iterator for IntoIterEitherOrBoth<T> {
 impl<T> From<EitherOrBoth<T>> for Items<T> {
     fn from(value: EitherOrBoth<T>) -> Self {
         Self {
-            either: value.map(Some),
+            inner: value.map(Some),
         }
     }
 }
@@ -128,7 +128,7 @@ impl<T> From<EitherOrBoth<T>> for Items<T> {
 impl<T> Default for Items<T> {
     fn default() -> Self {
         Self {
-            either: EitherOrBoth::Left(None),
+            inner: EitherOrBoth::Left(None),
         }
     }
 }
@@ -136,7 +136,7 @@ impl<T> Default for Items<T> {
 impl<T> DoubleEndedIterator for Items<T> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
-        match self.either.as_mut() {
+        match self.inner.as_mut() {
             EitherOrBoth::Both(_, right) | EitherOrBoth::Right(right) if right.is_some() => {
                 right.take()
             }
@@ -156,7 +156,7 @@ impl<T> Iterator for Items<T> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        match self.either.as_mut() {
+        match self.inner.as_mut() {
             EitherOrBoth::Both(left, _) | EitherOrBoth::Left(left) if left.is_some() => left.take(),
             EitherOrBoth::Both(None, right) | EitherOrBoth::Right(right) if right.is_some() => {
                 right.take()
@@ -166,7 +166,7 @@ impl<T> Iterator for Items<T> {
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        match &self.either {
+        match &self.inner {
             EitherOrBoth::Both(Some(_), Some(_)) => (2, Some(2)),
             EitherOrBoth::Left(Some(_))
             | EitherOrBoth::Right(Some(_))
@@ -294,11 +294,75 @@ where
             .bimap(Iterator::size_hint, Iterator::size_hint)
             .reduce(|(l_lower, l_upper), (r_lower, r_upper)| {
                 (
-                    // TODO: min or max?
-                    l_lower.min(r_lower),
+                    l_lower.max(r_lower),
                     // is `None` if the left or right upper bound is `None`
                     l_upper.and_then(|l| r_upper.map(|r| l.max(r))),
                 )
             })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use rstest::rstest;
+    use EitherOrBoth::*;
+
+    use super::*;
+
+    #[rstest]
+    #[case::both(Both(1, 2), [Some(1), Some(2), None])]
+    #[case::left(Left(1), [Some(1), None, None])]
+    #[case::right(Right(2), [Some(2), None, None])]
+    fn items_next(#[case] either_or_both: EitherOrBoth<i32>, #[case] expected: [Option<i32>; 3]) {
+        let mut expected_iter = expected.into_iter();
+        let mut items = Items::from(either_or_both);
+        assert_eq!(items.next(), expected_iter.next().unwrap());
+        assert_eq!(items.next(), expected_iter.next().unwrap());
+        assert_eq!(items.next(), expected_iter.next().unwrap());
+    }
+
+    #[rstest]
+    #[case::both(Both(1, 2), [Some(2), Some(1), None])]
+    #[case::left(Left(1), [Some(1), None, None])]
+    #[case::right(Right(2), [Some(2), None, None])]
+    fn items_next_back(
+        #[case] either_or_both: EitherOrBoth<i32>,
+        #[case] expected: [Option<i32>; 3],
+    ) {
+        let mut expected_iter = expected.into_iter();
+        let mut items = Items::from(either_or_both);
+        assert_eq!(items.next_back(), expected_iter.next().unwrap());
+        assert_eq!(items.next_back(), expected_iter.next().unwrap());
+        assert_eq!(items.next_back(), expected_iter.next().unwrap());
+    }
+
+    #[rstest]
+    #[case::both(Both(1, 2), [(2, Some(2)), (1, Some(1)), (0, Some(0))])]
+    #[case::left(Left(1), [(1, Some(1)), (0, Some(0)), (0, Some(0))])]
+    #[case::right(Right(2), [(1, Some(1)), (0, Some(0)), (0, Some(0))])]
+    fn items_size_hint(
+        #[case] either_or_both: EitherOrBoth<i32>,
+        #[case] expected: [(usize, Option<usize>); 3],
+    ) {
+        let mut expected_iter = expected.into_iter();
+        let mut iter = Items::from(either_or_both);
+        assert_eq!(iter.size_hint(), expected_iter.next().unwrap());
+        iter.next();
+        assert_eq!(iter.size_hint(), expected_iter.next().unwrap());
+        iter.next();
+        assert_eq!(iter.size_hint(), expected_iter.next().unwrap());
+    }
+
+    #[test]
+    fn items_default() {
+        assert_eq!(Items { inner: Left(None) }, Items::<i32>::default());
+    }
+
+    #[test]
+    fn chained_iter_default() {
+        assert_eq!(
+            ChainedIterEitherOrBoth(Left('\0')),
+            ChainedIterEitherOrBoth::<char>::default()
+        );
     }
 }

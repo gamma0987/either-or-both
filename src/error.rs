@@ -2,22 +2,15 @@
 
 use core::fmt::Display;
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 /// TODO: DOCS
-#[derive(Debug)]
-pub enum Error {
-    /// TODO: DOCS
-    TryFromOptions,
-}
+pub struct TryFromOptionsError;
 
-impl Display for Error {
+impl Display for TryFromOptionsError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::TryFromOptions => {
-                write!(f, "Either the left, right or both values must be present")
-            }
-        }
+        write!(f, "Either the left, right or both values must be present")
     }
 }
 
 #[cfg(feature = "std")]
-impl std::error::Error for Error {}
+impl std::error::Error for TryFromOptionsError {}

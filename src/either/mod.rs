@@ -40,6 +40,10 @@ pub enum Either<L, R = L> {
 }
 
 impl<L, R> Either<L, R> {
+    ////////////////////////////////////////////////////////////////////////////////
+    // Boolish
+    ////////////////////////////////////////////////////////////////////////////////
+
     /// TODO: DOCS
     pub fn is_left(&self) -> bool {
         matches!(self, Self::Left(_))
@@ -93,6 +97,10 @@ impl<L, R> Either<L, R> {
             Self::Left(left) => f(left),
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // As reference conversions
+    ////////////////////////////////////////////////////////////////////////////////
 
     /// TODO: DOCS
     #[allow(clippy::same_name_method)]
@@ -158,6 +166,10 @@ impl<L, R> Either<L, R> {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Unwrapping the contained values
+    ////////////////////////////////////////////////////////////////////////////////
+
     /// TODO: DOCS
     pub fn expect_left(self, msg: &str) -> L {
         match self {
@@ -209,6 +221,10 @@ impl<L, R> Either<L, R> {
             Self::Right(right) => right,
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Getting the contained values
+    ////////////////////////////////////////////////////////////////////////////////
 
     /// TODO: DOCS
     pub fn left(self) -> Option<L> {
@@ -264,13 +280,9 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Converts `Either<L, R>` to `Either<R, L>`.
-    pub fn flip(self) -> Either<R, L> {
-        match self {
-            Self::Left(left) => Right(left),
-            Self::Right(right) => Left(right),
-        }
-    }
+    ////////////////////////////////////////////////////////////////////////////////
+    // Iterators
+    ////////////////////////////////////////////////////////////////////////////////
 
     /// TODO: DOCS
     pub fn into_iter_swap(
@@ -309,6 +321,18 @@ impl<L, R> Either<L, R> {
             self.as_mut()
                 .bimap(IntoIterator::into_iter, IntoIterator::into_iter),
         )
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Conversions
+    ////////////////////////////////////////////////////////////////////////////////
+
+    /// Converts `Either<L, R>` to `Either<R, L>`.
+    pub fn flip(self) -> Either<R, L> {
+        match self {
+            Self::Left(left) => Right(left),
+            Self::Right(right) => Left(right),
+        }
     }
 
     /// TODO: DOCS
@@ -633,6 +657,10 @@ impl<L, R> Either<L, R> {
             Self::Right(_) => self,
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Replacing values
+    ////////////////////////////////////////////////////////////////////////////////
 
     /// TODO: DOCS
     pub fn replace_left(&mut self, value: L) -> Option<L> {

@@ -8,7 +8,7 @@ use std::vec::Vec;
 use crate::iter::{IntoIterEitherOrBoth, IterEitherOrBoth, IterMutEitherOrBoth};
 #[cfg(feature = "either")]
 use crate::Either;
-use crate::{EitherOrBoth, Error};
+use crate::{EitherOrBoth, TryFromOptionsError};
 
 impl<T> IntoIterator for EitherOrBoth<T, T> {
     type Item = T;
@@ -90,11 +90,11 @@ impl<L, R> From<(L, Option<R>)> for EitherOrBoth<L, R> {
 }
 
 impl<L, R> TryFrom<(Option<L>, Option<R>)> for EitherOrBoth<L, R> {
-    type Error = Error;
+    type Error = TryFromOptionsError;
 
     fn try_from(value: (Option<L>, Option<R>)) -> Result<Self, Self::Error> {
         match value {
-            (None, None) => Err(Error::TryFromOptions),
+            (None, None) => Err(TryFromOptionsError),
             (None, Some(right)) => Ok(Self::Right(right)),
             (Some(left), None) => Ok(Self::Left(left)),
             (Some(left), Some(right)) => Ok(Self::Both(left, right)),

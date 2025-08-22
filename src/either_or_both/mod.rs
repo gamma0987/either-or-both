@@ -54,6 +54,10 @@ pub enum EitherOrBoth<L, R = L> {
 }
 
 impl<L, R> EitherOrBoth<L, R> {
+    ////////////////////////////////////////////////////////////////////////////////
+    // Boolish
+    ////////////////////////////////////////////////////////////////////////////////
+
     /// Returns true if `Left` or `Both`
     pub fn has_left(&self) -> bool {
         match self {
@@ -198,6 +202,10 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // As reference conversions
+    ////////////////////////////////////////////////////////////////////////////////
+
     /// Converts from `&EitherOrBoth<L, R>` to `EitherOrBoth<&L, &R>`
     pub fn as_ref(&self) -> EitherOrBoth<&L, &R> {
         map_each!(self)
@@ -252,6 +260,10 @@ impl<L, R> EitherOrBoth<L, R> {
             )
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Unwrapping the contained values
+    ////////////////////////////////////////////////////////////////////////////////
 
     /// Returns the contained `Both` values consuming `self`
     ///
@@ -404,6 +416,10 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Getting the contained values
+    ////////////////////////////////////////////////////////////////////////////////
+
     /// If both values are present, return `Some` containing the values otherwise return `None`
     pub fn both(self) -> Option<(L, R)> {
         match self {
@@ -491,14 +507,9 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Converts `EitherOrBoth<L, R>` to `EitherOrBoth<R, L>`.
-    pub fn flip(self) -> EitherOrBoth<R, L> {
-        match self {
-            Self::Both(left, right) => Both(right, left),
-            Self::Left(left) => Right(left),
-            Self::Right(right) => Left(right),
-        }
-    }
+    ////////////////////////////////////////////////////////////////////////////////
+    // Iterators
+    ////////////////////////////////////////////////////////////////////////////////
 
     /// TODO: DOCS
     pub fn into_iter_swap(
@@ -537,6 +548,19 @@ impl<L, R> EitherOrBoth<L, R> {
             self.as_mut()
                 .bimap(IntoIterator::into_iter, IntoIterator::into_iter),
         )
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Conversions
+    ////////////////////////////////////////////////////////////////////////////////
+
+    /// Converts `EitherOrBoth<L, R>` to `EitherOrBoth<R, L>`.
+    pub fn flip(self) -> EitherOrBoth<R, L> {
+        match self {
+            Self::Both(left, right) => Both(right, left),
+            Self::Left(left) => Right(left),
+            Self::Right(right) => Left(right),
+        }
     }
 
     /// Applies mapping functions to the left and right values returning the result
@@ -820,6 +844,78 @@ impl<L, R> EitherOrBoth<L, R> {
     }
 
     /// TODO: DOCS
+    pub fn into_left<F>(self, f: F) -> Self
+    where
+        F: FnOnce(R) -> L,
+    {
+        match self {
+            Self::Both(left, _) => Self::Left(left),
+            Self::Left(_) => self,
+            Self::Right(right) => Self::Left(f(right)),
+        }
+    }
+
+    /// TODO: DOCS
+    pub fn into_right<F>(self, f: F) -> Self
+    where
+        F: FnOnce(L) -> R,
+    {
+        match self {
+            Self::Both(_, right) => Self::Right(right),
+            Self::Left(left) => Self::Right(f(left)),
+            Self::Right(_) => self,
+        }
+    }
+
+    /// TODO: DOCS
+    #[cfg(feature = "either")]
+    pub fn either<F>(self, f: F) -> Either<L, R>
+    where
+        F: FnOnce(L, R) -> Either<L, R>,
+    {
+        match self {
+            Self::Both(left, right) => f(left, right),
+            Self::Left(left) => Either::Left(left),
+            Self::Right(right) => Either::Right(right),
+        }
+    }
+
+    /// TODO: DOCS
+    #[cfg(feature = "either")]
+    pub fn either_or_right(self) -> Either<L, R> {
+        self.either(|_, r| Either::Right(r))
+    }
+
+    /// TODO: DOCS
+    #[cfg(feature = "either")]
+    pub fn either_or_left(self) -> Either<L, R> {
+        self.either(|l, _| Either::Left(l))
+    }
+
+    /// TODO: DOCS
+    #[cfg(feature = "either")]
+    pub fn either_or(self, default: Either<L, R>) -> Either<L, R> {
+        self.either_or_else(|| default)
+    }
+
+    /// TODO: DOCS
+    #[cfg(feature = "either")]
+    pub fn either_or_else<F>(self, f: F) -> Either<L, R>
+    where
+        F: FnOnce() -> Either<L, R>,
+    {
+        match self {
+            Self::Both(_, _) => f(),
+            Self::Left(left) => Either::Left(left),
+            Self::Right(right) => Either::Right(right),
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Replacing and inserting values
+    ////////////////////////////////////////////////////////////////////////////////
+
+    /// TODO: DOCS
     pub fn insert_left(&mut self, left: L) -> &mut L {
         match self {
             Self::Both(old_left, _) | Self::Left(old_left) => {
@@ -937,74 +1033,6 @@ impl<L, R> EitherOrBoth<L, R> {
             Self::Left(_) => None,
         }
     }
-
-    /// TODO: DOCS
-    pub fn into_left<F>(self, f: F) -> Self
-    where
-        F: FnOnce(R) -> L,
-    {
-        match self {
-            Self::Both(left, _) => Self::Left(left),
-            Self::Left(_) => self,
-            Self::Right(right) => Self::Left(f(right)),
-        }
-    }
-
-    /// TODO: DOCS
-    pub fn into_right<F>(self, f: F) -> Self
-    where
-        F: FnOnce(L) -> R,
-    {
-        match self {
-            Self::Both(_, right) => Self::Right(right),
-            Self::Left(left) => Self::Right(f(left)),
-            Self::Right(_) => self,
-        }
-    }
-
-    /// TODO: DOCS
-    #[cfg(feature = "either")]
-    pub fn either<F>(self, f: F) -> Either<L, R>
-    where
-        F: FnOnce(L, R) -> Either<L, R>,
-    {
-        match self {
-            Self::Both(left, right) => f(left, right),
-            Self::Left(left) => Either::Left(left),
-            Self::Right(right) => Either::Right(right),
-        }
-    }
-
-    /// TODO: DOCS
-    #[cfg(feature = "either")]
-    pub fn either_or_right(self) -> Either<L, R> {
-        self.either(|_, r| Either::Right(r))
-    }
-
-    /// TODO: DOCS
-    #[cfg(feature = "either")]
-    pub fn either_or_left(self) -> Either<L, R> {
-        self.either(|l, _| Either::Left(l))
-    }
-
-    /// TODO: DOCS
-    #[cfg(feature = "either")]
-    pub fn either_or(self, default: Either<L, R>) -> Either<L, R> {
-        self.either_or_else(|| default)
-    }
-
-    /// TODO: DOCS
-    #[cfg(feature = "either")]
-    pub fn either_or_else<F>(self, f: F) -> Either<L, R>
-    where
-        F: FnOnce() -> Either<L, R>,
-    {
-        match self {
-            Self::Both(_, _) => f(),
-            Self::Left(left) => Either::Left(left),
-            Self::Right(right) => Either::Right(right),
-        }
-    }
 }
 
 impl<T> EitherOrBoth<T, T> {
@@ -1058,6 +1086,10 @@ impl<T> EitherOrBoth<T, T> {
             Self::Right(right) => right,
         }
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // Iterators
+    //////////////////////////////////////////////////////////////////////////////////////////
 
     /// TODO: DOCS
     pub fn iter(&self) -> IterEitherOrBoth<'_, T> {
@@ -1242,34 +1274,6 @@ impl<T, E1, E2> EitherOrBoth<Result<T, E1>, Result<T, E2>> {
             },
             Self::Left(left) => left.map_err(Left),
             Self::Right(right) => right.map_err(Right),
-        }
-    }
-}
-
-// TODO: tests, usability
-#[cfg(feature = "either")]
-impl<L1, L2, R1, R2> EitherOrBoth<Either<L1, R1>, Either<L2, R2>> {
-    /// TODO: DOCS
-    ///
-    /// If in doubt the `Right` value is the "right" value
-    pub fn transpose(self) -> Either<EitherOrBoth<L1, L2>, EitherOrBoth<R1, R2>> {
-        match self {
-            Self::Both(left, right) => match (left, right) {
-                (Either::Left(left_1), Either::Left(left_2)) => Either::Left(Both(left_1, left_2)),
-                (Either::Left(_), Either::Right(right_2)) => Either::Right(Right(right_2)),
-                (Either::Right(right_1), Either::Left(_)) => Either::Right(Left(right_1)),
-                (Either::Right(right_1), Either::Right(right_2)) => {
-                    Either::Right(Both(right_1, right_2))
-                }
-            },
-            Self::Left(left) => match left {
-                Either::Left(left_1) => Either::Left(Left(left_1)),
-                Either::Right(right_1) => Either::Right(Left(right_1)),
-            },
-            Self::Right(right) => match right {
-                Either::Left(left_2) => Either::Left(Right(left_2)),
-                Either::Right(right_2) => Either::Right(Right(right_2)),
-            },
         }
     }
 }
