@@ -1,5 +1,9 @@
 //! Tests for `Either`
 
+mod iter;
+#[cfg(feature = "std")]
+mod std;
+
 use core::fmt::Write;
 use core::future::Future;
 use core::pin::Pin;

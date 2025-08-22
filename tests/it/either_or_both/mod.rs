@@ -1,5 +1,10 @@
 //! Tests for `EitherOrBoth`
 
+mod iter;
+mod same_type;
+#[cfg(feature = "std")]
+mod std;
+
 use core::pin::Pin;
 
 #[cfg(feature = "either")]
