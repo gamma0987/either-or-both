@@ -629,22 +629,6 @@ impl<L, R> Either<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn add_left(self, left: L) -> EitherOrBoth<L, R> {
-        match self {
-            Self::Left(left) => EitherOrBoth::Left(left),
-            Self::Right(right) => EitherOrBoth::Both(left, right),
-        }
-    }
-
-    /// TODO: DOCS
-    pub fn add_right(self, right: R) -> EitherOrBoth<L, R> {
-        match self {
-            Self::Left(left) => EitherOrBoth::Both(left, right),
-            Self::Right(right) => EitherOrBoth::Right(right),
-        }
-    }
-
-    /// TODO: DOCS
     pub fn inject_left(self, value: L) -> EitherOrBoth<L, R> {
         match self {
             Self::Left(_) => EitherOrBoth::Left(value),

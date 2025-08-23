@@ -55,6 +55,25 @@ impl<L, R> FromIterator<EitherOrBoth<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
     }
 }
 
+/// TODO: TEST
+#[cfg(all(feature = "std", feature = "either"))]
+impl<L, R> FromIterator<Either<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
+    fn from_iter<T: IntoIterator<Item = Either<L, R>>>(iter: T) -> Self {
+        let (left, right) =
+            iter.into_iter()
+                .fold((vec![], vec![]), |(mut left, mut right), either| {
+                    either.biapply(|l| left.push(l), |r| right.push(r));
+                    (left, right)
+                });
+
+        match (left.is_empty(), right.is_empty()) {
+            (true, true) | (false, false) => Self::Both(left, right),
+            (true, false) => Self::Right(right),
+            (false, true) => Self::Left(left),
+        }
+    }
+}
+
 #[cfg(feature = "either")]
 impl<L, R> From<Either<L, R>> for EitherOrBoth<L, R> {
     fn from(value: Either<L, R>) -> Self {

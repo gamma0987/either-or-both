@@ -572,20 +572,6 @@ fn or_default(#[case] either: Either<u8, char>, #[case] expected: (u8, char)) {
 }
 
 #[rstest]
-#[case::left(Left(109), EitherOrBoth::Left(109))]
-#[case::right(Right('c'), EitherOrBoth::Both(200, 'c'))]
-fn add_left(#[case] either: Either<u8, char>, #[case] expected: EitherOrBoth<u8, char>) {
-    assert_eq!(either.add_left(200), expected);
-}
-
-#[rstest]
-#[case::left(Left(109), EitherOrBoth::Both(109, 'm'))]
-#[case::right(Right('c'), EitherOrBoth::Right('c'))]
-fn add_right(#[case] either: Either<u8, char>, #[case] expected: EitherOrBoth<u8, char>) {
-    assert_eq!(either.add_right('m'), expected);
-}
-
-#[rstest]
 #[case::left(Left(109), EitherOrBoth::Left(200))]
 #[case::right(Right('c'), EitherOrBoth::Both(200, 'c'))]
 fn inject_left(#[case] either: Either<u8, char>, #[case] expected: EitherOrBoth<u8, char>) {
