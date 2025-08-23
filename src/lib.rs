@@ -6,46 +6,42 @@
 //!
 //! # Design Philosophy and Goals
 //!
-//! The api for `either_or_both` is heavily inspired by [`Option`] from the rust standard library
-//! and is designed to be consistent for the [`Either`] and [`EitherOrBoth`] enums. Some methods
-//! (like `bimap`) have their root in functional programming languages like `Haskell`. Where it
-//! makes sense, the methods of [`Option`] are implemented for [`Either`] and [`EitherOrBoth`]. As
-//! far as possible, the names of methods with similar functionality are transferred to both enums.
-//! All in all, if you're familiar with the methods for [`Option`], it should be easy to figure out
-//! what the equivalent method in [`Either`] and [`EitherOrBoth`] does.
+//! The API for `either_or_both` is heavily inspired by the [`Option`] type from the Rust standard
+//! library and aims for consistency between the [`Either`] and [`EitherOrBoth`] enums. Some
+//! methods, like bimap, are derived from functional programming languages such as Haskell. Where
+//! applicable, methods from [`Option`] are also implemented for both [`Either`] and
+//! [`EitherOrBoth`]. Whenever possible, method names with similar functionality are shared across
+//! both enums. If you're familiar with the methods of [`Option`], you should find it easy to
+//! understand the corresponding methods in [`Either`] and [`EitherOrBoth`].
 //!
 //! # Conventions and edge cases
 //!
-//! In most cases, [`Either`] and [`EitherOrBoth`] do not prioritize the right over the left value
-//! and vice versa. However, in rare situations, `Left` holds an error value, while `Right` holds
-//! the correct value (with "right" serving as a mnemonic for "correct"). If applicable or if in
-//! doubt, try to adhere to this convention to simplify conversions between [`Either`] and
-//! [`Result`].
+//! In most cases, [`Either`] and [`EitherOrBoth`] do not prioritize `Left` over `Right` values, or
+//! vice versa. However, in some contexts, `Left` is used to represent an error and `Right` a
+//! correct value - using "right" as a mnemonic for "correct".
 //!
-//! With [`EitherOrBoth`], it can happen that the `Both` variant holds an error and a correct value,
-//! and if not specified otherwise the evaluation of an error value takes precedence over the
-//! correct value. Same goes for the `None` and `Some` values of an [`Option`], in which case
-//! evaluating `None` takes precedence.
+//! With [`EitherOrBoth`], the `Both` variant may contain both an error and a correct value. Unless
+//! explicitly stated otherwise, the error value takes precedence during evaluation. The same
+//! principle applies to [`Option`] types, where `None` takes precedence over `Some`.
 //!
-//! Uniform versions of a function have the `bi-` prefix removed. For example `bimap` maps with two
-//! different functions for `L` and `R` which are possibly different types. `map` applies the same
-//! function to both values which have the same type `T`.
+//! Uniform type versions of bi-functional methods drop the bi- prefix. For example, bimap applies
+//! two functions to potentially different types (`L` and `R`), while map applies the same function
+//! to both sides of a uniform type `T`.
 //!
-//! If there is the question of an evaluation order in methods of [`EitherOrBoth`], then the
-//! evaluation order is from left to right. The evaluation order can be inverted by
-//! [`flipping`][EitherOrBoth::flip] the [`EitherOrBoth`] first.
+//! When evaluation order matters for [`EitherOrBoth`] methods, values are processed left to right.
+//! To reverse this order, use [flip][EitherOrBoth::flip].
 //!
 //! # Method Overview
 //!
 //! [`Either`] and [`EitherOrBoth`] provide a wide variety of different methods. Often, the links
-//! and descriptions in the following sections use [`EitherOrBoth`] but if not specified otherwise
+//! and descriptions in the following sections use [`EitherOrBoth`] but if not specified otherwise,
 //! the same methods are available for [`Either`].
 //!
 //! ## Querying the variant
 //!
 //! Similar to [`Option::is_some`] and [`Option::is_none`], [`is_left`][Either::is_left] and
 //! [`is_right`][Either::is_right] return `true` if the [`Either`] or [`EitherOrBoth`] is `Left` or
-//! `Right` respectively. Additionally [`is_both`][EitherOrBoth::is_both] returns true if
+//! `Right` respectively. Additionally, [`is_both`][EitherOrBoth::is_both] returns true if
 //! [`EitherOrBoth`] is `Both`. Since [`EitherOrBoth`] can hold a left value in the `Both` and
 //! `Left` case, the method [`has_left`][EitherOrBoth::has_left] returns true if the variant is
 //! either `Both` or `Left`. Symmetrically, the right value is covered with
@@ -268,7 +264,7 @@
 //! [`EitherOrBoth`] or [`Either`] is possible with [`transpose`] if the inner values are a
 //! [`Result`], [`Option`] or tuple respectively. The `Both` variant can be tricky because it can
 //! contain an error (or `None`) and correct value (or `Some`) simultaneously. As per [convention]
-//! mentioned above the error (or `None`) value takes precedence.
+//! mentioned above, the error (or `None`) value takes precedence.
 //!
 //! | From | To |
 //! | --- | --- |
@@ -276,7 +272,7 @@
 //! | [`EitherOrBoth<Option<L>, Option<R>>`] | [`Option<EitherOrBoth<L, R>>`] |
 //! | [`EitherOrBoth<(L1, R1), (L2, R2)>`][EitherOrBoth] | [`(EitherOrBoth<L1, L2>, EitherOrBoth<R1, R2>)`][EitherOrBoth] |
 //!
-//! The uniform cases can be handled separately with [`transpose_ok`] and [`transpose_err`] for
+//! The uniform type cases can be handled separately with [`transpose_ok`] and [`transpose_err`] for
 //! [`Result`] and [`transpose_left`] and [`transpose_right`] for tuples.
 //!
 //! [`transpose`]: EitherOrBoth::transpose
