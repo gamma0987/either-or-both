@@ -39,8 +39,6 @@ use crate::unwrap_failed;
 
 /// Represent values that have either a `Left` or `Right` value or `Both` values
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
-// TODO: Remove `c_repr` feature
-#[cfg_attr(feature = "c_repr", repr(C))]
 #[cfg_attr(feature = "serde", allow(clippy::unsafe_derive_deserialize))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum EitherOrBoth<L, R = L> {
