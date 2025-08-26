@@ -576,14 +576,14 @@ impl<L, R> Either<L, R> {
     }
 
     /// TODO: DOCS
-    pub fn ok_or(self, error: L) -> Result<R, L> {
+    pub fn ok_or<E>(self, error: E) -> Result<R, E> {
         self.ok_or_else(|| error)
     }
 
     /// TODO: DOCS
-    pub fn ok_or_else<F>(self, error: F) -> Result<R, L>
+    pub fn ok_or_else<F, E>(self, error: F) -> Result<R, E>
     where
-        F: FnOnce() -> L,
+        F: FnOnce() -> E,
     {
         match self {
             Self::Left(_) => Err(error()),
