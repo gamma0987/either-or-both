@@ -88,6 +88,7 @@ build package:
 build-docs:
     DOCS_RS=1 cargo doc --all-features --no-deps --workspace
 
+
 # Run all tests in a package. (Uses: 'cargo')
 [group('test')]
 test:
@@ -97,6 +98,10 @@ test:
 [group('test')]
 test-doc:
     DOCS_RS=1 cargo test --all-features --doc
+
+# Build and test the documentation (Uses: 'cargo')
+[group('test')]
+build-and-test-docs: build-docs test-doc
 
 [group('test')]
 test-hack:

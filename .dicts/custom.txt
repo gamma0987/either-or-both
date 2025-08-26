@@ -1,3 +1,4 @@
+EitherOrBoths
 biapply
 biconsume
 biinspect

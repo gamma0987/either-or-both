@@ -1,4 +1,4 @@
-//! The trait implementations if feature is `std`
+//! Trait implementations for `EitherOrBoth`
 
 #[cfg(feature = "std")]
 use std::vec;
@@ -14,6 +14,30 @@ impl<T> IntoIterator for EitherOrBoth<T, T> {
     type Item = T;
     type IntoIter = IntoIterEitherOrBoth<T>;
 
+    /// Returns a consuming iterator over the contained values of a uniform type
+    ///
+    /// The evaluation order is from left to right if this is a [`Both`] variant. To reverse the
+    /// order use [`flip`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use either_or_both::EitherOrBoth;
+    ///
+    /// let value: EitherOrBoth<char> = EitherOrBoth::Both('c', 'a');
+    /// let mut iter = value.into_iter();
+    /// assert_eq!(iter.next(), Some('c'));
+    /// assert_eq!(iter.next(), Some('a'));
+    /// assert_eq!(iter.next(), None);
+    ///
+    /// let value: EitherOrBoth<char> = EitherOrBoth::Left('c');
+    /// let mut iter = value.into_iter();
+    /// assert_eq!(iter.next(), Some('c'));
+    /// assert_eq!(iter.next(), None);
+    /// ```
+    ///
+    /// [`Both`]: EitherOrBoth::Both
+    /// [`flip`]: EitherOrBoth::flip
     fn into_iter(self) -> Self::IntoIter {
         IntoIterEitherOrBoth::new(self)
     }
@@ -39,6 +63,24 @@ impl<'a, T> IntoIterator for &'a mut EitherOrBoth<T, T> {
 
 #[cfg(feature = "std")]
 impl<L, R> FromIterator<EitherOrBoth<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
+    /// Takes each element in the [`Iterator`] collecting the left and right values into separate
+    /// iterators
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use either_or_both::EitherOrBoth;
+    ///
+    /// let items: Vec<EitherOrBoth<u8, char>> =
+    ///     vec![EitherOrBoth::Both(1, 'c'), EitherOrBoth::Left(2)];
+    ///
+    /// let collected: EitherOrBoth<_, _> = items
+    ///     .iter()
+    ///     .map(|e| e.bimap(|l| l + 1, |r| r.max('a')))
+    ///     .collect();
+    ///
+    /// assert_eq!(collected, EitherOrBoth::Both(vec![2, 3], vec!['c']));
+    /// ```
     fn from_iter<T: IntoIterator<Item = EitherOrBoth<L, R>>>(iter: T) -> Self {
         let (left, right) =
             iter.into_iter()
@@ -58,6 +100,23 @@ impl<L, R> FromIterator<EitherOrBoth<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
 /// TODO: TEST
 #[cfg(all(feature = "std", feature = "either"))]
 impl<L, R> FromIterator<Either<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
+    /// Takes each element in the [`Iterator`] collecting the left and right values into separate
+    /// iterators yielding an [`EitherOrBoth`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use either_or_both::{Either, EitherOrBoth};
+    ///
+    /// let items: Vec<Either<u8, char>> = vec![Either::Left(1), Either::Right('c')];
+    ///
+    /// let collected: EitherOrBoth<_, _> = items
+    ///     .iter()
+    ///     .map(|e| e.bimap(|l| l + 1, |r| r.max('a')))
+    ///     .collect();
+    ///
+    /// assert_eq!(collected, EitherOrBoth::Both(vec![2], vec!['c']));
+    /// ```
     fn from_iter<T: IntoIterator<Item = Either<L, R>>>(iter: T) -> Self {
         let (left, right) =
             iter.into_iter()

@@ -8,8 +8,6 @@ mod traits;
 
 use core::pin::Pin;
 
-#[cfg(feature = "either")]
-use either_or_both::Either;
 use either_or_both::EitherOrBoth;
 use either_or_both::EitherOrBoth::*;
 use rstest::rstest;
@@ -151,9 +149,7 @@ fn is_both(#[case] either_or_both: EitherOrBoth<u8, char>, #[case] expected: boo
 #[case::left(left_variant())]
 #[case::right(right_variant())]
 fn is_both_and_when_false(#[case] either_or_both: EitherOrBoth<u8, char>) {
-    assert!(!either_or_both.is_both_and(left_is_true, right_is_false));
-    assert!(!either_or_both.is_both_and(left_is_false, right_is_true));
-    assert!(!either_or_both.is_both_and(left_is_false, right_is_false));
+    assert!(!either_or_both.is_both_and(|l, r| left_is_false(l) && right_is_false(r)));
 }
 
 #[rstest]
@@ -162,7 +158,7 @@ fn is_both_and_when_false(#[case] either_or_both: EitherOrBoth<u8, char>) {
 #[case::right(right_variant(), false)]
 fn is_both_and_when_true(#[case] either_or_both: EitherOrBoth<u8, char>, #[case] expected: bool) {
     assert_eq!(
-        either_or_both.is_both_and(left_is_true, right_is_true),
+        either_or_both.is_both_and(|l, r| left_is_true(l) && right_is_true(r)),
         expected
     );
 }
@@ -993,66 +989,6 @@ fn into_right(
     #[case] expected: EitherOrBoth<u8, char>,
 ) {
     assert_eq!(either_or_both.into_right(|l| (l + 100) as char), expected);
-}
-
-#[cfg(feature = "either")]
-#[rstest]
-#[case::both(both_variant(), Either::Left(100))]
-#[case::left(left_variant(), Either::Left(LEFT_VALUE))]
-#[case::right(right_variant(), Either::Right(RIGHT_VALUE))]
-fn either(#[case] either_or_both: EitherOrBoth<u8, char>, #[case] expected: Either<u8, char>) {
-    assert_eq!(
-        either_or_both.either(|l, r| Either::Left(l + r as u8)),
-        expected
-    );
-}
-
-#[cfg(feature = "either")]
-#[rstest]
-#[case::both(both_variant(), Either::Right(RIGHT_VALUE))]
-#[case::left(left_variant(), Either::Left(LEFT_VALUE))]
-#[case::right(right_variant(), Either::Right(RIGHT_VALUE))]
-fn either_or_right(
-    #[case] either_or_both: EitherOrBoth<u8, char>,
-    #[case] expected: Either<u8, char>,
-) {
-    assert_eq!(either_or_both.either_or_right(), expected);
-}
-
-#[cfg(feature = "either")]
-#[rstest]
-#[case::both(both_variant(), Either::Left(LEFT_VALUE))]
-#[case::left(left_variant(), Either::Left(LEFT_VALUE))]
-#[case::right(right_variant(), Either::Right(RIGHT_VALUE))]
-fn either_or_left(
-    #[case] either_or_both: EitherOrBoth<u8, char>,
-    #[case] expected: Either<u8, char>,
-) {
-    assert_eq!(either_or_both.either_or_left(), expected);
-}
-
-#[cfg(feature = "either")]
-#[rstest]
-#[case::both(both_variant(), Either::Left(100))]
-#[case::left(left_variant(), Either::Left(LEFT_VALUE))]
-#[case::right(right_variant(), Either::Right(RIGHT_VALUE))]
-fn either_or(#[case] either_or_both: EitherOrBoth<u8, char>, #[case] expected: Either<u8, char>) {
-    assert_eq!(either_or_both.either_or(Either::Left(100)), expected);
-}
-
-#[cfg(feature = "either")]
-#[rstest]
-#[case::both(both_variant(), Either::Left(100))]
-#[case::left(left_variant(), Either::Left(LEFT_VALUE))]
-#[case::right(right_variant(), Either::Right(RIGHT_VALUE))]
-fn either_or_else(
-    #[case] either_or_both: EitherOrBoth<u8, char>,
-    #[case] expected: Either<u8, char>,
-) {
-    assert_eq!(
-        either_or_both.either_or_else(|| Either::Left(100)),
-        expected
-    );
 }
 
 #[rstest]

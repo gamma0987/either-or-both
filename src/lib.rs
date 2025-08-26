@@ -206,12 +206,10 @@
 //!
 //! ## Transforming contained values
 //!
-//! The methods below transform to a [`Result`]. In [`EitherOrBoth`] the [`Both(l, r)`] variant is
-//! ambiguous but per [convention], evaluations to error values take precedence so it evaluates to
-//! [`Err(l)`].
+//! The methods below convert to a [`Result`] as described in the [convention]:
 //!
-//! * [`ok`]: This method transforms [`Left(v)`] to [`Err(v)`] and [`Right(v)`] to [`Ok(v)`] with
-//!   the [convention] for [`EitherOrBoth`] as mentioned above.
+//! * [`ok`]: This method transforms [`Left(v)`] to [`Err(v)`], [`Right(v)`] to [`Ok(v)`] and in the
+//!   case of [`EitherOrBoth`], [`Both(l, r)`] to [`Err(l)`]
 //! * [`ok_or`] transforms [`Right(v)`] to [`Ok(v)`] and a left value to [`Err`] with the provided
 //!   `err` value.
 //! * [`ok_or_else`] transforms [`Right(v)`] to [`Ok(v)`] and a left value to [`Err`] using the
@@ -226,6 +224,7 @@
 //! [`Ok(v)`]: Result::Ok
 //! [`Err(v)`]: Result::Err
 //! [`Err(l)`]: Result::Err
+//! [`Err(r)`]: Result::Err
 //! [`Both(l, r)`]: EitherOrBoth::Both
 //! [convention]: #conventions-and-edge-cases
 //!

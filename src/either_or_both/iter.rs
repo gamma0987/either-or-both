@@ -4,29 +4,30 @@ use core::iter::FusedIterator;
 
 use crate::EitherOrBoth;
 
-/// TODO: DOCS
+/// A iterator over the contained iterators of a uniform type chaining both iterators from left to
+/// right
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ChainedIterEitherOrBoth<T>(EitherOrBoth<T, T>);
 
-/// TODO: DOCS
+/// An iterator over the contained values of a uniform type
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct IntoIterEitherOrBoth<T>(Items<T>);
 
-/// TODO: DOCS
+/// The `Items` used to iterate over an `EitherOrBoth`
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct Items<T> {
     inner: EitherOrBoth<Option<T>, Option<T>>,
 }
 
-/// TODO: DOCS
+/// An iterator over the references to the contained values of a uniform type
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct IterEitherOrBoth<'a, T: 'a>(Items<&'a T>);
 
-/// TODO: DOCS
+/// An iterator over the mutable references to the contained values of a uniform type
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct IterMutEitherOrBoth<'a, T: 'a>(Items<&'a mut T>);
 
-/// TODO: DOCS
+/// An iterator over `EitherOrBoths`
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SwapIterEitherOrBoth<L, R>(EitherOrBoth<L, R>);
 
