@@ -9,7 +9,7 @@ use std::error::Error;
 #[cfg(feature = "std")]
 use std::io::{BufRead, Read, Seek};
 
-use crate::either::iter::IterEither;
+use crate::iter_either::{IntoIterEither, IterEither, IterMutEither};
 use crate::Either;
 
 impl<L, R, T> AsMut<T> for Either<L, R>
@@ -143,39 +143,30 @@ where
     }
 }
 
-impl<T> IntoIterator for Either<T>
-where
-    T: IntoIterator,
-{
-    type Item = T::Item;
-    type IntoIter = IterEither<<T as IntoIterator>::IntoIter>;
+impl<T> IntoIterator for Either<T> {
+    type Item = T;
+    type IntoIter = IntoIterEither<T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        IterEither::new(self.map(IntoIterator::into_iter))
+        IntoIterEither::new(self)
     }
 }
 
-impl<'a, T> IntoIterator for &'a Either<T>
-where
-    &'a T: IntoIterator,
-{
-    type Item = <&'a T as IntoIterator>::Item;
-    type IntoIter = IterEither<<&'a T as IntoIterator>::IntoIter>;
+impl<'a, T> IntoIterator for &'a Either<T> {
+    type Item = &'a T;
+    type IntoIter = IterEither<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        IterEither::new(self.as_ref().map(IntoIterator::into_iter))
+        IterEither::new(self)
     }
 }
 
-impl<'a, T> IntoIterator for &'a mut Either<T>
-where
-    &'a mut T: IntoIterator,
-{
-    type Item = <&'a mut T as IntoIterator>::Item;
-    type IntoIter = IterEither<<&'a mut T as IntoIterator>::IntoIter>;
+impl<'a, T> IntoIterator for &'a mut Either<T> {
+    type Item = &'a mut T;
+    type IntoIter = IterMutEither<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        IterEither::new(self.as_mut().map(IntoIterator::into_iter))
+        IterMutEither::new(self)
     }
 }
 

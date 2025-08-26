@@ -22,9 +22,10 @@ use core::mem;
 use core::ops::{Deref, DerefMut};
 use core::pin::Pin;
 
-use iter::{IterEither, SwapIterEither};
+use iter::{InnerIterEither, SwapIterEither};
 use Either::*;
 
+use crate::iter_either::{IterEither, IterMutEither};
 use crate::{unwrap_failed, EitherOrBoth};
 
 /// Represent values with two possibilities. `Either` can be either `Left` or `Right`
@@ -1694,20 +1695,38 @@ impl<T> Either<T, T> {
         self
     }
 
-    /// TODO: DOCS and different impl
-    pub fn iter(&self) -> IterEither<<&T as IntoIterator>::IntoIter>
-    where
-        for<'a> &'a T: IntoIterator,
-    {
-        IterEither::new(self.as_ref().map(IntoIterator::into_iter))
+    /// TODO: DOCS
+    pub fn iter(&self) -> IterEither<'_, T> {
+        IterEither::new(self)
     }
 
     /// TODO: DOCS
-    pub fn iter_mut(&mut self) -> IterEither<<&mut T as IntoIterator>::IntoIter>
+    pub fn iter_mut(&mut self) -> IterMutEither<'_, T> {
+        IterMutEither::new(self)
+    }
+
+    /// TODO: DOCS
+    pub fn into_iter_inner(self) -> InnerIterEither<<T as IntoIterator>::IntoIter>
+    where
+        T: IntoIterator,
+    {
+        InnerIterEither::new(self.map(IntoIterator::into_iter))
+    }
+
+    /// TODO: DOCS
+    pub fn iter_inner(&self) -> InnerIterEither<<&T as IntoIterator>::IntoIter>
+    where
+        for<'a> &'a T: IntoIterator,
+    {
+        InnerIterEither::new(self.as_ref().map(IntoIterator::into_iter))
+    }
+
+    /// TODO: DOCS
+    pub fn iter_inner_mut(&mut self) -> InnerIterEither<<&mut T as IntoIterator>::IntoIter>
     where
         for<'a> &'a mut T: IntoIterator,
     {
-        IterEither::new(self.as_mut().map(IntoIterator::into_iter))
+        InnerIterEither::new(self.as_mut().map(IntoIterator::into_iter))
     }
 
     /// Applies a mapping function to the left and right values (of a uniform type) returning an

@@ -16,16 +16,16 @@ pub struct IntoIterEitherOrBoth<T>(Items<T>);
 /// The `Items` used to iterate over an `EitherOrBoth`
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct Items<T> {
-    inner: EitherOrBoth<Option<T>, Option<T>>,
+    inner: EitherOrBoth<Option<T>>,
 }
 
 /// An iterator over the references to the contained values of a uniform type
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub struct IterEitherOrBoth<'a, T: 'a>(Items<&'a T>);
+pub struct IterEitherOrBoth<'a, T>(Items<&'a T>);
 
 /// An iterator over the mutable references to the contained values of a uniform type
 #[derive(Debug, Default, PartialEq, Eq)]
-pub struct IterMutEitherOrBoth<'a, T: 'a>(Items<&'a mut T>);
+pub struct IterMutEitherOrBoth<'a, T>(Items<&'a mut T>);
 
 /// An iterator over `EitherOrBoths`
 #[derive(Debug, Clone, PartialEq, Eq)]
