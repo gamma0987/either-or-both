@@ -27,6 +27,23 @@ fn from_iter(
 
 #[cfg(feature = "either")]
 #[rstest]
+#[case::left(vec![Either::Left(1)], Left(vec![1]))]
+#[case::right(vec![Either::Right('c')], Right(vec!['c']))]
+#[case::left_and_right(vec![Either::Left(1), Either::Right('c')], Both(vec![1], vec!['c']))]
+fn from_iter_either(
+    #[case] either: Vec<Either<u8, char>>,
+    #[case] expected: EitherOrBoth<Vec<u8>, Vec<char>>,
+) {
+    assert_eq!(
+        either
+            .into_iter()
+            .collect::<EitherOrBoth<Vec<u8>, Vec<char>>>(),
+        expected
+    );
+}
+
+#[cfg(feature = "either")]
+#[rstest]
 #[case::left(Either::Left(1), Left(1))]
 #[case::right(Either::Right('c'), Right('c'))]
 fn from_either(#[case] either: Either<u8, char>, #[case] expected: EitherOrBoth<u8, char>) {

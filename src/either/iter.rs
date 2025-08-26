@@ -4,27 +4,27 @@ use core::iter::FusedIterator;
 
 use crate::Either;
 
-/// TODO: DOCS
+/// An iterator over the contained value of a uniform type
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct IntoIterEither<T>(Item<T>);
 
-/// TODO: DOCS
+/// The `Item` used to iterate over an `Either`
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct Item<T>(Option<Either<T>>);
 
-/// TODO: DOCS
+/// An iterator over the references to the contained values of a uniform type
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct IterEither<'a, T>(Item<&'a T>);
 
-/// TODO: DOCS
+/// An iterator over the mutable references to the contained values of a uniform type
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct IterMutEither<'a, T>(Item<&'a mut T>);
 
-/// TODO: DOCS
+/// An iterator over the contained iterator of a uniform type
 #[derive(Debug, Clone)]
 pub struct InnerIterEither<T>(Either<T>);
 
-/// TODO: DOCS
+/// An iterator over `Eithers`
 #[derive(Debug, Clone)]
 pub struct SwapIterEither<L, R>(Either<L, R>);
 

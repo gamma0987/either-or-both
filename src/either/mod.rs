@@ -1695,17 +1695,64 @@ impl<T> Either<T, T> {
         self
     }
 
-    /// TODO: DOCS
+    /// Returns an iterator over the contained value of a uniform type
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use either_or_both::EitherOrBoth;
+    ///
+    /// let value: EitherOrBoth<char> = EitherOrBoth::Left('c');
+    /// let mut iter = value.iter();
+    /// assert_eq!(iter.next(), Some(&'c'));
+    /// assert_eq!(iter.next(), None);
+    ///
+    /// let value: EitherOrBoth<char> = EitherOrBoth::Right('c');
+    /// let mut iter = value.iter();
+    /// assert_eq!(iter.next(), Some(&'c'));
+    /// assert_eq!(iter.next(), None);
+    /// ```
     pub fn iter(&self) -> IterEither<'_, T> {
         IterEither::new(self)
     }
 
-    /// TODO: DOCS
+    /// Returns an iterator over the contained mutable value of a uniform type
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use either_or_both::EitherOrBoth;
+    ///
+    /// let mut value: EitherOrBoth<char> = EitherOrBoth::Left('c');
+    /// let mut iter = value.iter_mut();
+    /// assert_eq!(iter.next(), Some(&mut 'c'));
+    /// assert_eq!(iter.next(), None);
+    ///
+    /// let mut value: EitherOrBoth<char> = EitherOrBoth::Right('c');
+    /// let mut iter = value.iter_mut();
+    /// assert_eq!(iter.next(), Some(&mut 'c'));
+    /// assert_eq!(iter.next(), None);
+    /// ```
     pub fn iter_mut(&mut self) -> IterMutEither<'_, T> {
         IterMutEither::new(self)
     }
 
-    /// TODO: DOCS
+    /// Consumes the `Either`, returning an iterator over the contained iterator of a uniform type
+    ///
+    /// For iteration over contained iterators with non-uniform types, you can use
+    /// [`into_iter_swap`] instead.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use either_or_both::Either;
+    ///
+    /// let value: Either<Vec<char>> = Either::Left(vec!['c', 'a']);
+    /// let collected: Vec<char> = value.into_iter_inner().collect();
+    /// assert_eq!(collected, vec!['c', 'a']);
+    /// ```
+    ///
+    /// [`into_iter_swap`]: Either::into_iter_swap
     pub fn into_iter_inner(self) -> InnerIterEither<<T as IntoIterator>::IntoIter>
     where
         T: IntoIterator,
@@ -1713,7 +1760,22 @@ impl<T> Either<T, T> {
         InnerIterEither::new(self.map(IntoIterator::into_iter))
     }
 
-    /// TODO: DOCS
+    /// Returns an iterator over the contained iterator of a uniform type
+    ///
+    /// For iteration over contained iterators with non-uniform types, you can use
+    /// [`iter_swap`] instead.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use either_or_both::Either;
+    ///
+    /// let value: Either<Vec<char>> = Either::Left(vec!['c', 'a']);
+    /// let collected: Vec<&char> = value.iter_inner().collect();
+    /// assert_eq!(collected, vec![&'c', &'a']);
+    /// ```
+    ///
+    /// [`iter_swap`]: Either::into_iter_swap
     pub fn iter_inner(&self) -> InnerIterEither<<&T as IntoIterator>::IntoIter>
     where
         for<'a> &'a T: IntoIterator,
@@ -1721,7 +1783,22 @@ impl<T> Either<T, T> {
         InnerIterEither::new(self.as_ref().map(IntoIterator::into_iter))
     }
 
-    /// TODO: DOCS
+    /// Returns an iterator over the mutable values of the contained iterator of a uniform type
+    ///
+    /// For iteration over contained iterators with non-uniform types, you can use [`iter_swap_mut`]
+    /// instead.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use either_or_both::Either;
+    ///
+    /// let mut value: Either<Vec<char>> = Either::Left(vec!['c', 'a']);
+    /// let collected: Vec<&mut char> = value.iter_inner_mut().collect();
+    /// assert_eq!(collected, vec![&mut 'c', &mut 'a']);
+    /// ```
+    ///
+    /// [`iter_swap_mut`]: Either::iter_swap_mut
     pub fn iter_inner_mut(&mut self) -> InnerIterEither<<&mut T as IntoIterator>::IntoIter>
     where
         for<'a> &'a mut T: IntoIterator,

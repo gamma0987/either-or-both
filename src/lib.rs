@@ -318,7 +318,7 @@
 //!
 //! ## Iterating
 //!
-//! Iterating over [`Either`] and [`EitherOrBoth`] is different
+//! Iterating over [`Either`] and [`EitherOrBoth`] is slightly different
 //!
 //! ### Iterating over [`EitherOrBoth`]
 //!
@@ -357,13 +357,22 @@
 //!
 //! ### Iterating over [`Either`]
 //!
-//! Unlike [`EitherOrBoth`], [`Either`] can only be iterated over directly if the types are uniform
-//! and the inner values implement [`IntoIterator`].
+//! Like [`EitherOrBoth`], an [`Either`] can be iterated over directly if the types are uniform
+//! [`Either<T>`]. The iterator produces a single value. The uniform iterators over the type `T`
+//! come in in three types:
 //!
 //! * [`into_iter`][Either::into_iter] consumes the [`Either`]
-//! * [`iter`][Either::iter] produces immutable references of type `&T` to the inner iterator values
-//! * [`iter_mut`][Either::iter_mut] produces mutable references of type `&mut T` to the inner
+//! * [`iter`][Either::iter] produces an immutable reference of type `&T` to the contained value
+//! * [`iter_mut`][Either::iter_mut] produces an mutable reference of type `&mut T` to the contained
+//!   value
+//!
+//! If the uniform inner types implement [`IntoIterator`], the [`Either`] can be iterator over with:
+//!
+//! * [`into_iter_inner`][Either::into_iter_inner] consumes the [`Either`]
+//! * [`iter_inner`][Either::iter_inner] produces immutable references of type `&T` to the inner
 //!   iterator values
+//! * [`iter_inner_mut`][Either::iter_inner_mut] produces mutable references of type `&mut T` to the
+//!   inner iterator values
 //!
 //! If the [`Either`] types are non-uniform, the swap iterator for [`Either`] work exactly the same
 //! as the [`EitherOrBoth`] swap iterators:
