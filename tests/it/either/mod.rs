@@ -705,11 +705,11 @@ fn transpose_result(
 #[case::left_err(Left(Err("10")), Err("10"))]
 #[case::right(Right(Ok(10)), Ok(Right(10)))]
 #[case::right_err(Right(Err("20")), Err("20"))]
-fn transpose_ok(
+fn transpose_err(
     #[case] either: Either<Result<i32, &str>, Result<u8, &str>>,
     #[case] expected: Result<Either<i32, u8>, &str>,
 ) {
-    assert_eq!(either.transpose_ok(), expected);
+    assert_eq!(either.transpose_err(), expected);
 }
 
 #[rstest]
@@ -717,11 +717,11 @@ fn transpose_ok(
 #[case::left_err(Left(Err("10")), Err(Left("10")))]
 #[case::right(Right(Ok(10)), Ok(10))]
 #[case::right_err(Right(Err('c')), Err(Right('c')))]
-fn transpose_err(
+fn transpose_ok(
     #[case] either: Either<Result<i32, &str>, Result<i32, char>>,
     #[case] expected: Result<i32, Either<&str, char>>,
 ) {
-    assert_eq!(either.transpose_err(), expected);
+    assert_eq!(either.transpose_ok(), expected);
 }
 
 #[rstest]

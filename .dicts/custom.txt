@@ -1,4 +1,5 @@
 EitherOrBoths
+Eithers
 biapply
 biconsume
 biinspect

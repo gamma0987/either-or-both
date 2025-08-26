@@ -2198,9 +2198,9 @@ impl<L, R> EitherOrBoth<L, R> {
     /// a correct value. Also, the evaluation of the `error` value takes precedence if [`Both`]
     /// values are present.
     ///
-    /// The `ok_or` combinator eagerly evaluates its arguments, which can result in
-    /// unnecessary computations. When chaining operations that involve function calls, use
-    /// [`ok_or_else`] instead. It evaluates the function lazily.
+    /// The `ok_or` combinator eagerly evaluates its arguments, which can result in unnecessary
+    /// computations. When chaining operations that involve function calls, use [`ok_or_else`]
+    /// instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
