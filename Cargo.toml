@@ -1,8 +1,11 @@
+[workspace]
+members = ["benchmarks"]
+
 [package]
 authors = ["gamma0987 <gamma0987@posteo.de>"]
 categories = ["data-structures", "no-std"]
 description = """
-An enum data structure `EitherOrBoth` with the three variants `Left`, `Right`, `Both`
+The enums `EitherOrBoth` with the three variants `Left`, `Right`, `Both` and `Either` with the `Left` and `Right` variants
 """
 edition = "2021"
 homepage = "https://github.com/gamma0987/either-or-both"
@@ -11,8 +14,21 @@ license = "Apache-2.0 OR MIT"
 name = "either-or-both"
 readme = "README.md"
 repository = "https://github.com/gamma0987/either-or-both"
-rust-version = "1.67.1"
+rust-version = "1.63.0"
 version = "0.1.0"
+
+[features]
+default = ["either", "std"]
+either = []
+serde = ["dep:serde"]
+std = []
+
+[dependencies]
+serde = { version = "1", optional = true, features = ["derive"] }
+
+[dev-dependencies]
+rstest = "0.18"
+tokio = { version = "1.38", features = ["rt", "macros"] }
 
 [lints.rust]
 missing_docs = "warn"
@@ -52,7 +68,7 @@ missing_panics_doc = "allow"
 mixed_read_write_in_expression = "warn"
 module_name_repetitions = "allow"
 multiple_inherent_impl = "warn"
-multiple_unsafe_ops_per_block = "warn"
+# multiple_unsafe_ops_per_block = "warn"
 must_use_candidate = "allow"
 needless_collect = "warn"
 needless_pass_by_ref_mut = "warn"
@@ -76,6 +92,7 @@ return_self_not_must_use = "allow"
 same_name_method = "warn"
 semicolon_inside_block = "warn"
 single_option_map = "warn"
+std_instead_of_core = "warn"
 str_to_string = "warn"
 string_lit_chars_any = "warn"
 string_to_string = "warn"

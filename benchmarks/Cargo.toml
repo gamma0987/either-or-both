@@ -1,0 +1,21 @@
+[package]
+name = "benchmarks"
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.89.0"
+publish = false
+
+[dev-dependencies]
+either-or-both = { version = "0.1.0", path = ".." }
+iai-callgrind = "0.16.1"
+
+# TODO: rename to either_or_both or either_or_both_iter
+[[bench]]
+harness = false
+name = "iai_callgrind"
+path = "benches/iai_callgrind.rs"
+
+[[bench]]
+harness = false
+name = "either"
+path = "benches/either.rs"
