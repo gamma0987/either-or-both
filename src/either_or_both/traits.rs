@@ -97,7 +97,6 @@ impl<L, R> FromIterator<EitherOrBoth<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
     }
 }
 
-/// TODO: TEST
 #[cfg(all(feature = "std", feature = "either"))]
 impl<L, R> FromIterator<Either<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
     /// Takes each element in the [`Iterator`] collecting the left and right values into separate

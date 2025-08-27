@@ -450,8 +450,9 @@ mod error;
 
 #[cfg(feature = "either")]
 pub use either::{iter as iter_either, Either};
-pub use either_or_both::{iter, EitherOrBoth};
 pub use error::TryFromOptionsError;
+
+pub use crate::either_or_both::{iter, EitherOrBoth};
 
 #[cold]
 #[track_caller]

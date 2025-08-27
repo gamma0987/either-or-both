@@ -1,5 +1,14 @@
 //! The `Either` enum
 
+macro_rules! map_each {
+    ($src:expr) => {
+        match $src {
+            Self::Left(left) => Left(left),
+            Self::Right(left) => Right(left),
+        }
+    };
+}
+
 macro_rules! each {
     ($src:expr, $( $rest:tt )*) => {
         match $src {
@@ -208,10 +217,7 @@ impl<L, R> Either<L, R> {
     /// ```
     #[allow(clippy::same_name_method)]
     pub fn as_ref(&self) -> Either<&L, &R> {
-        match self {
-            Self::Left(left) => Left(left),
-            Self::Right(right) => Right(right),
-        }
+        map_each!(self)
     }
 
     /// Converts from `&mut Either<L, R>` to `Either<&mut L, &mut R>`.
@@ -232,10 +238,7 @@ impl<L, R> Either<L, R> {
     /// ```
     #[allow(clippy::same_name_method)]
     pub fn as_mut(&mut self) -> Either<&mut L, &mut R> {
-        match self {
-            Self::Left(left) => Left(left),
-            Self::Right(right) => Right(right),
-        }
+        map_each!(self)
     }
 
     /// Converts from `Either<L, R>` to `Either<&L::Target, &R::Target>`.

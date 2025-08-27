@@ -107,14 +107,14 @@ fn iter_size_hint(
 }
 
 #[rstest]
-#[case::both(Both(1, 2), [Some(&mut 1), Some(&mut 2), None])]
-#[case::left(Left(1), [Some(&mut 1), None, None])]
-#[case::right(Right(2), [Some(&mut 2), None, None])]
+#[case::both(Both(1, 2), [Some(1), Some(2), None])]
+#[case::left(Left(1), [Some(1), None, None])]
+#[case::right(Right(2), [Some(2), None, None])]
 fn iter_mut_next(
     #[case] mut either_or_both: EitherOrBoth<i32>,
-    #[case] expected: [Option<&mut i32>; 3],
+    #[case] mut expected: [Option<i32>; 3],
 ) {
-    let mut expected_iter = expected.into_iter();
+    let mut expected_iter = expected.iter_mut().map(Option::as_mut);
     let mut iter = either_or_both.iter_mut();
     assert_eq!(iter.next(), expected_iter.next().unwrap());
     assert_eq!(iter.next(), expected_iter.next().unwrap());
@@ -137,14 +137,14 @@ fn iter_mut_for_loop(#[case] mut either_or_both: EitherOrBoth<i32>, #[case] mut 
 }
 
 #[rstest]
-#[case::both(Both(1, 2), [Some(&mut 2), Some(&mut 1), None])]
-#[case::left(Left(1), [Some(&mut 1), None, None])]
-#[case::right(Right(2), [Some(&mut 2), None, None])]
+#[case::both(Both(1, 2), [Some(2), Some(1), None])]
+#[case::left(Left(1), [Some(1), None, None])]
+#[case::right(Right(2), [Some(2), None, None])]
 fn iter_mut_next_back(
     #[case] mut either_or_both: EitherOrBoth<i32>,
-    #[case] expected: [Option<&mut i32>; 3],
+    #[case] mut expected: [Option<i32>; 3],
 ) {
-    let mut expected_iter = expected.into_iter();
+    let mut expected_iter = expected.iter_mut().map(Option::as_mut);
     let mut iter = either_or_both.iter_mut();
     assert_eq!(iter.next_back(), expected_iter.next().unwrap());
     assert_eq!(iter.next_back(), expected_iter.next().unwrap());
@@ -209,14 +209,14 @@ fn iter_chain_next(
 }
 
 #[rstest]
-#[case::both(Both(vec![1], vec![2]), [Some(&mut 1), Some(&mut 2), None])]
-#[case::left(Left(vec![1]), [Some(&mut 1), None, None])]
-#[case::right(Right(vec![2]), [Some(&mut 2), None, None])]
+#[case::both(Both(vec![1], vec![2]), [Some(1), Some(2), None])]
+#[case::left(Left(vec![1]), [Some(1), None, None])]
+#[case::right(Right(vec![2]), [Some(2), None, None])]
 fn iter_chain_mut_next(
     #[case] mut either_or_both: EitherOrBoth<Vec<i32>>,
-    #[case] expected: [Option<&mut i32>; 3],
+    #[case] mut expected: [Option<i32>; 3],
 ) {
-    let mut expected_iter = expected.into_iter();
+    let mut expected_iter = expected.iter_mut().map(Option::as_mut);
     let mut iter = either_or_both.iter_chain_mut();
     assert_eq!(iter.next(), expected_iter.next().unwrap());
     assert_eq!(iter.next(), expected_iter.next().unwrap());

@@ -2,7 +2,7 @@
 
 mod iter;
 #[cfg(feature = "std")]
-mod std;
+mod std_tests;
 
 use core::fmt::Write;
 use core::future::Future;
@@ -119,9 +119,13 @@ fn as_ref(#[case] either: &Either<u8, char>, #[case] expected: Either<&u8, &char
 }
 
 #[rstest]
-#[case::left(&mut left_variant(), Left(&mut 1))]
-#[case::right(&mut right_variant(), Right(&mut 'c'))]
-fn as_mut(#[case] either: &mut Either<u8, char>, #[case] expected: Either<&mut u8, &mut char>) {
+#[case::left(&mut left_variant(), Left(1))]
+#[case::right(&mut right_variant(), Right('c'))]
+fn as_mut(#[case] either: &mut Either<u8, char>, #[case] mut expected: Either<u8, char>) {
+    let expected = match &mut expected {
+        Either::Left(left) => Either::Left(left),
+        Either::Right(right) => Either::Right(right),
+    };
     assert_eq!(either.as_mut(), expected);
 }
 
@@ -631,9 +635,10 @@ fn cloned(#[case] either: Either<&i32>, #[case] expected: Either<i32>) {
 }
 
 #[rstest]
-#[case::left(Left(&mut 109), Left(109))]
-#[case::right(Right(&mut 20), Right(20))]
-fn cloned_mut(#[case] either: Either<&mut i32>, #[case] expected: Either<i32>) {
+#[case::left(Left(109), Left(109))]
+#[case::right(Right(20), Right(20))]
+fn cloned_mut(#[case] mut either: Either<i32>, #[case] expected: Either<i32>) {
+    let either = either.as_mut();
     assert_eq!(either.cloned(), expected);
 }
 
@@ -645,9 +650,10 @@ fn copied(#[case] either: Either<&i32>, #[case] expected: Either<i32>) {
 }
 
 #[rstest]
-#[case::left(Left(&mut 109), Left(109))]
-#[case::right(Right(&mut 20), Right(20))]
-fn copied_mut(#[case] either: Either<&mut i32>, #[case] expected: Either<i32>) {
+#[case::left(Left(109), Left(109))]
+#[case::right(Right(20), Right(20))]
+fn copied_mut(#[case] mut either: Either<i32>, #[case] expected: Either<i32>) {
+    let either = either.as_mut();
     assert_eq!(either.copied(), expected);
 }
 
@@ -732,9 +738,10 @@ fn from_ref(#[case] either: &Either<u8, char>, #[case] expected: Either<&u8, &ch
 }
 
 #[rstest]
-#[case::left(&mut Left(10), Left(&mut 10))]
-#[case::left(&mut Right('c'), Right(&mut 'c'))]
-fn from_mut(#[case] either: &mut Either<u8, char>, #[case] expected: Either<&mut u8, &mut char>) {
+#[case::left(&mut Left(10), Left(10))]
+#[case::left(&mut Right('c'), Right('c'))]
+fn from_mut(#[case] either: &mut Either<u8, char>, #[case] mut expected: Either<u8, char>) {
+    let expected = expected.as_mut();
     assert_eq!(Either::from(either), expected);
 }
 

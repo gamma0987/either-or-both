@@ -3,7 +3,7 @@
 mod iter;
 mod same_type;
 #[cfg(feature = "std")]
-mod std;
+mod std_tests;
 mod traits;
 
 use core::pin::Pin;
@@ -1003,13 +1003,14 @@ fn cloned(
 }
 
 #[rstest]
-#[case::both(Both(&mut 1, &mut 'c'), both_variant())]
-#[case::left(Left(&mut 1), left_variant())]
-#[case::right(Right(&mut 'c'), right_variant())]
+#[case::both(Both(1, 'c'), both_variant())]
+#[case::left(Left(1), left_variant())]
+#[case::right(Right('c'), right_variant())]
 fn cloned_mut(
-    #[case] either_or_both: EitherOrBoth<&mut u8, &mut char>,
+    #[case] mut either_or_both: EitherOrBoth<u8, char>,
     #[case] expected: EitherOrBoth<u8, char>,
 ) {
+    let either_or_both = either_or_both.as_mut();
     assert_eq!(either_or_both.cloned(), expected);
 }
 
@@ -1025,13 +1026,14 @@ fn copied(
 }
 
 #[rstest]
-#[case::both(Both(&mut 1, &mut 'c'), both_variant())]
-#[case::left(Left(&mut 1), left_variant())]
-#[case::right(Right(&mut 'c'), right_variant())]
+#[case::both(Both(1, 'c'), both_variant())]
+#[case::left(Left(1), left_variant())]
+#[case::right(Right('c'), right_variant())]
 fn copied_mut(
-    #[case] either_or_both: EitherOrBoth<&mut u8, &mut char>,
+    #[case] mut either_or_both: EitherOrBoth<u8, char>,
     #[case] expected: EitherOrBoth<u8, char>,
 ) {
+    let either_or_both = either_or_both.as_mut();
     assert_eq!(either_or_both.copied(), expected);
 }
 

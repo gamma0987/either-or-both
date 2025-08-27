@@ -1,5 +1,5 @@
 # spell-checker: ignore dtolnay taiki Swatinem binstall taplo rustup
-name: Rust
+name: Build, Check and Test
 
 on:
   push:
@@ -75,7 +75,7 @@ jobs:
       - run: just check-fmt-all
 
   base:
-    needs: [format]
+    needs: [deny, minimal_versions, format]
     name: Build, check and test
     strategy:
       fail-fast: false
@@ -86,7 +86,7 @@ jobs:
           - nightly
         include:
           - toolchain: stable
-            components: clippy
+            components: clippy, llvm-tools
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -104,9 +104,7 @@ jobs:
           cargo update
       - uses: taiki-e/install-action@cargo-hack
       - uses: taiki-e/install-action@just
-      - uses: Swatinem/rust-cache@v2
-        with:
-          key: ${{ matrix.toolchain }}
+      - uses: taiki-e/install-action@grcov
       - name: Info
         run: |
           set -x
@@ -115,6 +113,18 @@ jobs:
           rustup --version
           rustup show
           rustup component list --installed
+          printenv
+      - name: Set cargo registry protocol if the toolchain is MSRV
+        if: matrix.toolchain == '1.63.0'
+        run: |
+          echo CARGO_REGISTRIES_CRATES_IO_PROTOCOL=git >> $GITHUB_ENV
+      - name: Cache/Restore cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ matrix.toolchain }}
       - name: Lint
         run: just lint
       - name: Build
@@ -122,4 +132,10 @@ jobs:
       - name: Run tests
         run: just test-hack
       - name: Coverage
+        if: matrix.toolchain == 'stable'
         run: just coverage-lcov-fresh
+      - name: Upload coverage reports to Codecov
+        if: matrix.toolchain == 'stable'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
