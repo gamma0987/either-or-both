@@ -39,6 +39,7 @@ use crate::unwrap_failed;
 
 /// Represent values that have either a `Left` or `Right` value or `Both` values
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", allow(clippy::unsafe_derive_deserialize))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum EitherOrBoth<L, R = L> {
@@ -802,9 +803,7 @@ impl<L, R> EitherOrBoth<L, R> {
         match self {
             Self::Both(left, right) => (left, right),
             // SAFETY: the safety contract must be upheld by the caller.
-            // cov:excl-start
-            _ => unsafe { core::hint::unreachable_unchecked() },
-            // cov:excl-stop
+            _ => core::hint::unreachable_unchecked(), // cov:excl-line
         }
     }
 
@@ -869,9 +868,7 @@ impl<L, R> EitherOrBoth<L, R> {
         match self {
             Self::Both(left, _) | Self::Left(left) => left,
             // SAFETY: the safety contract must be upheld by the caller.
-            // cov:excl-start
-            Self::Right(_) => unsafe { core::hint::unreachable_unchecked() },
-            // cov:excl-stop
+            Self::Right(_) => core::hint::unreachable_unchecked(), // cov:excl-line
         }
     }
 
@@ -939,9 +936,7 @@ impl<L, R> EitherOrBoth<L, R> {
         match self {
             Self::Left(left) => left,
             // SAFETY: the safety contract must be upheld by the caller.
-            // cov:excl-start
-            _ => unsafe { core::hint::unreachable_unchecked() },
-            // cov:excl-stop
+            _ => core::hint::unreachable_unchecked(), // cov:excl-line
         }
     }
 
@@ -1006,9 +1001,7 @@ impl<L, R> EitherOrBoth<L, R> {
         match self {
             Self::Both(_, right) | Self::Right(right) => right,
             // SAFETY: the safety contract must be upheld by the caller.
-            // cov:excl-start
-            Self::Left(_) => unsafe { core::hint::unreachable_unchecked() },
-            // cov:excl-stop
+            Self::Left(_) => core::hint::unreachable_unchecked(), // cov:excl-line
         }
     }
 
@@ -1076,9 +1069,7 @@ impl<L, R> EitherOrBoth<L, R> {
         match self {
             Self::Right(right) => right,
             // SAFETY: the safety contract must be upheld by the caller.
-            // cov:excl-start
-            _ => unsafe { core::hint::unreachable_unchecked() },
-            // cov:excl-stop
+            _ => core::hint::unreachable_unchecked(), // cov:excl-line
         }
     }
 

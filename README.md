@@ -32,8 +32,8 @@
 </div>
 <hr>
 
-The enums `EitherOrBoth` with the three variants `Left`, `Right`, `Both` and
-`Either` with the `Left` and `Right` variants.
+The `no_std` compatible enums `EitherOrBoth` with the three variants `Left`,
+`Right`, `Both` and `Either` with the `Left` and `Right` variants.
 
 The `Either` enum represents a value with two possibilities and `EitherOrBoth`
 represents values which can additionally be both present simultaneously.
@@ -63,7 +63,7 @@ Rust standard library and aims for consistency between the `Either` and
 programming languages such as Haskell. Where applicable, methods from `Option`
 are also implemented for both `Either` and `EitherOrBoth`. Whenever possible,
 method names with similar functionality are shared across both enums. If you're
-familiar with `Option` api, you'll find the `EitherOrBoth` and `Either`
+familiar with the `Option` api, you'll find the `EitherOrBoth` and `Either`
 interface intuitive and easy to work with.
 
 ## Development

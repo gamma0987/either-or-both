@@ -32,6 +32,7 @@ rustc
 rustflags
 rustls
 rustsec
+schemars
 serde
 taplo
 vecdeque

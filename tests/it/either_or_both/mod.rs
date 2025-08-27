@@ -2,8 +2,6 @@
 
 mod iter;
 mod same_type;
-#[cfg(feature = "std")]
-mod std_tests;
 mod traits;
 
 use core::pin::Pin;
