@@ -1,22 +1,125 @@
+# spell-checker: ignore dtolnay taiki Swatinem binstall taplo rustup
 name: Rust
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: "1"
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
-
+  deny:
+    name: Check dependencies/ubuntu-latest
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.74.1
+      - uses: taiki-e/install-action@cargo-deny
+      - uses: taiki-e/install-action@just
+      - name: Check advisories
+        run: just args='--deny warnings' deny advisories
+      - name: Check bans licenses sources
+        run: just deny bans licenses sources
+
+  minimal_versions:
+    name: Check minimal version requirements of dependencies
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain:
+          - stable
+          - nightly
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        if: ${{ startsWith(matrix.toolchain, 'nightly') }}
+        with:
+          toolchain: ${{ matrix.toolchain }}
+      - uses: dtolnay/rust-toolchain@master
+        if: ${{ ! startsWith(matrix.toolchain, 'nightly') }}
+        with:
+          toolchain: nightly
+      - uses: dtolnay/rust-toolchain@master
+        if: ${{ ! startsWith(matrix.toolchain, 'nightly') }}
+        with:
+          toolchain: ${{ matrix.toolchain }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ubuntu-latest_${{ matrix.toolchain }}
+      - uses: taiki-e/install-action@cargo-hack
+      - uses: taiki-e/install-action@cargo-minimal-versions
+      - uses: taiki-e/install-action@just
+      - name: Check build with minimal versions
+        run: just minimal-versions
+
+  format:
+    name: Check format and spelling
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+      - uses: taiki-e/install-action@cargo-binstall
+      - uses: taiki-e/install-action@just
+      - run: cargo binstall --no-confirm --no-symlinks taplo-cli
+      - run: just check-fmt-all
+
+  base:
+    needs: [format]
+    name: Build, check and test
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain:
+          - "1.63.0" # MSRV
+          - stable
+          - nightly
+        include:
+          - toolchain: stable
+            components: clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          components: ${{ matrix.components }}
+      - name: "Prepare: Install stable toolchain with clippy"
+        if: matrix.toolchain != 'stable'
+        run: |
+          rustup toolchain install stable --no-self-update --component clippy
+      - name: "Prepare: Run cargo update"
+        if: matrix.toolchain == 'stable' || matrix.toolchain == 'nightly'
+        run: |
+          cargo update
+      - uses: taiki-e/install-action@cargo-hack
+      - uses: taiki-e/install-action@just
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.toolchain }}
+      - name: Info
+        run: |
+          set -x
+          uname -a
+          pwd
+          rustup --version
+          rustup show
+          rustup component list --installed
+      - name: Lint
+        run: just lint
+      - name: Build
+        run: just build-hack
+      - name: Run tests
+        run: just test-hack
+      - name: Coverage
+        run: just coverage-lcov-fresh

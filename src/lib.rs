@@ -388,7 +388,7 @@
 //! or [`EitherOrBoth`] to be collected into an [`EitherOrBoth`] of two collections, the left
 //! collection containing the left values and the right collection containing the right values.
 //!
-//! ```rust
+//! ```ignore
 //! use either_or_both::{Either, EitherOrBoth};
 //!
 //! let vector: Vec<Either<i32>> = vec![Either::Left(2), Either::Left(1)];

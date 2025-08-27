@@ -6,6 +6,7 @@ use either_or_both::EitherOrBoth::{self, *};
 use either_or_both::TryFromOptionsError;
 use rstest::rstest;
 
+#[cfg(feature = "std")]
 #[rstest]
 #[case::both_empty(vec![], Both(vec![], vec![]))]
 #[case::both_and_both(vec![Both(1, 'c'), Both(2, 'm')], Both(vec![1, 2], vec!['c', 'm']))]
@@ -25,7 +26,7 @@ fn from_iter(
     );
 }
 
-#[cfg(feature = "either")]
+#[cfg(all(feature = "std", feature = "either"))]
 #[rstest]
 #[case::left(vec![Either::Left(1)], Left(vec![1]))]
 #[case::right(vec![Either::Right('c')], Right(vec!['c']))]
