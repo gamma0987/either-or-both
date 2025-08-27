@@ -20,7 +20,7 @@ jobs:
     name: Check dependencies/ubuntu-latest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@1.74.1
       - uses: taiki-e/install-action@cargo-deny
       - uses: taiki-e/install-action@just
@@ -39,7 +39,7 @@ jobs:
           - stable
           - nightly
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@master
         if: ${{ startsWith(matrix.toolchain, 'nightly') }}
         with:
@@ -65,7 +65,7 @@ jobs:
     name: Check format and spelling
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt
