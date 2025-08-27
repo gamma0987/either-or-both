@@ -428,9 +428,7 @@ impl<L, R> Either<L, R> {
         match self {
             Self::Left(left) => left,
             // SAFETY: the safety contract must be upheld by the caller.
-            // cov:excl-start
-            Self::Right(_) => unsafe { core::hint::unreachable_unchecked() },
-            // cov:excl-stop
+            Self::Right(_) => core::hint::unreachable_unchecked(), // cov:excl-line
         }
     }
 
@@ -488,9 +486,7 @@ impl<L, R> Either<L, R> {
     pub unsafe fn unwrap_right_unchecked(self) -> R {
         match self {
             // SAFETY: the safety contract must be upheld by the caller.
-            // cov:excl-start
-            Self::Left(_) => unsafe { core::hint::unreachable_unchecked() },
-            // cov:excl-stop
+            Self::Left(_) => core::hint::unreachable_unchecked(), // cov:excl-line
             Self::Right(right) => right,
         }
     }

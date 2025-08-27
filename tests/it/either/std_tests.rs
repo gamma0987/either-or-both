@@ -6,8 +6,6 @@ use either_or_both::Either;
 use rstest::rstest;
 
 fn cursor_fixture(buf: &[u8]) -> Cursor<Vec<u8>> {
-    use std::io::Write;
-
     let mut cursor = Cursor::new(Vec::new());
     assert_eq!(cursor.write(buf).unwrap(), buf.len());
     cursor
