@@ -20,11 +20,15 @@ version = "0.1.0"
 [features]
 default = ["either", "std"]
 either = []
+schema = ["dep:schemars", "std"] # schemars versions below 1.x need std
 serde = ["dep:serde"]
 std = ["serde?/std"]
 
 [dependencies]
-serde = { version = "1", optional = true, default-features = false, features = [
+schemars = { version = ">=0.8", optional = true, default-features = false, features = [
+  "derive",
+] }
+serde = { version = "1.0.194", optional = true, default-features = false, features = [
   "derive",
 ] }
 
