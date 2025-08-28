@@ -12,6 +12,7 @@ boolish
 bufs
 bumpversion
 callgrind
+cicd
 clippy
 coreutils
 docsrs
