@@ -433,6 +433,7 @@
 //! [`right_or_insert_with`]: EitherOrBoth::right_or_insert_with
 
 #![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 #[cfg(feature = "std")]
 extern crate std;
