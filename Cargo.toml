@@ -5,7 +5,7 @@ members = ["benchmarks"]
 authors = ["gamma0987 <gamma0987@posteo.de>"]
 categories = ["data-structures", "no-std"]
 description = """
-The no_std compatible enums EitherOrBoth with the three variants Left, Right, Both and Either with the Left and Right variants
+The enums EitherOrBoth with the three variants Left, Right, Both and Either with the Left and Right variants
 """
 edition = "2021"
 homepage = "https://github.com/gamma0987/either-or-both"
