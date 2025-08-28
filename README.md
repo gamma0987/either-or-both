@@ -93,13 +93,13 @@ Add `either-or-both` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-either-or-both = "0.1.0"
+either-or-both = "0.2.0"
 ```
 
 Or use [`cargo add`](https://github.com/killercup/cargo-edit):
 
 ```bash
-cargo add either-or-both@0.1.0
+cargo add either-or-both@0.2.0
 ```
 
 ## Design Philosophy
