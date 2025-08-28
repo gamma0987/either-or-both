@@ -1,18 +1,12 @@
-//! The enums [`EitherOrBoth`] with the three variants `Left`, `Right`, `Both` and [`Either`] with
-//! the `Left` and `Right` variants.
+//! # `EitherOrBoth` and `Either`
 //!
-//! The [`Either`] enum represents a value with two possibilities and [`EitherOrBoth`] represents
-//! values which can additionally be both present simultaneously.
+//! `either-or-both` provides two enums: [`Either`] and [`EitherOrBoth`].
 //!
-//! # Design Philosophy and Goals
+//! * **`Either<L, R>`** — a value that is either `Left(L)` or `Right(R)`
+//! * **`EitherOrBoth<L, R>`** — a value that can be `Left(L)`, `Right(R)`, or `Both(L, R)`
 //!
-//! The API for `either_or_both` is heavily inspired by the [`Option`] type from the Rust standard
-//! library and aims for consistency between the [`Either`] and [`EitherOrBoth`] enums. Some
-//! methods, like bimap, are derived from functional programming languages such as Haskell. Where
-//! applicable, methods from [`Option`] are also implemented for both [`Either`] and
-//! [`EitherOrBoth`]. Whenever possible, method names with similar functionality are shared across
-//! both enums. If you're familiar with the methods of [`Option`], you should find it easy to
-//! understand the corresponding methods in [`Either`] and [`EitherOrBoth`].
+//! While `Either` is useful for representing mutually exclusive values, `EitherOrBoth` extends this
+//! idea by allowing both values to be present simultaneously.
 //!
 //! # Conventions and edge cases
 //!
@@ -439,6 +433,7 @@
 //! [`right_or_insert_with`]: EitherOrBoth::right_or_insert_with
 
 #![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 #[cfg(feature = "std")]
 extern crate std;

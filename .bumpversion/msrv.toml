@@ -10,3 +10,9 @@ replace = "rust-version = \"{new_version}\""
 
 [[tool.bumpversion.files]]
 filename = ".clippy.toml"
+
+[[tool.bumpversion.files]]
+filename = ".github/workflows/cicd.yml"
+
+[[tool.bumpversion.files]]
+filename = "Justfile"

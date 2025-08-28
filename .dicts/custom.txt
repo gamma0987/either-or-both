@@ -12,8 +12,10 @@ boolish
 bufs
 bumpversion
 callgrind
+cicd
 clippy
 coreutils
+docsrs
 dotgraph
 dotgraphs
 grcov
@@ -29,6 +31,7 @@ reqwest
 rfold
 rstest
 rustc
+rustdoc
 rustflags
 rustls
 rustsec

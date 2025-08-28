@@ -1,4 +1,4 @@
-<!-- spell-checker: ignore fixt binstall libtest eprintln usize Gjengset -->
+<!-- spell-checker: ignore fixt binstall libtest eprintln usize Gjengset println combinators -->
 <!-- markdownlint-disable MD041 MD033 -->
 
 <h1 align="center"><code>EitherOrBoth</code> and <code>Either</code></h1>
@@ -26,53 +26,108 @@
     <a href="https://docs.rs/either-or-both/">
         <img src="https://docs.rs/either-or-both/badge.svg" alt="docs.rs"/>
     </a>
-    <a href="https://github.com/rust-lang/rust">
-        <img src="https://img.shields.io/badge/MSRV-1.63.0-brightgreen" alt="MSRV"/>
-    </a>
 </div>
 <hr>
 
-The `no_std` compatible enums `EitherOrBoth` with the three variants `Left`,
-`Right`, `Both` and `Either` with the `Left` and `Right` variants.
+`either-or-both` provides two enums: [`Either`] and [`EitherOrBoth`].
 
-The `Either` enum represents a value with two possibilities and `EitherOrBoth`
-represents values which can additionally be both present simultaneously.
+* **`Either<L, R>`** — a value that is either `Left(L)` or `Right(R)`
+* **`EitherOrBoth<L, R>`** — a value that can be `Left(L)`, `Right(R)`, or `Both(L, R)`
+
+While `Either` is useful for representing mutually exclusive values,
+`EitherOrBoth` extends this idea by allowing both values to be present
+simultaneously.
+
+## Why Use `EitherOrBoth` and `Either`?
+
+If you often write code like this:
+
+```rust
+match options {
+    (Some(left), Some(right)) => println!("Left is: {left}, Right is: {right}"),
+    (Some(left), None) => println!("Left is: {left}"),
+    (None, Some(right)) => println!("Right is: {right}"),
+    (None, None) => unreachable!("Should not happen"),
+}
+```
+
+You can **simplify** and **clarify** your intent using `EitherOrBoth`:
+
+* Removes **boilerplate**
+* Improves **readability**
+* Eliminates **unreachable patterns** at compile time
+
+Abstracting over multiple types with `Either`:
+
+Suppose you have a function that returns either an in-memory reader or a
+file-backed one:
+
+```rust
+fn get_reader(path: Option<&str>) -> Either<Cursor<Vec<u8>>, File> {
+    match path {
+        Some(p) => Either::Right(File::open(p).unwrap()),
+        None => Either::Left(Cursor::new(vec![1, 2, 3])),
+    }
+}
+```
+
+This allows you to return different types under a **single unified interface**
+(e.g. both implement `Read`), without boxing or trait objects.
+
+Use `Either` when:
+
+* You want to represent **one of two meaningful values**
+* You're modeling **branching logic** that's not necessarily an error case
+* You need to return **different types** while keeping the API ergonomic and type-safe
+
+## Features
+
+* **Intuitive** API inspired by `Option` and functional programming patterns
+* Includes **combinators** like `bimap`, `map`, `and_then`, `apply`, etc.
+* `#![no_std]` compatible (when the `std` feature is disabled)
+* Fully **documented** on [docs.rs](https://docs.rs/either-or-both)
 
 ## Installation
 
-To start using `either-or-both`, add the following to your `Cargo.toml` file:
+Add `either-or-both` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
 either-or-both = "0.1.0"
 ```
 
-or run
+Or use [`cargo add`](https://github.com/killercup/cargo-edit):
 
 ```bash
 cargo add either-or-both@0.1.0
 ```
 
-`either-or-both` is fully documented at [docs.rs](https://docs.rs/crate/either-or-both)
+## Design Philosophy
 
-## Design Philosophy and Goals
-
-The api for `either-or-both` is heavily inspired by the `Option` type from the
+The API for `either-or-both` is heavily inspired by the `Option` type from the
 Rust standard library and aims for consistency between the `Either` and
 `EitherOrBoth` enums. Some methods, like `bimap`, are derived from functional
-programming languages such as Haskell. Where applicable, methods from `Option`
-are also implemented for both `Either` and `EitherOrBoth`. Whenever possible,
-method names with similar functionality are shared across both enums. If you're
-familiar with the `Option` api, you'll find the `EitherOrBoth` and `Either`
+programming languages. Where applicable, methods from `Option` are also
+implemented for both `Either` and `EitherOrBoth`. Whenever possible, method
+names with similar functionality are shared across both enums. If you're
+familiar with the `Option` API, you'll find the `EitherOrBoth` and `Either`
 interface intuitive and easy to work with.
 
-## Development
+## Development Status
 
-The enums and api are fully implemented and functional. Nevertheless, you may
-experience big changes between a minor version bump as long as the version is
-`0.x`.
+The core API is production-ready.
 
-### License
+However, as long as the crate version is below `1.0.0`, semver guarantees do not
+apply — minor version bumps may include breaking changes.
+
+## License
 
 `either-or-both` is dual licensed under the Apache 2.0 license and the MIT license
 at your option.
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you shall be dual licensed as in
+[License](#license), without any additional terms or conditions.
+
+[`Either`]: https://docs.rs/either-or-both/latest/either_or_both/enum.Either.html
+[`EitherOrBoth`]: https://docs.rs/either-or-both/latest/either_or_both/enum.EitherOrBoth.html

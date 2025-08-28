@@ -17,6 +17,18 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-08-28
+
+### Added
+
+* ([#8](https://github.com/gamma0987/either-or-both/pull/8)): Derive
+  `schemars::JsonSchema` if the schema feature is activated.
+
+### Fixed
+
+* ([#8](https://github.com/gamma0987/either-or-both/pull/8)): Fix the feature
+  usage of serde in `no_std` environments.
+
 ## [0.1.0] - 2025-08-27
 
 ### Added
