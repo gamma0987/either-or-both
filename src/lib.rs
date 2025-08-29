@@ -381,8 +381,8 @@
 //! [`EitherOrBoth`] implements the [`FromIterator`] trait which allows an iterator over [`Either`]
 //! or [`EitherOrBoth`] to be collected into an [`EitherOrBoth`] of two collections, the left
 //! collection containing the left values and the right collection containing the right values.
-//!
-//! ```ignore
+#![cfg_attr(all(feature = "std", feature = "either"), doc = "```rust")]
+#![cfg_attr(not(all(feature = "std", feature = "either")), doc = "```rust,ignore")]
 //! use either_or_both::{Either, EitherOrBoth};
 //!
 //! let vector: Vec<Either<i32>> = vec![Either::Left(2), Either::Left(1)];
@@ -395,7 +395,7 @@
 //!
 //! assert_eq!(either_or_both, EitherOrBoth::Both(vec![2], vec![1]));
 //! ```
-//!
+//! 
 //! ## Modifying in-place
 //!
 //! Both enums support replacing the left or right values:

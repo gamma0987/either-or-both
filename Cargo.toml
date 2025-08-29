@@ -20,11 +20,13 @@ version = "0.2.0"
 [features]
 default = ["either", "std"]
 either = []
-schema = ["dep:schemars", "std"] # schemars versions below 1.x need std
+indexmap = ["dep:indexmap"]
+schema = ["dep:schemars", "std"]      # schemars versions below 1.x need std
 serde = ["dep:serde"]
-std = ["serde?/std"]
+std = ["serde?/std", "indexmap?/std"]
 
 [dependencies]
+indexmap = { version = "2", optional = true, default-features = false }
 schemars = { version = ">=0.8", optional = true, default-features = false, features = [
   "derive",
 ] }
