@@ -461,6 +461,31 @@ fn both(#[case] either_or_both: EitherOrBoth<u8, char>, #[case] expected: Option
 }
 
 #[rstest]
+#[case::both(both_variant(), Left(2))]
+#[case::left(left_variant(), left_variant())]
+#[case::right(right_variant(), right_variant())]
+fn both_and(
+    #[case] either_or_both: EitherOrBoth<u8, char>,
+    #[case] expected: EitherOrBoth<u8, char>,
+) {
+    assert_eq!(either_or_both.both_and(Left(2)), expected);
+}
+
+#[rstest]
+#[case::both(both_variant(), Left(100))]
+#[case::left(left_variant(), left_variant())]
+#[case::right(right_variant(), right_variant())]
+fn both_and_then(
+    #[case] either_or_both: EitherOrBoth<u8, char>,
+    #[case] expected: EitherOrBoth<u8, char>,
+) {
+    assert_eq!(
+        either_or_both.both_and_then(|l, r| Left(l + r as u8)),
+        expected
+    );
+}
+
+#[rstest]
 #[case::both(both_variant(), Some(LEFT_VALUE))]
 #[case::left(left_variant(), Some(LEFT_VALUE))]
 #[case::right(right_variant(), None)]

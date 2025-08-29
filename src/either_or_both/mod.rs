@@ -1100,6 +1100,70 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
+    /// Returns [`Right`] or [`Left`] if the `EitherOrBoth` is not [`Both`] otherwise returns
+    /// `other`.
+    ///
+    /// The `both_and` combinator eagerly evaluates its arguments, which can result in unnecessary
+    /// computations. When chaining operations that involve function calls, use [`both_and_then`]
+    /// instead. It evaluates the function lazily.
+    ///
+    /// [`both_and_then`]: EitherOrBoth::both_and_then
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use either_or_both::EitherOrBoth;
+    ///
+    /// let x: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
+    /// let y: EitherOrBoth<u8, char> = EitherOrBoth::Left(2);
+    /// assert_eq!(x.both_and(y), EitherOrBoth::Left(2));
+    ///
+    /// let x: EitherOrBoth<u8, char> = EitherOrBoth::Left(1);
+    /// let y: EitherOrBoth<u8, char> = EitherOrBoth::Left(2);
+    /// assert_eq!(x.both_and(y), EitherOrBoth::Left(1));
+    ///
+    /// let x: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
+    /// let y: EitherOrBoth<u8, char> = EitherOrBoth::Left(2);
+    /// assert_eq!(x.both_and(y), EitherOrBoth::Right('c'));
+    /// ```
+    pub fn both_and(self, other: Self) -> Self {
+        match self {
+            Self::Both(_, _) => other,
+            Self::Left(_) | Self::Right(_) => self,
+        }
+    }
+
+    /// Returns [`Right`] or [`Left`] if the `EitherOrBoth` is not [`Both`] otherwise calls `f`
+    /// with both values and returns the result.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use either_or_both::EitherOrBoth;
+    ///
+    /// fn apply_to_both(left: u8, right: char) -> EitherOrBoth<u8, char> {
+    ///     EitherOrBoth::Both(left + 1, right.max('m'))
+    /// }
+    ///
+    /// let x: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
+    /// assert_eq!(x.both_and_then(apply_to_both), EitherOrBoth::Both(2, 'm'));
+    ///
+    /// let x: EitherOrBoth<u8, char> = EitherOrBoth::Left(1);
+    /// assert_eq!(x.both_and_then(apply_to_both), EitherOrBoth::Left(1));
+    ///
+    /// let x: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
+    /// assert_eq!(x.both_and_then(apply_to_both), EitherOrBoth::Right('c'));
+    /// ```
+    pub fn both_and_then<F>(self, f: F) -> Self
+    where
+        F: FnOnce(L, R) -> Self,
+    {
+        match self {
+            Self::Both(left, right) => f(left, right),
+            Self::Left(_) | Self::Right(_) => self,
+        }
+    }
+
     /// If a left value is present, return `Some` containing the value otherwise return `None`.
     ///
     /// # Examples
