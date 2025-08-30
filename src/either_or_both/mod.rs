@@ -559,6 +559,7 @@ impl<L, R> EitherOrBoth<L, R> {
     }
 
     /// Converts from `Pin<&EitherOrBoth<L, R>>` to `EitherOrBoth<Pin<&L>, Pin<&R>>`.
+    #[must_use]
     pub fn as_pin_ref(self: Pin<&Self>) -> EitherOrBoth<Pin<&L>, Pin<&R>> {
         // SAFETY: `x` is guaranteed to be pinned because it comes from `self` which is pinned.
         unsafe {
@@ -568,6 +569,7 @@ impl<L, R> EitherOrBoth<L, R> {
 
     /// Converts from `Pin<&mut EitherOrBoth<L, R>>` to `EitherOrBoth<Pin<&mut L>,
     /// Pin<&mut R>>`.
+    #[must_use]
     pub fn as_pin_mut(self: Pin<&mut Self>) -> EitherOrBoth<Pin<&mut L>, Pin<&mut R>> {
         // SAFETY: `get_unchecked_mut` is never used to move the `EitherOrBoth` inside `self`. `x`
         // is guaranteed to be pinned because it comes from `self` which is pinned.
@@ -1543,6 +1545,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Left(1);
     /// assert_eq!(value.flip(), EitherOrBoth::Right(1));
     /// ```
+    #[must_use]
     pub fn flip(self) -> EitherOrBoth<R, L> {
         match self {
             Self::Both(left, right) => Both(right, left),
@@ -3169,6 +3172,7 @@ impl<L, R> EitherOrBoth<&L, &R> {
     /// let refs: EitherOrBoth<&u8, &char> = value.as_ref();
     /// assert_eq!(refs.cloned(), EitherOrBoth::Left(1));
     /// ```
+    #[must_use]
     pub fn cloned(self) -> EitherOrBoth<L, R>
     where
         L: Clone,
@@ -3193,6 +3197,7 @@ impl<L, R> EitherOrBoth<&L, &R> {
     /// let refs: EitherOrBoth<&u8, &char> = value.as_ref();
     /// assert_eq!(refs.copied(), EitherOrBoth::Left(1));
     /// ```
+    #[must_use]
     pub fn copied(self) -> EitherOrBoth<L, R>
     where
         L: Copy,
@@ -3219,6 +3224,7 @@ impl<L, R> EitherOrBoth<&mut L, &mut R> {
     /// let refs: EitherOrBoth<&mut u8, &mut char> = value.as_mut();
     /// assert_eq!(refs.cloned(), EitherOrBoth::Left(1));
     /// ```
+    #[must_use]
     pub fn cloned(self) -> EitherOrBoth<L, R>
     where
         L: Clone,
@@ -3243,6 +3249,7 @@ impl<L, R> EitherOrBoth<&mut L, &mut R> {
     /// let refs: EitherOrBoth<&mut u8, &mut char> = value.as_mut();
     /// assert_eq!(refs.copied(), EitherOrBoth::Left(1));
     /// ```
+    #[must_use]
     pub fn copied(self) -> EitherOrBoth<L, R>
     where
         L: Copy,

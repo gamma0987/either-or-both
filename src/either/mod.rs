@@ -289,6 +289,7 @@ impl<L, R> Either<L, R> {
     }
 
     /// Converts from `Pin<&Either<L, R>>` to `Either<Pin<&L>, Pin<&R>>`.
+    #[must_use]
     pub fn as_pin_ref(self: Pin<&Self>) -> Either<Pin<&L>, Pin<&R>> {
         // SAFETY: `x` is guaranteed to be pinned because it comes from `self` which is pinned.
         unsafe {
@@ -300,6 +301,7 @@ impl<L, R> Either<L, R> {
     }
 
     /// Converts from `Pin<&mut Either<L, R>>` to `Either<Pin<&mut L>, Pin<&mut R>>`.
+    #[must_use]
     pub fn as_pin_mut(self: Pin<&mut Self>) -> Either<Pin<&mut L>, Pin<&mut R>> {
         // SAFETY: `x` is guaranteed to be pinned because it comes from `self` which is pinned.
         unsafe {
@@ -766,6 +768,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.flip(), Either::Left('c'));
     /// ```
+    #[must_use]
     pub fn flip(self) -> Either<R, L> {
         match self {
             Self::Left(left) => Right(left),
@@ -1898,6 +1901,7 @@ impl<L, R> Either<&L, &R> {
     /// let refs: Either<&u8, &char> = value.as_ref();
     /// assert_eq!(refs.cloned(), Either::Left(1));
     /// ```
+    #[must_use]
     pub fn cloned(self) -> Either<L, R>
     where
         L: Clone,
@@ -1920,6 +1924,7 @@ impl<L, R> Either<&L, &R> {
     /// let refs: Either<&u8, &char> = value.as_ref();
     /// assert_eq!(refs.copied(), Either::Left(1));
     /// ```
+    #[must_use]
     pub fn copied(self) -> Either<L, R>
     where
         L: Copy,
@@ -1945,6 +1950,7 @@ impl<L, R> Either<&mut L, &mut R> {
     /// let refs: Either<&mut u8, &mut char> = value.as_mut();
     /// assert_eq!(refs.cloned(), Either::Left(1));
     /// ```
+    #[must_use]
     pub fn cloned(self) -> Either<L, R>
     where
         L: Clone,
@@ -1968,6 +1974,7 @@ impl<L, R> Either<&mut L, &mut R> {
     /// let refs: Either<&mut u8, &mut char> = value.as_mut();
     /// assert_eq!(refs.copied(), Either::Left(1));
     /// ```
+    #[must_use]
     pub fn copied(self) -> Either<L, R>
     where
         L: Copy,
