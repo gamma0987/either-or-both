@@ -35,7 +35,7 @@ use iter::{InnerIterEither, SwapIterEither};
 use Either::*;
 
 use crate::iter_either::{IterEither, IterMutEither};
-use crate::{unwrap_failed, EitherOrBoth};
+use crate::EitherOrBoth;
 
 /// Represent values with two possibilities. `Either` can be either `Left` or `Right`
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
@@ -365,7 +365,9 @@ impl<L, R> Either<L, R> {
     pub fn expect_left(self, msg: &str) -> L {
         match self {
             Self::Left(left) => left,
-            Self::Right(_) => unwrap_failed(msg),
+            Self::Right(_) => {
+                panic!("{msg}");
+            }
         }
     }
 
@@ -397,7 +399,9 @@ impl<L, R> Either<L, R> {
     #[inline]
     pub fn expect_right(self, msg: &str) -> R {
         match self {
-            Self::Left(_) => unwrap_failed(msg),
+            Self::Left(_) => {
+                panic!("{msg}");
+            }
             Self::Right(right) => right,
         }
     }

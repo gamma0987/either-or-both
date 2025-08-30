@@ -35,8 +35,6 @@ use core::{mem, ptr};
 use iter::{ChainedIterEitherOrBoth, IterEitherOrBoth, IterMutEitherOrBoth, SwapIterEitherOrBoth};
 use EitherOrBoth::*;
 
-use crate::unwrap_failed;
-
 /// Represent values that have either a `Left` or `Right` value or `Both` values
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
@@ -654,7 +652,9 @@ impl<L, R> EitherOrBoth<L, R> {
     pub fn expect_both(self, msg: &str) -> (L, R) {
         match self {
             Self::Both(left, right) => (left, right),
-            _ => unwrap_failed(msg),
+            _ => {
+                panic!("{msg}");
+            }
         }
     }
 
@@ -690,7 +690,9 @@ impl<L, R> EitherOrBoth<L, R> {
     pub fn expect_left(self, msg: &str) -> L {
         match self {
             Self::Both(left, _) | Self::Left(left) => left,
-            Self::Right(_) => unwrap_failed(msg),
+            Self::Right(_) => {
+                panic!("{msg}");
+            }
         }
     }
 
@@ -730,7 +732,9 @@ impl<L, R> EitherOrBoth<L, R> {
     pub fn expect_only_left(self, msg: &str) -> L {
         match self {
             Self::Left(left) => left,
-            _ => unwrap_failed(msg),
+            _ => {
+                panic!("{msg}");
+            }
         }
     }
 
@@ -766,7 +770,9 @@ impl<L, R> EitherOrBoth<L, R> {
     pub fn expect_right(self, msg: &str) -> R {
         match self {
             Self::Both(_, right) | Self::Right(right) => right,
-            Self::Left(_) => unwrap_failed(msg),
+            Self::Left(_) => {
+                panic!("{msg}");
+            }
         }
     }
 
@@ -806,7 +812,9 @@ impl<L, R> EitherOrBoth<L, R> {
     pub fn expect_only_right(self, msg: &str) -> R {
         match self {
             Self::Right(right) => right,
-            _ => unwrap_failed(msg),
+            _ => {
+                panic!("{msg}");
+            }
         }
     }
 

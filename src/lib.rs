@@ -466,9 +466,3 @@ pub use either::{iter as iter_either, Either};
 pub use error::TryFromOptionsError;
 
 pub use crate::either_or_both::{iter, EitherOrBoth};
-
-#[cold]
-#[track_caller]
-fn unwrap_failed(msg: &str) -> ! {
-    panic!("{msg}");
-}
