@@ -32,7 +32,7 @@ pub struct IterMutEitherOrBoth<'a, T>(Items<&'a mut T>);
 pub struct SwapIterEitherOrBoth<L, R>(EitherOrBoth<L, R>);
 
 impl<T> ChainedIterEitherOrBoth<T> {
-    pub(crate) fn new(either_or_both: EitherOrBoth<T, T>) -> Self {
+    pub(crate) const fn new(either_or_both: EitherOrBoth<T, T>) -> Self {
         Self(either_or_both)
     }
 }
@@ -239,7 +239,7 @@ impl<'a, T> Iterator for IterMutEitherOrBoth<'a, T> {
 }
 
 impl<L, R> SwapIterEitherOrBoth<L, R> {
-    pub(crate) fn new(either_or_both: EitherOrBoth<L, R>) -> Self {
+    pub(crate) const fn new(either_or_both: EitherOrBoth<L, R>) -> Self {
         Self(either_or_both)
     }
 }

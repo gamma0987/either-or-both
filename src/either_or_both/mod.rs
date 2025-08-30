@@ -72,7 +72,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.has_left(), false);
     /// ```
-    pub fn has_left(&self) -> bool {
+    pub const fn has_left(&self) -> bool {
         match self {
             Self::Left(_) | Self::Both(_, _) => true,
             Self::Right(_) => false,
@@ -149,7 +149,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
     /// assert_eq!(value.has_right(), true);
     /// ```
-    pub fn has_right(&self) -> bool {
+    pub const fn has_right(&self) -> bool {
         match self {
             Self::Right(_) | Self::Both(_, _) => true,
             Self::Left(_) => false,
@@ -229,7 +229,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.is_both(), false);
     /// ```
-    pub fn is_both(&self) -> bool {
+    pub const fn is_both(&self) -> bool {
         matches!(self, Self::Both(_, _))
     }
 
@@ -310,7 +310,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.is_left(), false);
     /// ```
-    pub fn is_left(&self) -> bool {
+    pub const fn is_left(&self) -> bool {
         matches!(self, Self::Left(_))
     }
 
@@ -384,7 +384,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
     /// assert_eq!(value.is_right(), false);
-    pub fn is_right(&self) -> bool {
+    pub const fn is_right(&self) -> bool {
         matches!(self, Self::Right(_))
     }
 
@@ -471,7 +471,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// println!("`text` has not been moved: {:?}", &text);
     /// ```
-    pub fn as_ref(&self) -> EitherOrBoth<&L, &R> {
+    pub const fn as_ref(&self) -> EitherOrBoth<&L, &R> {
         map_each!(self)
     }
 
@@ -2257,6 +2257,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [convention]: ./index.html#conventions-and-edge-cases
+    #[allow(clippy::missing_errors_doc)]
     pub fn ok(self) -> Result<R, L> {
         match self {
             Self::Both(left, _) | Self::Left(left) => Err(left),
@@ -2292,6 +2293,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// [`ok_or_else`]: EitherOrBoth::ok_or_else
     /// [convention]: ./index.html#conventions-and-edge-cases
+    #[allow(clippy::missing_errors_doc)]
     pub fn ok_or<E>(self, error: E) -> Result<R, E> {
         self.ok_or_else(|| error)
     }
@@ -2330,6 +2332,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// [`ok_or_else`]: EitherOrBoth::ok_or_else
     /// [convention]: ./index.html#conventions-and-edge-cases
+    #[allow(clippy::missing_errors_doc)]
     pub fn ok_or_else<F, E>(self, error: F) -> Result<R, E>
     where
         F: FnOnce() -> E,
@@ -3198,7 +3201,7 @@ impl<L, R> EitherOrBoth<&L, &R> {
     /// assert_eq!(refs.copied(), EitherOrBoth::Left(1));
     /// ```
     #[must_use]
-    pub fn copied(self) -> EitherOrBoth<L, R>
+    pub const fn copied(self) -> EitherOrBoth<L, R>
     where
         L: Copy,
         R: Copy,
@@ -3440,6 +3443,7 @@ impl<L, R, E1, E2> EitherOrBoth<Result<L, E1>, Result<R, E2>> {
     ///
     /// [`Results`]: Result
     /// [convention]: ./index.html#conventions-and-edge-cases
+    #[allow(clippy::missing_errors_doc)]
     pub fn transpose(self) -> Result<EitherOrBoth<L, R>, EitherOrBoth<E1, E2>> {
         match self {
             Self::Both(left, right) => match (left, right) {
@@ -3500,6 +3504,7 @@ impl<L, R, E> EitherOrBoth<Result<L, E>, Result<R, E>> {
     ///
     /// [`Results`]: Result
     /// [convention]: ./index.html#conventions-and-edge-cases
+    #[allow(clippy::missing_errors_doc)]
     pub fn transpose_err<F>(self, f: F) -> Result<EitherOrBoth<L, R>, E>
     where
         F: FnOnce(E, E) -> E,
@@ -3555,6 +3560,7 @@ impl<T, E1, E2> EitherOrBoth<Result<T, E1>, Result<T, E2>> {
     ///
     /// [`Results`]: Result
     /// [convention]: ./index.html#conventions-and-edge-cases
+    #[allow(clippy::missing_errors_doc)]
     pub fn transpose_ok<F>(self, f: F) -> Result<T, EitherOrBoth<E1, E2>>
     where
         F: FnOnce(T, T) -> T,

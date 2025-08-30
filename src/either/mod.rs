@@ -67,7 +67,7 @@ impl<L, R> Either<L, R> {
     /// let either = Either::<u8>::Right(1);
     /// assert_eq!(either.is_left(), false);
     /// ```
-    pub fn is_left(&self) -> bool {
+    pub const fn is_left(&self) -> bool {
         matches!(self, Self::Left(_))
     }
 
@@ -135,7 +135,7 @@ impl<L, R> Either<L, R> {
     /// let either = Either::<u8, char>::Left(1);
     /// assert_eq!(either.is_right(), false);
     /// ```
-    pub fn is_right(&self) -> bool {
+    pub const fn is_right(&self) -> bool {
         matches!(self, Self::Right(_))
     }
 
@@ -218,7 +218,7 @@ impl<L, R> Either<L, R> {
     /// println!("`text` has not been moved: {:?}", &text);
     /// ```
     #[allow(clippy::same_name_method)]
-    pub fn as_ref(&self) -> Either<&L, &R> {
+    pub const fn as_ref(&self) -> Either<&L, &R> {
         map_each!(self)
     }
 
@@ -1359,6 +1359,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [convention]: ./index.html#conventions-and-edge-cases
+    #[allow(clippy::missing_errors_doc)]
     pub fn ok(self) -> Result<R, L> {
         match self {
             Self::Left(left) => Err(left),
@@ -1390,6 +1391,7 @@ impl<L, R> Either<L, R> {
     ///
     /// [`ok_or_else`]: Either::ok_or_else
     /// [convention]: ./index.html#conventions-and-edge-cases
+    #[allow(clippy::missing_errors_doc)]
     pub fn ok_or<E>(self, error: E) -> Result<R, E> {
         self.ok_or_else(|| error)
     }
@@ -1421,6 +1423,7 @@ impl<L, R> Either<L, R> {
     ///
     /// [`ok_or_else`]: Either::ok_or_else
     /// [convention]: ./index.html#conventions-and-edge-cases
+    #[allow(clippy::missing_errors_doc)]
     pub fn ok_or_else<F, E>(self, error: F) -> Result<R, E>
     where
         F: FnOnce() -> E,
@@ -1925,7 +1928,7 @@ impl<L, R> Either<&L, &R> {
     /// assert_eq!(refs.copied(), Either::Left(1));
     /// ```
     #[must_use]
-    pub fn copied(self) -> Either<L, R>
+    pub const fn copied(self) -> Either<L, R>
     where
         L: Copy,
         R: Copy,
@@ -2101,6 +2104,7 @@ impl<L, R, E1, E2> Either<Result<L, E1>, Result<R, E2>> {
     /// ```
     ///
     /// [`Results`]: Result
+    #[allow(clippy::missing_errors_doc)]
     pub fn transpose(self) -> Result<Either<L, R>, Either<E1, E2>> {
         match self {
             Self::Left(left) => match left {
@@ -2134,6 +2138,7 @@ impl<L, R, E> Either<Result<L, E>, Result<R, E>> {
     /// ```
     ///
     /// [`Results`]: Result
+    #[allow(clippy::missing_errors_doc)]
     pub fn transpose_err(self) -> Result<Either<L, R>, E> {
         match self {
             Self::Left(left) => left.map(Left),
@@ -2161,6 +2166,7 @@ impl<T, E1, E2> Either<Result<T, E1>, Result<T, E2>> {
     /// ```
     ///
     /// [`Results`]: Result
+    #[allow(clippy::missing_errors_doc)]
     pub fn transpose_ok(self) -> Result<T, Either<E1, E2>> {
         match self {
             Self::Left(left) => left.map_err(Left),

@@ -7,15 +7,15 @@ use rstest::rstest;
 const RIGHT_VALUE: u8 = 2;
 const LEFT_VALUE: u8 = 1;
 
-fn left_variant() -> EitherOrBoth<u8> {
+const fn left_variant() -> EitherOrBoth<u8> {
     Left(LEFT_VALUE)
 }
 
-fn right_variant() -> EitherOrBoth<u8> {
+const fn right_variant() -> EitherOrBoth<u8> {
     Right(RIGHT_VALUE)
 }
 
-fn both_variant() -> EitherOrBoth<u8> {
+const fn both_variant() -> EitherOrBoth<u8> {
     Both(LEFT_VALUE, RIGHT_VALUE)
 }
 

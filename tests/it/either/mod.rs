@@ -17,27 +17,27 @@ use Either::*;
 const RIGHT_VALUE: char = 'c';
 const LEFT_VALUE: u8 = 1;
 
-fn left_variant() -> Either<u8, char> {
+const fn left_variant() -> Either<u8, char> {
     Left(LEFT_VALUE)
 }
 
-fn right_variant() -> Either<u8, char> {
+const fn right_variant() -> Either<u8, char> {
     Right(RIGHT_VALUE)
 }
 
-fn left_is_false(i: u8) -> bool {
+const fn left_is_false(i: u8) -> bool {
     i != LEFT_VALUE
 }
 
-fn left_is_true(i: u8) -> bool {
+const fn left_is_true(i: u8) -> bool {
     i == LEFT_VALUE
 }
 
-fn right_is_false(c: char) -> bool {
+const fn right_is_false(c: char) -> bool {
     c != RIGHT_VALUE
 }
 
-fn right_is_true(c: char) -> bool {
+const fn right_is_true(c: char) -> bool {
     c == RIGHT_VALUE
 }
 
