@@ -72,6 +72,8 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.has_left(), false);
     /// ```
+    #[must_use = "if you intended to assert that this has a left value, consider `.unwrap_left()` \
+                  instead"]
     #[inline]
     pub const fn has_left(&self) -> bool {
         match self {
@@ -97,6 +99,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.has_left_and(|l| l == 1), false);
     /// ```
+    #[must_use]
     #[inline]
     pub fn has_left_and<F>(self, f: F) -> bool
     where
@@ -125,6 +128,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.has_left_or(|r| r != 'c'), false);
     /// ```
+    #[must_use]
     #[inline]
     pub fn has_left_or<F>(self, f: F) -> bool
     where
@@ -152,6 +156,8 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
     /// assert_eq!(value.has_right(), true);
     /// ```
+    #[must_use = "if you intended to assert that this has a right value, consider `.unwrap_right()` \
+                  instead"]
     #[inline]
     pub const fn has_right(&self) -> bool {
         match self {
@@ -180,6 +186,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
     /// assert_eq!(value.has_right_and(|r| r == 'c'), true);
     /// ```
+    #[must_use]
     #[inline]
     pub fn has_right_and<F>(self, f: F) -> bool
     where
@@ -211,6 +218,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
     /// assert_eq!(value.has_right_or(|l| l == 2), true);
     /// ```
+    #[must_use]
     #[inline]
     pub fn has_right_or<F>(self, f: F) -> bool
     where
@@ -235,6 +243,8 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.is_both(), false);
     /// ```
+    #[must_use = "if you intended to assert that this has both values, consider `.unwrap_both()` \
+                  instead"]
     #[inline]
     pub const fn is_both(&self) -> bool {
         matches!(self, Self::Both(_, _))
@@ -259,6 +269,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.is_both_and(|_, r| r == 'c'), false);
     /// ```
+    #[must_use]
     #[inline]
     pub fn is_both_and<F>(self, f: F) -> bool
     where
@@ -290,6 +301,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.is_both_or(|l| l == 1, |r| r == 'm'), false);
     /// ```
+    #[must_use]
     #[inline]
     pub fn is_both_or<F, G>(self, f: F, g: G) -> bool
     where
@@ -319,6 +331,8 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.is_left(), false);
     /// ```
+    #[must_use = "if you intended to assert that this is a left value, consider \
+                  `.unwrap_only_left()` instead"]
     #[inline]
     pub const fn is_left(&self) -> bool {
         matches!(self, Self::Left(_))
@@ -340,6 +354,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.is_left_and(|l| l == 1), false);
     /// ```
+    #[must_use]
     #[inline]
     pub fn is_left_and<F>(self, f: F) -> bool
     where
@@ -370,6 +385,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.is_left_or(|r| r == 'c'), true);
     /// ```
+    #[must_use]
     #[inline]
     pub fn is_left_or<F>(self, f: F) -> bool
     where
@@ -396,6 +412,8 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
     /// assert_eq!(value.is_right(), false);
+    #[must_use = "if you intended to assert that this is a right value, consider \
+                  `.unwrap_only_right()` instead"]
     #[inline]
     pub const fn is_right(&self) -> bool {
         matches!(self, Self::Right(_))
@@ -420,6 +438,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
     /// assert_eq!(value.is_right_and(|r| r == 'c'), false);
     /// ```
+    #[must_use]
     #[inline]
     pub fn is_right_and<F>(self, f: F) -> bool
     where
@@ -450,6 +469,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
     /// assert_eq!(value.is_right_or(|l| l == 1), true);
     /// ```
+    #[must_use]
     #[inline]
     pub fn is_right_or<F>(self, f: F) -> bool
     where
@@ -3278,7 +3298,7 @@ impl<L, R> EitherOrBoth<&L, &R> {
     /// let refs: EitherOrBoth<&u8, &char> = value.as_ref();
     /// assert_eq!(refs.cloned(), EitherOrBoth::Left(1));
     /// ```
-    #[must_use]
+    #[must_use = "`self` will be dropped if the result is not used"]
     pub fn cloned(self) -> EitherOrBoth<L, R>
     where
         L: Clone,
@@ -3303,7 +3323,7 @@ impl<L, R> EitherOrBoth<&L, &R> {
     /// let refs: EitherOrBoth<&u8, &char> = value.as_ref();
     /// assert_eq!(refs.copied(), EitherOrBoth::Left(1));
     /// ```
-    #[must_use]
+    #[must_use = "`self` will be dropped if the result is not used"]
     pub const fn copied(self) -> EitherOrBoth<L, R>
     where
         L: Copy,
@@ -3330,7 +3350,7 @@ impl<L, R> EitherOrBoth<&mut L, &mut R> {
     /// let refs: EitherOrBoth<&mut u8, &mut char> = value.as_mut();
     /// assert_eq!(refs.cloned(), EitherOrBoth::Left(1));
     /// ```
-    #[must_use]
+    #[must_use = "`self` will be dropped if the result is not used"]
     pub fn cloned(self) -> EitherOrBoth<L, R>
     where
         L: Clone,
@@ -3355,7 +3375,7 @@ impl<L, R> EitherOrBoth<&mut L, &mut R> {
     /// let refs: EitherOrBoth<&mut u8, &mut char> = value.as_mut();
     /// assert_eq!(refs.copied(), EitherOrBoth::Left(1));
     /// ```
-    #[must_use]
+    #[must_use = "`self` will be dropped if the result is not used"]
     pub fn copied(self) -> EitherOrBoth<L, R>
     where
         L: Copy,

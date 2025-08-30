@@ -67,6 +67,8 @@ impl<L, R> Either<L, R> {
     /// let either = Either::<u8>::Right(1);
     /// assert_eq!(either.is_left(), false);
     /// ```
+    #[must_use = "if you intended to assert that this is a left value, consider `.unwrap_left()` \
+                  instead"]
     #[inline]
     pub const fn is_left(&self) -> bool {
         matches!(self, Self::Left(_))
@@ -88,6 +90,7 @@ impl<L, R> Either<L, R> {
     /// let either: Either<u8> = Either::Right(1);
     /// assert_eq!(either.is_left_and(|l| l == 1), false);
     /// ```
+    #[must_use]
     #[inline]
     pub fn is_left_and<F>(self, f: F) -> bool
     where
@@ -114,6 +117,7 @@ impl<L, R> Either<L, R> {
     /// let either: Either<u8, char> = Either::Right('c');
     /// assert_eq!(either.is_left_or(|r| r == 'm'), false);
     /// ```
+    #[must_use]
     #[inline]
     pub fn is_left_or<F>(self, f: F) -> bool
     where
@@ -138,6 +142,8 @@ impl<L, R> Either<L, R> {
     /// let either = Either::<u8, char>::Left(1);
     /// assert_eq!(either.is_right(), false);
     /// ```
+    #[must_use = "if you intended to assert that this is a right value, consider `.unwrap_right()` \
+                  instead"]
     #[inline]
     pub const fn is_right(&self) -> bool {
         matches!(self, Self::Right(_))
@@ -160,6 +166,7 @@ impl<L, R> Either<L, R> {
     /// let either: Either<u8, char> = Either::Left(1);
     /// assert_eq!(either.is_right_and(|r| r == 'c'), false);
     /// ```
+    #[must_use]
     #[inline]
     pub fn is_right_and<F>(self, f: F) -> bool
     where
@@ -187,6 +194,7 @@ impl<L, R> Either<L, R> {
     /// let either: Either<u8, char> = Either::Left(2);
     /// assert_eq!(either.is_right_or(|l| l == 1), false);
     /// ```
+    #[must_use]
     #[inline]
     pub fn is_right_or<F>(self, f: F) -> bool
     where
@@ -1973,7 +1981,7 @@ impl<L, R> Either<&L, &R> {
     /// let refs: Either<&u8, &char> = value.as_ref();
     /// assert_eq!(refs.cloned(), Either::Left(1));
     /// ```
-    #[must_use]
+    #[must_use = "`self` will be dropped if the result is not used"]
     pub fn cloned(self) -> Either<L, R>
     where
         L: Clone,
@@ -1996,7 +2004,7 @@ impl<L, R> Either<&L, &R> {
     /// let refs: Either<&u8, &char> = value.as_ref();
     /// assert_eq!(refs.copied(), Either::Left(1));
     /// ```
-    #[must_use]
+    #[must_use = "`self` will be dropped if the result is not used"]
     pub const fn copied(self) -> Either<L, R>
     where
         L: Copy,
@@ -2022,7 +2030,7 @@ impl<L, R> Either<&mut L, &mut R> {
     /// let refs: Either<&mut u8, &mut char> = value.as_mut();
     /// assert_eq!(refs.cloned(), Either::Left(1));
     /// ```
-    #[must_use]
+    #[must_use = "`self` will be dropped if the result is not used"]
     pub fn cloned(self) -> Either<L, R>
     where
         L: Clone,
@@ -2046,7 +2054,7 @@ impl<L, R> Either<&mut L, &mut R> {
     /// let refs: Either<&mut u8, &mut char> = value.as_mut();
     /// assert_eq!(refs.copied(), Either::Left(1));
     /// ```
-    #[must_use]
+    #[must_use = "`self` will be dropped if the result is not used"]
     pub fn copied(self) -> Either<L, R>
     where
         L: Copy,
