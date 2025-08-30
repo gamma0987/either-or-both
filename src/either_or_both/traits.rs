@@ -128,7 +128,7 @@ impl<L, R> FromIterator<EitherOrBoth<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
     ///
     /// assert_eq!(collected, EitherOrBoth::Both(vec![1, 2], vec!['c']));
     /// ```
-    ///
+    /// 
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -139,7 +139,7 @@ impl<L, R> FromIterator<EitherOrBoth<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
     ///
     /// assert_eq!(collected, EitherOrBoth::Left(vec![2]));
     /// ```
-    ///
+    /// 
     /// [vectors]: Vec
     /// [`Left`]: EitherOrBoth::Left
     /// [`Right`]: EitherOrBoth::Right
@@ -197,7 +197,7 @@ where
     ///     )
     /// );
     /// ```
-    ///
+    /// 
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -213,7 +213,7 @@ where
     ///
     /// assert_eq!(collected, EitherOrBoth::Left(HashMap::from([("left", 2)]),));
     /// ```
-    ///
+    /// 
     /// [`HashMaps`]: std::collections::HashMap
     /// [`Left`]: EitherOrBoth::Left
     /// [`Right`]: EitherOrBoth::Right
@@ -277,7 +277,7 @@ where
     ///     EitherOrBoth::Both(HashSet::from([1, 2]), HashSet::from(['c']))
     /// );
     /// ```
-    ///
+    /// 
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -291,7 +291,7 @@ where
     ///
     /// assert_eq!(collected, EitherOrBoth::Left(HashSet::from([2])));
     /// ```
-    ///
+    /// 
     /// [`HashSets`]: std::collections::HashSet
     /// [`Left`]: EitherOrBoth::Left
     /// [`Right`]: EitherOrBoth::Right
@@ -359,7 +359,7 @@ where
     ///     )
     /// );
     /// ```
-    ///
+    /// 
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -376,7 +376,7 @@ where
     ///     EitherOrBoth::Left(IndexMap::from([("left", 2)]),)
     /// );
     /// ```
-    ///
+    /// 
     /// [`IndexMaps`]: indexmap::IndexMap
     /// [`IndexMap`]: indexmap::IndexMap
     /// [`Left`]: EitherOrBoth::Left
@@ -440,7 +440,7 @@ where
     ///     EitherOrBoth::Both(IndexSet::from([1, 2]), IndexSet::from(['c']))
     /// );
     /// ```
-    ///
+    /// 
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -453,7 +453,7 @@ where
     ///
     /// assert_eq!(collected, EitherOrBoth::Left(IndexSet::from([2])));
     /// ```
-    ///
+    /// 
     /// [`IndexSets`]: indexmap::IndexSet
     /// [`IndexSet`]: indexmap::IndexSet
     /// [`Left`]: EitherOrBoth::Left
@@ -507,7 +507,7 @@ impl<L, R> FromIterator<Either<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
     ///
     /// assert_eq!(collected, EitherOrBoth::Both(vec![1], vec!['c']));
     /// ```
-    ///
+    /// 
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -518,7 +518,7 @@ impl<L, R> FromIterator<Either<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
     ///
     /// assert_eq!(collected, EitherOrBoth::Both(vec![1], vec!['c']));
     /// ```
-    ///
+    /// 
     /// [vectors]: Vec
     /// [`Left`]: EitherOrBoth::Left
     /// [`Right`]: EitherOrBoth::Right
@@ -574,7 +574,7 @@ where
     ///     )
     /// );
     /// ```
-    ///
+    /// 
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -589,7 +589,7 @@ where
     ///
     /// assert_eq!(collected, EitherOrBoth::Left(HashMap::from([("left", 2)]),));
     /// ```
-    ///
+    /// 
     /// [`HashMaps`]: std::collections::HashMap
     /// [`Left`]: EitherOrBoth::Left
     /// [`Right`]: EitherOrBoth::Right
@@ -651,7 +651,7 @@ where
     ///     EitherOrBoth::Both(HashSet::from([2]), HashSet::from(['c']))
     /// );
     /// ```
-    ///
+    /// 
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -665,7 +665,7 @@ where
     ///
     /// assert_eq!(collected, EitherOrBoth::Left(HashSet::from([2])));
     /// ```
-    ///
+    /// 
     /// [`HashSets`]: std::collections::HashSet
     /// [`Left`]: EitherOrBoth::Left
     /// [`Right`]: EitherOrBoth::Right
@@ -731,7 +731,7 @@ where
     ///     )
     /// );
     /// ```
-    ///
+    /// 
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -748,7 +748,7 @@ where
     ///     EitherOrBoth::Left(IndexMap::from([("left", 2)]),)
     /// );
     /// ```
-    ///
+    /// 
     /// [`IndexMaps`]: indexmap::IndexMap
     /// [`IndexMap`]: indexmap::IndexMap
     /// [`Left`]: EitherOrBoth::Left
@@ -810,7 +810,7 @@ where
     ///     EitherOrBoth::Both(IndexSet::from([2]), IndexSet::from(['c']))
     /// );
     /// ```
-    ///
+    /// 
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -823,7 +823,7 @@ where
     ///
     /// assert_eq!(collected, EitherOrBoth::Left(IndexSet::from([2])));
     /// ```
-    ///
+    /// 
     /// [`IndexSets`]: indexmap::IndexSet
     /// [`IndexSet`]: indexmap::IndexSet
     /// [`Left`]: EitherOrBoth::Left
