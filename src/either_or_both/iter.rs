@@ -4,8 +4,8 @@ use core::iter::FusedIterator;
 
 use crate::EitherOrBoth;
 
-/// A iterator over the contained iterators of a uniform type chaining both iterators from left to
-/// right
+/// A iterator over the contained iterators of a uniform type chaining both iterators from
+/// left to right
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ChainedIterEitherOrBoth<T>(EitherOrBoth<T, T>);
 
@@ -32,7 +32,8 @@ pub struct IterMutEitherOrBoth<'a, T>(Items<&'a mut T>);
 pub struct SwapIterEitherOrBoth<L, R>(EitherOrBoth<L, R>);
 
 impl<T> ChainedIterEitherOrBoth<T> {
-    pub(crate) fn new(either_or_both: EitherOrBoth<T, T>) -> Self {
+    #[inline]
+    pub(crate) const fn new(either_or_both: EitherOrBoth<T, T>) -> Self {
         Self(either_or_both)
     }
 }
@@ -41,6 +42,7 @@ impl<T> Default for ChainedIterEitherOrBoth<T>
 where
     T: Default,
 {
+    #[inline]
     fn default() -> Self {
         Self(EitherOrBoth::Left(T::default()))
     }
@@ -89,6 +91,7 @@ where
 }
 
 impl<T> IntoIterEitherOrBoth<T> {
+    #[inline]
     pub(crate) fn new(either_or_both: EitherOrBoth<T, T>) -> Self {
         Self(either_or_both.into())
     }
@@ -119,6 +122,7 @@ impl<T> Iterator for IntoIterEitherOrBoth<T> {
 }
 
 impl<T> From<EitherOrBoth<T>> for Items<T> {
+    #[inline]
     fn from(value: EitherOrBoth<T>) -> Self {
         Self {
             inner: value.map(Some),
@@ -127,6 +131,7 @@ impl<T> From<EitherOrBoth<T>> for Items<T> {
 }
 
 impl<T> Default for Items<T> {
+    #[inline]
     fn default() -> Self {
         Self {
             inner: EitherOrBoth::Left(None),
@@ -179,6 +184,7 @@ impl<T> Iterator for Items<T> {
 }
 
 impl<'a, T> IterEitherOrBoth<'a, T> {
+    #[inline]
     pub(crate) fn new(either_or_both: &'a EitherOrBoth<T>) -> Self {
         Self(either_or_both.as_ref().into())
     }
@@ -209,6 +215,7 @@ impl<'a, T> Iterator for IterEitherOrBoth<'a, T> {
 }
 
 impl<'a, T> IterMutEitherOrBoth<'a, T> {
+    #[inline]
     pub(crate) fn new(either_or_both: &'a mut EitherOrBoth<T>) -> Self {
         Self(either_or_both.as_mut().into())
     }
@@ -239,7 +246,8 @@ impl<'a, T> Iterator for IterMutEitherOrBoth<'a, T> {
 }
 
 impl<L, R> SwapIterEitherOrBoth<L, R> {
-    pub(crate) fn new(either_or_both: EitherOrBoth<L, R>) -> Self {
+    #[inline]
+    pub(crate) const fn new(either_or_both: EitherOrBoth<L, R>) -> Self {
         Self(either_or_both)
     }
 }

@@ -35,7 +35,7 @@ use iter::{InnerIterEither, SwapIterEither};
 use Either::*;
 
 use crate::iter_either::{IterEither, IterMutEither};
-use crate::{unwrap_failed, EitherOrBoth};
+use crate::EitherOrBoth;
 
 /// Represent values with two possibilities. `Either` can be either `Left` or `Right`
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
@@ -67,7 +67,10 @@ impl<L, R> Either<L, R> {
     /// let either = Either::<u8>::Right(1);
     /// assert_eq!(either.is_left(), false);
     /// ```
-    pub fn is_left(&self) -> bool {
+    #[must_use = "if you intended to assert that this is a left value, consider `.unwrap_left()` \
+                  instead"]
+    #[inline]
+    pub const fn is_left(&self) -> bool {
         matches!(self, Self::Left(_))
     }
 
@@ -87,6 +90,8 @@ impl<L, R> Either<L, R> {
     /// let either: Either<u8> = Either::Right(1);
     /// assert_eq!(either.is_left_and(|l| l == 1), false);
     /// ```
+    #[must_use]
+    #[inline]
     pub fn is_left_and<F>(self, f: F) -> bool
     where
         F: FnOnce(L) -> bool,
@@ -112,6 +117,8 @@ impl<L, R> Either<L, R> {
     /// let either: Either<u8, char> = Either::Right('c');
     /// assert_eq!(either.is_left_or(|r| r == 'm'), false);
     /// ```
+    #[must_use]
+    #[inline]
     pub fn is_left_or<F>(self, f: F) -> bool
     where
         F: FnOnce(R) -> bool,
@@ -135,11 +142,15 @@ impl<L, R> Either<L, R> {
     /// let either = Either::<u8, char>::Left(1);
     /// assert_eq!(either.is_right(), false);
     /// ```
-    pub fn is_right(&self) -> bool {
+    #[must_use = "if you intended to assert that this is a right value, consider `.unwrap_right()` \
+                  instead"]
+    #[inline]
+    pub const fn is_right(&self) -> bool {
         matches!(self, Self::Right(_))
     }
 
-    /// Returns `true` if `Either` is [`Right`] and the contained value matches a predicate
+    /// Returns `true` if `Either` is [`Right`] and the contained value matches a
+    /// predicate
     ///
     /// # Examples
     ///
@@ -155,6 +166,8 @@ impl<L, R> Either<L, R> {
     /// let either: Either<u8, char> = Either::Left(1);
     /// assert_eq!(either.is_right_and(|r| r == 'c'), false);
     /// ```
+    #[must_use]
+    #[inline]
     pub fn is_right_and<F>(self, f: F) -> bool
     where
         F: FnOnce(R) -> bool,
@@ -181,6 +194,8 @@ impl<L, R> Either<L, R> {
     /// let either: Either<u8, char> = Either::Left(2);
     /// assert_eq!(either.is_right_or(|l| l == 1), false);
     /// ```
+    #[must_use]
+    #[inline]
     pub fn is_right_or<F>(self, f: F) -> bool
     where
         F: FnOnce(L) -> bool,
@@ -217,7 +232,8 @@ impl<L, R> Either<L, R> {
     /// println!("`text` has not been moved: {:?}", &text);
     /// ```
     #[allow(clippy::same_name_method)]
-    pub fn as_ref(&self) -> Either<&L, &R> {
+    #[inline]
+    pub const fn as_ref(&self) -> Either<&L, &R> {
         map_each!(self)
     }
 
@@ -238,15 +254,16 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(either, Either::Left(3))
     /// ```
     #[allow(clippy::same_name_method)]
+    #[inline]
     pub fn as_mut(&mut self) -> Either<&mut L, &mut R> {
         map_each!(self)
     }
 
     /// Converts from `Either<L, R>` to `Either<&L::Target, &R::Target>`.
     ///
-    /// This method keeps the original `Either` unchanged, while creating a new instance that
-    /// holds a reference to the original. It also coerces the inner values through the `Deref`
-    /// trait.
+    /// This method keeps the original `Either` unchanged, while creating a new instance
+    /// that holds a reference to the original. It also coerces the inner values
+    /// through the `Deref` trait.
     ///
     /// ```
     /// use either_or_both::Either;
@@ -255,6 +272,7 @@ impl<L, R> Either<L, R> {
     /// let deref: Either<&str> = values.as_deref();
     /// assert_eq!(deref.left(), Some("left"));
     /// ```
+    #[inline]
     pub fn as_deref(&self) -> Either<&<L as Deref>::Target, &<R as Deref>::Target>
     where
         L: Deref,
@@ -265,8 +283,8 @@ impl<L, R> Either<L, R> {
 
     /// Converts from `Either<L, R>` to `Either<&mut L::Target, &mut R::Target>`.
     ///
-    /// This method keeps the original `Either` unchanged, while creating a new instance that
-    /// holds a mutable reference to the inner type's [`Deref::Target`] type.
+    /// This method keeps the original `Either` unchanged, while creating a new instance
+    /// that holds a mutable reference to the inner type's [`Deref::Target`] type.
     ///
     /// ```
     /// use either_or_both::Either;
@@ -279,6 +297,7 @@ impl<L, R> Either<L, R> {
     ///
     /// assert_eq!(upper_case.left(), Some("LEFT".to_owned().as_mut_str()));
     /// ```
+    #[inline]
     pub fn as_deref_mut(&mut self) -> Either<&mut <L as Deref>::Target, &mut <R as Deref>::Target>
     where
         L: DerefMut,
@@ -288,6 +307,8 @@ impl<L, R> Either<L, R> {
     }
 
     /// Converts from `Pin<&Either<L, R>>` to `Either<Pin<&L>, Pin<&R>>`.
+    #[must_use]
+    #[inline]
     pub fn as_pin_ref(self: Pin<&Self>) -> Either<Pin<&L>, Pin<&R>> {
         // SAFETY: `x` is guaranteed to be pinned because it comes from `self` which is pinned.
         unsafe {
@@ -299,6 +320,8 @@ impl<L, R> Either<L, R> {
     }
 
     /// Converts from `Pin<&mut Either<L, R>>` to `Either<Pin<&mut L>, Pin<&mut R>>`.
+    #[must_use]
+    #[inline]
     pub fn as_pin_mut(self: Pin<&mut Self>) -> Either<Pin<&mut L>, Pin<&mut R>> {
         // SAFETY: `x` is guaranteed to be pinned because it comes from `self` which is pinned.
         unsafe {
@@ -317,7 +340,8 @@ impl<L, R> Either<L, R> {
     ///
     /// # Panics
     ///
-    /// Panics with a custom panic message provided by `msg` if there is no left value present
+    /// Panics with a custom panic message provided by `msg` if there is no left value
+    /// present
     ///
     /// # Examples
     ///
@@ -336,10 +360,14 @@ impl<L, R> Either<L, R> {
     /// let value: Either<&str> = Either::Right("right");
     /// value.expect_left("should be left");
     /// ```
+    #[track_caller]
+    #[inline]
     pub fn expect_left(self, msg: &str) -> L {
         match self {
             Self::Left(left) => left,
-            Self::Right(_) => unwrap_failed(msg),
+            Self::Right(_) => {
+                panic!("{msg}");
+            }
         }
     }
 
@@ -347,7 +375,8 @@ impl<L, R> Either<L, R> {
     ///
     /// # Panics
     ///
-    /// Panics with a custom panic message provided by `msg` if there is no right value present
+    /// Panics with a custom panic message provided by `msg` if there is no right value
+    /// present
     ///
     /// # Examples
     ///
@@ -366,9 +395,13 @@ impl<L, R> Either<L, R> {
     /// let value: Either<&str> = Either::Left("left");
     /// value.expect_right("should be right");
     /// ```
+    #[track_caller]
+    #[inline]
     pub fn expect_right(self, msg: &str) -> R {
         match self {
-            Self::Left(_) => unwrap_failed(msg),
+            Self::Left(_) => {
+                panic!("{msg}");
+            }
             Self::Right(right) => right,
         }
     }
@@ -394,12 +427,14 @@ impl<L, R> Either<L, R> {
     /// let value: Either<&str> = Either::Right("right");
     /// value.unwrap_left(); // panics
     /// ```
+    #[track_caller]
+    #[inline]
     pub fn unwrap_left(self) -> L {
         self.expect_left("Called `Either::unwrap_left` on a `Right` value")
     }
 
-    /// Returns the contained left value consuming `self`, without checking that the value is not
-    /// [`Left`].
+    /// Returns the contained left value consuming `self`, without checking that the value
+    /// is not [`Left`].
     ///
     /// # SAFETY
     ///
@@ -424,6 +459,8 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
+    #[track_caller]
+    #[inline]
     pub unsafe fn unwrap_left_unchecked(self) -> L {
         match self {
             Self::Left(left) => left,
@@ -453,12 +490,14 @@ impl<L, R> Either<L, R> {
     /// let value: Either<&str> = Either::Left("left");
     /// value.unwrap_right(); // panics
     /// ```
+    #[track_caller]
+    #[inline]
     pub fn unwrap_right(self) -> R {
         self.expect_right("Called `Either::unwrap_right` on a `Left` value")
     }
 
-    /// Returns the contained right value consuming `self`, without checking that the value is not
-    /// [`Right`].
+    /// Returns the contained right value consuming `self`, without checking that the
+    /// value is not [`Right`].
     ///
     /// # SAFETY
     ///
@@ -483,6 +522,8 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
+    #[track_caller]
+    #[inline]
     pub unsafe fn unwrap_right_unchecked(self) -> R {
         match self {
             // SAFETY: the safety contract must be upheld by the caller.
@@ -495,7 +536,8 @@ impl<L, R> Either<L, R> {
     // Getting the contained values
     ////////////////////////////////////////////////////////////////////////////////
 
-    /// If a left value is present, return `Some` containing the value otherwise return `None`.
+    /// If a left value is present, return `Some` containing the value otherwise return
+    /// `None`.
     ///
     /// # Examples
     ///
@@ -508,6 +550,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.left(), None);
     /// ```
+    #[inline]
     pub fn left(self) -> Option<L> {
         match self {
             Self::Left(left) => Some(left),
@@ -517,9 +560,9 @@ impl<L, R> Either<L, R> {
 
     /// Returns [`Right`] if the `Either` is [`Right`] otherwise returns `other`.
     ///
-    /// The `left_and` combinator eagerly evaluates its arguments, which can result in unnecessary
-    /// computations. When chaining operations that involve function calls, use [`left_and_then`]
-    /// instead. It evaluates the function lazily.
+    /// The `left_and` combinator eagerly evaluates its arguments, which can result in
+    /// unnecessary computations. When chaining operations that involve function
+    /// calls, use [`left_and_then`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -536,6 +579,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [`left_and_then`]: Either::left_and_then
+    #[inline]
     pub fn left_and<T>(self, other: Either<T, R>) -> Either<T, R> {
         match self {
             Self::Left(_) => other,
@@ -560,6 +604,7 @@ impl<L, R> Either<L, R> {
     /// let x: Either<u8, char> = Either::Right('c');
     /// assert_eq!(x.left_and_then(left_to_string), Either::Right('c'));
     /// ```
+    #[inline]
     pub fn left_and_then<F, T>(self, f: F) -> Either<T, R>
     where
         F: FnOnce(L) -> Either<T, R>,
@@ -570,7 +615,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// If a left value is present, return `Some` containing the value otherwise return `None`.
+    /// If a left value is present, return `Some` containing the value otherwise return
+    /// `None`.
     ///
     /// # Examples
     ///
@@ -583,6 +629,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Left(1);
     /// assert_eq!(value.right(), None);
     /// ```
+    #[inline]
     pub fn right(self) -> Option<R> {
         match self {
             Self::Left(_) => None,
@@ -592,9 +639,9 @@ impl<L, R> Either<L, R> {
 
     /// Returns [`Left`] if the `Either` is [`Left`] otherwise returns `other`.
     ///
-    /// The `right_and` combinator eagerly evaluates its arguments, which can result in unnecessary
-    /// computations. When chaining operations that involve function calls, use [`right_and_then`]
-    /// instead. It evaluates the function lazily.
+    /// The `right_and` combinator eagerly evaluates its arguments, which can result in
+    /// unnecessary computations. When chaining operations that involve function
+    /// calls, use [`right_and_then`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -611,6 +658,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [`right_and_then`]: Either::right_and_then
+    #[inline]
     pub fn right_and<T>(self, other: Either<L, T>) -> Either<L, T> {
         match self {
             Self::Left(left) => Left(left),
@@ -638,6 +686,7 @@ impl<L, R> Either<L, R> {
     /// let x: Either<u8, char> = Either::Left(1);
     /// assert_eq!(x.right_and_then(right_to_string), Either::Left(1));
     /// ```
+    #[inline]
     pub fn right_and_then<F, T>(self, f: F) -> Either<L, T>
     where
         F: FnOnce(R) -> Either<L, T>,
@@ -652,8 +701,8 @@ impl<L, R> Either<L, R> {
     // Iterators
     ////////////////////////////////////////////////////////////////////////////////
 
-    /// Consumes the inner iterators and returns an iterator that yields items of type `Either<L,
-    /// R>`.
+    /// Consumes the inner iterators and returns an iterator that yields items of type
+    /// `Either<L, R>`.
     ///
     ///
     /// This iterator allows traversing inner iterators with different types
@@ -712,8 +761,8 @@ impl<L, R> Either<L, R> {
         )
     }
 
-    /// Mutably borrows the inner iterators returning an iterator that yields items of type
-    /// `Either<&mut L, &mut R>`.
+    /// Mutably borrows the inner iterators returning an iterator that yields items of
+    /// type `Either<&mut L, &mut R>`.
     ///
     /// This iterator allows traversing inner iterators with different types
     ///
@@ -761,6 +810,8 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.flip(), Either::Left('c'));
     /// ```
+    #[must_use]
+    #[inline]
     pub fn flip(self) -> Either<R, L> {
         match self {
             Self::Left(left) => Right(left),
@@ -768,7 +819,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Applies mapping functions to the left and right values returning an `Either<T, U>`.
+    /// Applies mapping functions to the left and right values returning an `Either<T,
+    /// U>`.
     ///
     /// # Examples
     ///
@@ -787,6 +839,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.bimap(map_left, map_right), Either::Right(99));
     /// ```
+    #[inline]
     pub fn bimap<F, G, T, U>(self, f: F, g: G) -> Either<T, U>
     where
         F: FnOnce(L) -> T,
@@ -813,6 +866,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.map_left(map_left), Either::Right('c'));
     /// ```
+    #[inline]
     pub fn map_left<F, T>(self, f: F) -> Either<T, R>
     where
         F: FnOnce(L) -> T,
@@ -823,12 +877,12 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns the provided default value if this is a [`Right`] or applies a mapping function to
-    /// the contained left value.
+    /// Returns the provided default value if this is a [`Right`] or applies a mapping
+    /// function to the contained left value.
     ///
     /// The `map_left_or` combinator eagerly evaluates its arguments, which can result in
-    /// unnecessary computations. When chaining operations that involve function calls, use
-    /// [`map_left_or_else`] instead. It evaluates the function lazily.
+    /// unnecessary computations. When chaining operations that involve function calls,
+    /// use [`map_left_or_else`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -845,6 +899,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [`map_left_or_else`]: Either::map_left_or_else
+    #[inline]
     pub fn map_left_or<F, T>(self, default: T, f: F) -> T
     where
         F: FnOnce(L) -> T,
@@ -852,8 +907,8 @@ impl<L, R> Either<L, R> {
         self.map_left_or_else(|| default, f)
     }
 
-    /// Applies the given function to the left value , mapping `L` to `T` otherwise returns the
-    /// [default value] for type `T`.
+    /// Applies the given function to the left value , mapping `L` to `T` otherwise
+    /// returns the [default value] for type `T`.
     ///
     /// # Examples
     ///
@@ -870,6 +925,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [default value]: Default::default
+    #[inline]
     pub fn map_left_or_default<F, T>(self, f: F) -> T
     where
         F: FnOnce(L) -> T,
@@ -878,8 +934,8 @@ impl<L, R> Either<L, R> {
         self.map_left_or_else(T::default, f)
     }
 
-    /// Applies the given function to the left value, mapping `L` to `T` otherwise applies a
-    /// different function.
+    /// Applies the given function to the left value, mapping `L` to `T` otherwise applies
+    /// a different function.
     ///
     /// # Examples
     ///
@@ -900,6 +956,7 @@ impl<L, R> Either<L, R> {
     ///     1.to_string()
     /// );
     /// ```
+    #[inline]
     pub fn map_left_or_else<D, F, T>(self, default: D, f: F) -> T
     where
         F: FnOnce(L) -> T,
@@ -926,6 +983,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Left(1);
     /// assert_eq!(value.map_right(map_right), Either::Left(1));
     /// ```
+    #[inline]
     pub fn map_right<F, T>(self, f: F) -> Either<L, T>
     where
         F: FnOnce(R) -> T,
@@ -936,12 +994,12 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns the provided default value if this is a [`Left`] or applies a mapping function to
-    /// the contained right value.
+    /// Returns the provided default value if this is a [`Left`] or applies a mapping
+    /// function to the contained right value.
     ///
     /// The `map_right_or` combinator eagerly evaluates its arguments, which can result in
-    /// unnecessary computations. When chaining operations that involve function calls, use
-    /// [`map_right_or_else`] instead. It evaluates the function lazily.
+    /// unnecessary computations. When chaining operations that involve function calls,
+    /// use [`map_right_or_else`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -958,6 +1016,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [`map_right_or_else`]: Either::map_right_or_else
+    #[inline]
     pub fn map_right_or<F, T>(self, default: T, f: F) -> T
     where
         F: FnOnce(R) -> T,
@@ -965,8 +1024,8 @@ impl<L, R> Either<L, R> {
         self.map_right_or_else(|| default, f)
     }
 
-    /// Applies the given function to the right value, mapping `R` to `T` otherwise returns the
-    /// [default value] for type `T`.
+    /// Applies the given function to the right value, mapping `R` to `T` otherwise
+    /// returns the [default value] for type `T`.
     ///
     /// # Examples
     ///
@@ -983,6 +1042,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [default value]: Default::default
+    #[inline]
     pub fn map_right_or_default<F, T>(self, f: F) -> T
     where
         F: FnOnce(R) -> T,
@@ -991,8 +1051,8 @@ impl<L, R> Either<L, R> {
         self.map_right_or_else(T::default, f)
     }
 
-    /// Applies the given function to the right value, mapping `R` to `T` otherwise applies a
-    /// different function.
+    /// Applies the given function to the right value, mapping `R` to `T` otherwise
+    /// applies a different function.
     ///
     /// # Examples
     ///
@@ -1013,6 +1073,7 @@ impl<L, R> Either<L, R> {
     ///     String::from("right")
     /// );
     /// ```
+    #[inline]
     pub fn map_right_or_else<D, F, T>(self, default: D, f: F) -> T
     where
         F: FnOnce(R) -> T,
@@ -1024,7 +1085,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Calls functions with a reference to the contained values returning the original `Either`.
+    /// Calls functions with a reference to the contained values returning the original
+    /// `Either`.
     ///
     /// # Examples
     ///
@@ -1045,6 +1107,7 @@ impl<L, R> Either<L, R> {
     ///     .expect_right("should be a right value");
     /// assert_eq!(right, 'c');
     /// ```
+    #[inline]
     pub fn biinspect<F, G>(self, f: F, g: G) -> Self
     where
         for<'a> F: Fn(&'a L),
@@ -1057,8 +1120,8 @@ impl<L, R> Either<L, R> {
         self
     }
 
-    /// Calls a function with a reference to the contained left value returning the original
-    /// `Either`.
+    /// Calls a function with a reference to the contained left value returning the
+    /// original `Either`.
     ///
     /// # Examples
     ///
@@ -1079,6 +1142,7 @@ impl<L, R> Either<L, R> {
     ///     .expect_right("should be a right value");
     /// assert_eq!(right, 'c');
     /// ```
+    #[inline]
     pub fn inspect_left<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a L),
@@ -1090,8 +1154,8 @@ impl<L, R> Either<L, R> {
         self
     }
 
-    /// Calls a function with a reference to the contained right value returning the original
-    /// `Either`.
+    /// Calls a function with a reference to the contained right value returning the
+    /// original `Either`.
     ///
     /// # Examples
     ///
@@ -1112,6 +1176,7 @@ impl<L, R> Either<L, R> {
     ///     .expect_left("should be a left value");
     /// assert_eq!(left, 1);
     /// ```
+    #[inline]
     pub fn inspect_right<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a R),
@@ -1123,8 +1188,8 @@ impl<L, R> Either<L, R> {
         self
     }
 
-    /// Consumes this `Either` applying functions to the contained values taking mutable references
-    /// to capture variables.
+    /// Consumes this `Either` applying functions to the contained values taking mutable
+    /// references to capture variables.
     ///
     /// # Examples
     ///
@@ -1140,8 +1205,8 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(left, vec![1]);
     /// ```
     ///
-    /// The following example will not compile with the error: "cannot borrow `both` as mutable more
-    /// than once at a time".
+    /// The following example will not compile with the error: "cannot borrow `both` as
+    /// mutable more than once at a time".
     ///
     /// If you need to apply a function that requires mutable access to both elements
     /// simultaneously, consider using [`biapply_with`] instead.
@@ -1156,6 +1221,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [`biapply_with`]: Either::biapply_with
+    #[inline]
     pub fn biapply<F, G>(self, mut f: F, mut g: G)
     where
         F: FnMut(L),
@@ -1167,7 +1233,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Consumes this `Either` applying functions to the contained values and a given accumulator.
+    /// Consumes this `Either` applying functions to the contained values and a given
+    /// accumulator.
     ///
     /// # Examples
     ///
@@ -1186,6 +1253,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [`flip`]: Either::flip
+    #[inline]
     pub fn biapply_with<F, G, Acc>(self, acc: Acc, mut f: F, mut g: G)
     where
         F: FnMut(Acc, L),
@@ -1214,6 +1282,7 @@ impl<L, R> Either<L, R> {
     /// value.apply_left(|l| left.push(l));
     /// assert_eq!(left.is_empty(), true);
     /// ```
+    #[inline]
     pub fn apply_left<F>(self, mut f: F)
     where
         F: FnMut(L),
@@ -1241,6 +1310,7 @@ impl<L, R> Either<L, R> {
     /// value.apply_right(|r| right.push(r));
     /// assert_eq!(right.is_empty(), true);
     /// ```
+    #[inline]
     pub fn apply_right<F>(self, mut f: F)
     where
         F: FnMut(R),
@@ -1251,8 +1321,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns the contained values applying a mapping function which converts the `L` and `R`
-    /// values to a uniform type.
+    /// Returns the contained values applying a mapping function which converts the `L`
+    /// and `R` values to a uniform type.
     ///
     /// # Examples
     ///
@@ -1271,6 +1341,7 @@ impl<L, R> Either<L, R> {
     ///     "c".to_owned()
     /// );
     /// ```
+    #[inline]
     pub fn bireduce<F, G, T>(self, f: F, g: G) -> T
     where
         F: FnOnce(L) -> T,
@@ -1282,8 +1353,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns the left value otherwise applies a function to a [`Right`] variant, converting it
-    /// into an `L` value.
+    /// Returns the left value otherwise applies a function to a [`Right`] variant,
+    /// converting it into an `L` value.
     ///
     /// # Example
     ///
@@ -1296,6 +1367,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Left(1);
     /// assert_eq!(value.reduce_left(|r| r as u8), 1);
     /// ```
+    #[inline]
     pub fn reduce_left<F>(self, f: F) -> L
     where
         F: FnOnce(R) -> L,
@@ -1306,8 +1378,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns the right value otherwise applies a function to a [`Left`] variant, converting it
-    /// into an `R` value.
+    /// Returns the right value otherwise applies a function to a [`Left`] variant,
+    /// converting it into an `R` value.
     ///
     /// # Examples
     ///
@@ -1320,6 +1392,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Left(0);
     /// assert_eq!(value.reduce_right(|l| l as char), '\0');
     /// ```
+    #[inline]
     pub fn reduce_right<F>(self, f: F) -> R
     where
         F: FnOnce(L) -> R,
@@ -1332,8 +1405,8 @@ impl<L, R> Either<L, R> {
 
     /// Transforms the `Either<L, R>` into a `Result<R, L>`.
     ///
-    /// Following the [convention], the left value represents an error and a right value represents
-    /// a correct value.
+    /// Following the [convention], the left value represents an error and a right value
+    /// represents a correct value.
     ///
     /// # Examples
     ///
@@ -1348,6 +1421,8 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [convention]: ./index.html#conventions-and-edge-cases
+    #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn ok(self) -> Result<R, L> {
         match self {
             Self::Left(left) => Err(left),
@@ -1355,15 +1430,15 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Transforms the `Either<L, R>` into a `Result<R, L>` using the provided `error` as error
-    /// value.
+    /// Transforms the `Either<L, R>` into a `Result<R, L>` using the provided `error` as
+    /// error value.
     ///
-    /// Following the [convention], the left value represents an error and a right value represents
-    /// a correct value.
+    /// Following the [convention], the left value represents an error and a right value
+    /// represents a correct value.
     ///
-    /// The `ok_or` combinator eagerly evaluates its arguments, which can result in unnecessary
-    /// computations. When chaining operations that involve function calls, use [`ok_or_else`]
-    /// instead. It evaluates the function lazily.
+    /// The `ok_or` combinator eagerly evaluates its arguments, which can result in
+    /// unnecessary computations. When chaining operations that involve function
+    /// calls, use [`ok_or_else`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -1379,19 +1454,21 @@ impl<L, R> Either<L, R> {
     ///
     /// [`ok_or_else`]: Either::ok_or_else
     /// [convention]: ./index.html#conventions-and-edge-cases
+    #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn ok_or<E>(self, error: E) -> Result<R, E> {
         self.ok_or_else(|| error)
     }
 
-    /// Transforms the `Either<L, R>` into a `Result<R, L>` using the result of an `error` function
-    /// as error value.
+    /// Transforms the `Either<L, R>` into a `Result<R, L>` using the result of an `error`
+    /// function as error value.
     ///
-    /// Following the [convention], the left value represents an error and a right value represents
-    /// a correct value.
+    /// Following the [convention], the left value represents an error and a right value
+    /// represents a correct value.
     ///
-    /// The `ok_or` combinator eagerly evaluates its arguments, which can result in unnecessary
-    /// computations. When chaining operations that involve function calls, use [`ok_or_else`]
-    /// instead. It evaluates the function lazily.
+    /// The `ok_or` combinator eagerly evaluates its arguments, which can result in
+    /// unnecessary computations. When chaining operations that involve function
+    /// calls, use [`ok_or_else`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -1410,6 +1487,8 @@ impl<L, R> Either<L, R> {
     ///
     /// [`ok_or_else`]: Either::ok_or_else
     /// [convention]: ./index.html#conventions-and-edge-cases
+    #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn ok_or_else<F, E>(self, error: F) -> Result<R, E>
     where
         F: FnOnce() -> E,
@@ -1420,7 +1499,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns a tuple (L, R) with the provided values filling in any missing left or right value.
+    /// Returns a tuple (L, R) with the provided values filling in any missing left or
+    /// right value.
     ///
     /// # Examples
     ///
@@ -1433,6 +1513,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.or(2, 'm'), (2, 'c'));
     /// ```
+    #[inline]
     pub fn or(self, left: L, right: R) -> (L, R) {
         match self {
             Self::Left(left) => (left, right),
@@ -1440,8 +1521,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns a tuple (L, R) where any missing left or right value is replaced with its respective
-    /// default value.
+    /// Returns a tuple (L, R) where any missing left or right value is replaced with its
+    /// respective default value.
     ///
     /// # Examples
     ///
@@ -1454,6 +1535,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.or_default(), (0, 'c'));
     /// ```
+    #[inline]
     pub fn or_default(self) -> (L, R)
     where
         L: Default,
@@ -1465,8 +1547,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns a tuple (L, R) where any missing left or right value is computed with the given
-    /// functions.
+    /// Returns a tuple (L, R) where any missing left or right value is computed with the
+    /// given functions.
     ///
     /// # Examples
     ///
@@ -1479,6 +1561,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.or_else(|| 1 + 1, || char::from(100)), (2, 'c'));
     /// ```
+    #[inline]
     pub fn or_else<F, G>(self, f: F, g: G) -> (L, R)
     where
         F: FnOnce() -> L,
@@ -1503,6 +1586,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.inject_left(1), EitherOrBoth::Both(1, 'c'));
     /// ```
+    #[inline]
     pub fn inject_left(self, left: L) -> EitherOrBoth<L, R> {
         match self {
             Self::Left(_) => EitherOrBoth::Left(left),
@@ -1523,6 +1607,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Left(1);
     /// assert_eq!(value.inject_right('m'), EitherOrBoth::Both(1, 'm'));
     /// ```
+    #[inline]
     pub fn inject_right(self, right: R) -> EitherOrBoth<L, R> {
         match self {
             Self::Left(left) => EitherOrBoth::Both(left, right),
@@ -1530,8 +1615,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Converts into a [`Left`] variant, using the contained left value or applying a mapping
-    /// function to the [`Right`] value.
+    /// Converts into a [`Left`] variant, using the contained left value or applying a
+    /// mapping function to the [`Right`] value.
     ///
     /// # Examples
     ///
@@ -1544,6 +1629,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.into_left(|r| r as u8), Either::Left(99));
     /// ```
+    #[inline]
     pub fn into_left<F>(self, f: F) -> Self
     where
         F: FnOnce(R) -> L,
@@ -1554,8 +1640,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Converts into a [`Right`] variant, using the contained right value or applying a mapping
-    /// function to the [`Left`] value.
+    /// Converts into a [`Right`] variant, using the contained right value or applying a
+    /// mapping function to the [`Left`] value.
     ///
     /// # Examples
     ///
@@ -1568,6 +1654,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Left(0);
     /// assert_eq!(value.into_right(|l| l as char), Either::Right('\0'));
     /// ```
+    #[inline]
     pub fn into_right<F>(self, f: F) -> Self
     where
         F: FnOnce(L) -> R,
@@ -1599,6 +1686,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(old, None);
     /// assert_eq!(value, Either::Right('c'));
     /// ```
+    #[inline]
     pub fn replace_left(&mut self, value: L) -> Option<L> {
         match self {
             Self::Left(left) => Some(mem::replace(left, value)),
@@ -1623,6 +1711,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(old, None);
     /// assert_eq!(value, Either::Left(1));
     /// ```
+    #[inline]
     pub fn replace_right(&mut self, value: R) -> Option<R> {
         match self {
             Self::Right(right) => Some(mem::replace(right, value)),
@@ -1632,8 +1721,8 @@ impl<L, R> Either<L, R> {
 }
 
 impl<T> Either<T, T> {
-    /// Consumes this `Either` applying a function to the contained value (of a uniform type) taking
-    /// mutable references to capture variables.
+    /// Consumes this `Either` applying a function to the contained value (of a uniform
+    /// type) taking mutable references to capture variables.
     ///
     /// # Examples
     ///
@@ -1650,6 +1739,7 @@ impl<T> Either<T, T> {
     ///
     /// assert_eq!(both, vec!['c', 'a']);
     /// ```
+    #[inline]
     pub fn apply<F>(self, mut f: F)
     where
         F: FnMut(T),
@@ -1660,8 +1750,8 @@ impl<T> Either<T, T> {
         }
     }
 
-    /// Calls a function with a reference to the contained value (of a uniform type) returning the
-    /// original `Either`.
+    /// Calls a function with a reference to the contained value (of a uniform type)
+    /// returning the original `Either`.
     ///
     /// # Examples
     ///
@@ -1683,6 +1773,7 @@ impl<T> Either<T, T> {
     ///
     /// assert_eq!(right, 'a');
     /// ```
+    #[inline]
     pub fn inspect<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a T),
@@ -1712,6 +1803,7 @@ impl<T> Either<T, T> {
     /// assert_eq!(iter.next(), Some(&'c'));
     /// assert_eq!(iter.next(), None);
     /// ```
+    #[inline]
     pub fn iter(&self) -> IterEither<'_, T> {
         IterEither::new(self)
     }
@@ -1733,11 +1825,13 @@ impl<T> Either<T, T> {
     /// assert_eq!(iter.next(), Some(&mut 'c'));
     /// assert_eq!(iter.next(), None);
     /// ```
+    #[inline]
     pub fn iter_mut(&mut self) -> IterMutEither<'_, T> {
         IterMutEither::new(self)
     }
 
-    /// Consumes the `Either`, returning an iterator over the contained iterator of a uniform type
+    /// Consumes the `Either`, returning an iterator over the contained iterator of a
+    /// uniform type
     ///
     /// For iteration over contained iterators with non-uniform types, you can use
     /// [`into_iter_swap`] instead.
@@ -1783,10 +1877,11 @@ impl<T> Either<T, T> {
         InnerIterEither::new(self.as_ref().map(IntoIterator::into_iter))
     }
 
-    /// Returns an iterator over the mutable values of the contained iterator of a uniform type
+    /// Returns an iterator over the mutable values of the contained iterator of a uniform
+    /// type
     ///
-    /// For iteration over contained iterators with non-uniform types, you can use [`iter_swap_mut`]
-    /// instead.
+    /// For iteration over contained iterators with non-uniform types, you can use
+    /// [`iter_swap_mut`] instead.
     ///
     /// # Examples
     ///
@@ -1806,8 +1901,8 @@ impl<T> Either<T, T> {
         InnerIterEither::new(self.as_mut().map(IntoIterator::into_iter))
     }
 
-    /// Applies a mapping function to the left and right values (of a uniform type) returning an
-    /// `Either<U, U>`.
+    /// Applies a mapping function to the left and right values (of a uniform type)
+    /// returning an `Either<U, U>`.
     ///
     /// # Examples
     ///
@@ -1820,6 +1915,7 @@ impl<T> Either<T, T> {
     /// let value: Either<char> = Either::Right('a');
     /// assert_eq!(value.map(|c| c.to_string()), Either::Right("a".to_owned()));
     /// ```
+    #[inline]
     pub fn map<F, U>(self, f: F) -> Either<U, U>
     where
         F: FnOnce(T) -> U,
@@ -1843,6 +1939,7 @@ impl<T> Either<T, T> {
     /// let value: Either<u8> = Either::Right(2);
     /// assert_eq!(value.reduce(), 2);
     /// ```
+    #[inline]
     pub fn reduce(self) -> T {
         match self {
             Self::Left(left) => left,
@@ -1850,8 +1947,8 @@ impl<T> Either<T, T> {
         }
     }
 
-    /// Returns the contained [`Left`] or [`Right`] value applying a mapping function to the
-    /// contained values.
+    /// Returns the contained [`Left`] or [`Right`] value applying a mapping function to
+    /// the contained values.
     ///
     /// # Example
     ///
@@ -1864,6 +1961,7 @@ impl<T> Either<T, T> {
     /// let value: Either<u8> = Either::Right(2);
     /// assert_eq!(value.reduce_map(|v| v + 1), 3);
     /// ```
+    #[inline]
     pub fn reduce_map<F, U>(self, f: F) -> U
     where
         F: FnOnce(T) -> U,
@@ -1887,6 +1985,7 @@ impl<L, R> Either<&L, &R> {
     /// let refs: Either<&u8, &char> = value.as_ref();
     /// assert_eq!(refs.cloned(), Either::Left(1));
     /// ```
+    #[must_use = "`self` will be dropped if the result is not used"]
     pub fn cloned(self) -> Either<L, R>
     where
         L: Clone,
@@ -1909,7 +2008,8 @@ impl<L, R> Either<&L, &R> {
     /// let refs: Either<&u8, &char> = value.as_ref();
     /// assert_eq!(refs.copied(), Either::Left(1));
     /// ```
-    pub fn copied(self) -> Either<L, R>
+    #[must_use = "`self` will be dropped if the result is not used"]
+    pub const fn copied(self) -> Either<L, R>
     where
         L: Copy,
         R: Copy,
@@ -1922,7 +2022,8 @@ impl<L, R> Either<&L, &R> {
 }
 
 impl<L, R> Either<&mut L, &mut R> {
-    /// Converts an `Either<&mut L, &mut R>` into an `Either<L, R>` by cloning its contents.
+    /// Converts an `Either<&mut L, &mut R>` into an `Either<L, R>` by cloning its
+    /// contents.
     ///
     /// # Examples
     ///
@@ -1933,6 +2034,7 @@ impl<L, R> Either<&mut L, &mut R> {
     /// let refs: Either<&mut u8, &mut char> = value.as_mut();
     /// assert_eq!(refs.cloned(), Either::Left(1));
     /// ```
+    #[must_use = "`self` will be dropped if the result is not used"]
     pub fn cloned(self) -> Either<L, R>
     where
         L: Clone,
@@ -1944,7 +2046,8 @@ impl<L, R> Either<&mut L, &mut R> {
         }
     }
 
-    /// Converts an `Either<&mut L, &mut R>` into an `Either<L, R>` by copying its contents
+    /// Converts an `Either<&mut L, &mut R>` into an `Either<L, R>` by copying its
+    /// contents
     ///
     /// # Examples
     ///
@@ -1955,6 +2058,7 @@ impl<L, R> Either<&mut L, &mut R> {
     /// let refs: Either<&mut u8, &mut char> = value.as_mut();
     /// assert_eq!(refs.copied(), Either::Left(1));
     /// ```
+    #[must_use = "`self` will be dropped if the result is not used"]
     pub fn copied(self) -> Either<L, R>
     where
         L: Copy,
@@ -1990,8 +2094,8 @@ impl<L1, L2, R1, R2> Either<(L1, R1), (L2, R2)> {
 }
 
 impl<L, R, T> Either<(T, L), (T, R)> {
-    /// Transposes an `Either` of tuples to a tuple of a single value and an `Either` with the left
-    /// value having a uniform type
+    /// Transposes an `Either` of tuples to a tuple of a single value and an `Either` with
+    /// the left value having a uniform type
     ///
     /// # Examples
     ///
@@ -2013,8 +2117,8 @@ impl<L, R, T> Either<(T, L), (T, R)> {
 }
 
 impl<L, R, T> Either<(L, T), (R, T)> {
-    /// Transposes an `Either` of tuples to a tuple of a single value and an `Either` with the right
-    /// value having a uniform type
+    /// Transposes an `Either` of tuples to a tuple of a single value and an `Either` with
+    /// the right value having a uniform type
     ///
     /// # Examples
     ///
@@ -2054,6 +2158,7 @@ impl<L, R> Either<Option<L>, Option<R>> {
     /// ```
     ///
     /// [`Options`]: Option
+    #[inline]
     pub fn transpose(self) -> Option<Either<L, R>> {
         match self {
             Self::Left(left) => left.map(Left),
@@ -2081,6 +2186,8 @@ impl<L, R, E1, E2> Either<Result<L, E1>, Result<R, E2>> {
     /// ```
     ///
     /// [`Results`]: Result
+    #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn transpose(self) -> Result<Either<L, R>, Either<E1, E2>> {
         match self {
             Self::Left(left) => match left {
@@ -2114,6 +2221,8 @@ impl<L, R, E> Either<Result<L, E>, Result<R, E>> {
     /// ```
     ///
     /// [`Results`]: Result
+    #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn transpose_err(self) -> Result<Either<L, R>, E> {
         match self {
             Self::Left(left) => left.map(Left),
@@ -2141,6 +2250,8 @@ impl<T, E1, E2> Either<Result<T, E1>, Result<T, E2>> {
     /// ```
     ///
     /// [`Results`]: Result
+    #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn transpose_ok(self) -> Result<T, Either<E1, E2>> {
         match self {
             Self::Left(left) => left.map_err(Left),

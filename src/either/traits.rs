@@ -18,6 +18,7 @@ where
     L: AsMut<T>,
     R: AsMut<T>,
 {
+    #[inline]
     fn as_mut(&mut self) -> &mut T {
         each!(self, .as_mut())
     }
@@ -29,6 +30,7 @@ where
     L: AsRef<T>,
     R: AsRef<T>,
 {
+    #[inline]
     fn as_ref(&self) -> &T {
         each!(self, .as_ref())
     }
@@ -56,6 +58,7 @@ where
 {
     type Target = R::Target;
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
         each!(self)
     }
@@ -66,6 +69,7 @@ where
     L: DerefMut<Target = R::Target>,
     R: DerefMut,
 {
+    #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         each!(self)
     }
@@ -105,18 +109,21 @@ where
 }
 
 impl<'a, L, R> From<&'a Either<L, R>> for Either<&'a L, &'a R> {
+    #[inline]
     fn from(value: &'a Either<L, R>) -> Self {
         value.as_ref()
     }
 }
 
 impl<'a, L, R> From<&'a mut Either<L, R>> for Either<&'a mut L, &'a mut R> {
+    #[inline]
     fn from(value: &'a mut Either<L, R>) -> Self {
         value.as_mut()
     }
 }
 
 impl<L, R> From<Result<R, L>> for Either<L, R> {
+    #[inline]
     fn from(value: Result<R, L>) -> Self {
         match value {
             Ok(ok) => Self::Right(ok),

@@ -29,7 +29,7 @@ pub struct InnerIterEither<T>(Either<T>);
 pub struct SwapIterEither<L, R>(Either<L, R>);
 
 impl<T> InnerIterEither<T> {
-    pub(crate) fn new(either: Either<T, T>) -> Self {
+    pub(crate) const fn new(either: Either<T, T>) -> Self {
         Self(either)
     }
 }
@@ -194,7 +194,7 @@ impl<'a, T> Iterator for IterMutEither<'a, T> {
 }
 
 impl<L, R> SwapIterEither<L, R> {
-    pub(crate) fn new(either: Either<L, R>) -> Self {
+    pub(crate) const fn new(either: Either<L, R>) -> Self {
         Self(either)
     }
 }

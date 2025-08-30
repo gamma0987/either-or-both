@@ -14,15 +14,15 @@ const RIGHT_VALUE: char = 'c';
 const LEFT_VALUE: u8 = 1;
 const BOTH_VALUES: (u8, char) = (LEFT_VALUE, RIGHT_VALUE);
 
-fn left_variant() -> EitherOrBoth<u8, char> {
+const fn left_variant() -> EitherOrBoth<u8, char> {
     Left(LEFT_VALUE)
 }
 
-fn right_variant() -> EitherOrBoth<u8, char> {
+const fn right_variant() -> EitherOrBoth<u8, char> {
     Right(RIGHT_VALUE)
 }
 
-fn both_variant() -> EitherOrBoth<u8, char> {
+const fn both_variant() -> EitherOrBoth<u8, char> {
     Both(LEFT_VALUE, RIGHT_VALUE)
 }
 
@@ -38,19 +38,19 @@ fn right_string() -> EitherOrBoth<String> {
     Right(String::from("right"))
 }
 
-fn left_is_false(i: u8) -> bool {
+const fn left_is_false(i: u8) -> bool {
     i != LEFT_VALUE
 }
 
-fn left_is_true(i: u8) -> bool {
+const fn left_is_true(i: u8) -> bool {
     i == LEFT_VALUE
 }
 
-fn right_is_false(c: char) -> bool {
+const fn right_is_false(c: char) -> bool {
     c != RIGHT_VALUE
 }
 
-fn right_is_true(c: char) -> bool {
+const fn right_is_true(c: char) -> bool {
     c == RIGHT_VALUE
 }
 
@@ -458,6 +458,31 @@ fn unwrap_only_right_unchecked() {
 #[case::right(right_variant(), None)]
 fn both(#[case] either_or_both: EitherOrBoth<u8, char>, #[case] expected: Option<(u8, char)>) {
     assert_eq!(either_or_both.both(), expected);
+}
+
+#[rstest]
+#[case::both(both_variant(), Left(2))]
+#[case::left(left_variant(), left_variant())]
+#[case::right(right_variant(), right_variant())]
+fn both_and(
+    #[case] either_or_both: EitherOrBoth<u8, char>,
+    #[case] expected: EitherOrBoth<u8, char>,
+) {
+    assert_eq!(either_or_both.both_and(Left(2)), expected);
+}
+
+#[rstest]
+#[case::both(both_variant(), Left(100))]
+#[case::left(left_variant(), left_variant())]
+#[case::right(right_variant(), right_variant())]
+fn both_and_then(
+    #[case] either_or_both: EitherOrBoth<u8, char>,
+    #[case] expected: EitherOrBoth<u8, char>,
+) {
+    assert_eq!(
+        either_or_both.both_and_then(|l, r| Left(l + r as u8)),
+        expected
+    );
 }
 
 #[rstest]

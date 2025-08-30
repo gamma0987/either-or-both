@@ -17,27 +17,27 @@ use Either::*;
 const RIGHT_VALUE: char = 'c';
 const LEFT_VALUE: u8 = 1;
 
-fn left_variant() -> Either<u8, char> {
+const fn left_variant() -> Either<u8, char> {
     Left(LEFT_VALUE)
 }
 
-fn right_variant() -> Either<u8, char> {
+const fn right_variant() -> Either<u8, char> {
     Right(RIGHT_VALUE)
 }
 
-fn left_is_false(i: u8) -> bool {
+const fn left_is_false(i: u8) -> bool {
     i != LEFT_VALUE
 }
 
-fn left_is_true(i: u8) -> bool {
+const fn left_is_true(i: u8) -> bool {
     i == LEFT_VALUE
 }
 
-fn right_is_false(c: char) -> bool {
+const fn right_is_false(c: char) -> bool {
     c != RIGHT_VALUE
 }
 
-fn right_is_true(c: char) -> bool {
+const fn right_is_true(c: char) -> bool {
     c == RIGHT_VALUE
 }
 
@@ -399,7 +399,8 @@ fn map_right_or_else(#[case] either: Either<i32, char>, #[case] expected: char) 
 #[case::left(Left(10), 10)]
 #[case::right(Right(20), 20)]
 fn inspect(#[case] either: Either<i32>, #[case] expected: i32) {
-    // The assertion is a side effect to provoke a panic and is not part of the test assertions
+    // The assertion is a side effect to provoke a panic and is not part of the test
+    // assertions
     let actual = either.inspect(|i| assert_eq!(*i, expected));
     assert_eq!(actual, either);
 }

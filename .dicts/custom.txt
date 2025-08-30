@@ -2,6 +2,7 @@ EitherOrBoths
 Eithers
 Justfile
 biapply
+bicollect
 biconsume
 biinspect
 bimap
@@ -19,6 +20,9 @@ docsrs
 dotgraph
 dotgraphs
 grcov
+hashset
+indexmap
+indexset
 msrv
 pathbuf
 peekable

@@ -20,11 +20,13 @@ version = "0.2.0"
 [features]
 default = ["either", "std"]
 either = []
-schema = ["dep:schemars", "std"] # schemars versions below 1.x need std
+indexmap = ["dep:indexmap"]
+schema = ["dep:schemars", "std"]      # schemars versions below 1.x need std
 serde = ["dep:serde"]
-std = ["serde?/std"]
+std = ["serde?/std", "indexmap?/std"]
 
 [dependencies]
+indexmap = { version = "2", optional = true, default-features = false }
 schemars = { version = ">=0.8", optional = true, default-features = false, features = [
   "derive",
 ] }
@@ -73,13 +75,10 @@ large_stack_frames = "warn"
 literal_string_with_formatting_args = "warn"
 lossy_float_literal = "warn"
 map_with_unused_argument_over_ranges = "warn"
-missing_errors_doc = "allow"
-missing_panics_doc = "allow"
+missing_const_for_fn = "warn"
 mixed_read_write_in_expression = "warn"
 module_name_repetitions = "allow"
 multiple_inherent_impl = "warn"
-# multiple_unsafe_ops_per_block = "warn"
-must_use_candidate = "allow"
 needless_collect = "warn"
 needless_pass_by_ref_mut = "warn"
 needless_raw_strings = "warn"
@@ -111,8 +110,6 @@ suspicious_operation_groupings = "warn"
 suspicious_xor_used_as_pow = "warn"
 todo = "warn"
 too_long_first_doc_paragraph = "warn"
-too_many_arguments = "allow"
-too_many_lines = "allow"
 trait_duplication_in_bounds = "warn"
 try_err = "warn"
 tuple_array_conversions = "warn"
