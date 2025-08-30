@@ -399,7 +399,8 @@ fn map_right_or_else(#[case] either: Either<i32, char>, #[case] expected: char) 
 #[case::left(Left(10), 10)]
 #[case::right(Right(20), 20)]
 fn inspect(#[case] either: Either<i32>, #[case] expected: i32) {
-    // The assertion is a side effect to provoke a panic and is not part of the test assertions
+    // The assertion is a side effect to provoke a panic and is not part of the test
+    // assertions
     let actual = either.inspect(|i| assert_eq!(*i, expected));
     assert_eq!(actual, either);
 }

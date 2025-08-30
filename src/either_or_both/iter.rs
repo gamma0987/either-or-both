@@ -4,8 +4,8 @@ use core::iter::FusedIterator;
 
 use crate::EitherOrBoth;
 
-/// A iterator over the contained iterators of a uniform type chaining both iterators from left to
-/// right
+/// A iterator over the contained iterators of a uniform type chaining both iterators from
+/// left to right
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ChainedIterEitherOrBoth<T>(EitherOrBoth<T, T>);
 

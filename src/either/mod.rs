@@ -139,7 +139,8 @@ impl<L, R> Either<L, R> {
         matches!(self, Self::Right(_))
     }
 
-    /// Returns `true` if `Either` is [`Right`] and the contained value matches a predicate
+    /// Returns `true` if `Either` is [`Right`] and the contained value matches a
+    /// predicate
     ///
     /// # Examples
     ///
@@ -244,9 +245,9 @@ impl<L, R> Either<L, R> {
 
     /// Converts from `Either<L, R>` to `Either<&L::Target, &R::Target>`.
     ///
-    /// This method keeps the original `Either` unchanged, while creating a new instance that
-    /// holds a reference to the original. It also coerces the inner values through the `Deref`
-    /// trait.
+    /// This method keeps the original `Either` unchanged, while creating a new instance
+    /// that holds a reference to the original. It also coerces the inner values
+    /// through the `Deref` trait.
     ///
     /// ```
     /// use either_or_both::Either;
@@ -265,8 +266,8 @@ impl<L, R> Either<L, R> {
 
     /// Converts from `Either<L, R>` to `Either<&mut L::Target, &mut R::Target>`.
     ///
-    /// This method keeps the original `Either` unchanged, while creating a new instance that
-    /// holds a mutable reference to the inner type's [`Deref::Target`] type.
+    /// This method keeps the original `Either` unchanged, while creating a new instance
+    /// that holds a mutable reference to the inner type's [`Deref::Target`] type.
     ///
     /// ```
     /// use either_or_both::Either;
@@ -317,7 +318,8 @@ impl<L, R> Either<L, R> {
     ///
     /// # Panics
     ///
-    /// Panics with a custom panic message provided by `msg` if there is no left value present
+    /// Panics with a custom panic message provided by `msg` if there is no left value
+    /// present
     ///
     /// # Examples
     ///
@@ -347,7 +349,8 @@ impl<L, R> Either<L, R> {
     ///
     /// # Panics
     ///
-    /// Panics with a custom panic message provided by `msg` if there is no right value present
+    /// Panics with a custom panic message provided by `msg` if there is no right value
+    /// present
     ///
     /// # Examples
     ///
@@ -398,8 +401,8 @@ impl<L, R> Either<L, R> {
         self.expect_left("Called `Either::unwrap_left` on a `Right` value")
     }
 
-    /// Returns the contained left value consuming `self`, without checking that the value is not
-    /// [`Left`].
+    /// Returns the contained left value consuming `self`, without checking that the value
+    /// is not [`Left`].
     ///
     /// # SAFETY
     ///
@@ -457,8 +460,8 @@ impl<L, R> Either<L, R> {
         self.expect_right("Called `Either::unwrap_right` on a `Left` value")
     }
 
-    /// Returns the contained right value consuming `self`, without checking that the value is not
-    /// [`Right`].
+    /// Returns the contained right value consuming `self`, without checking that the
+    /// value is not [`Right`].
     ///
     /// # SAFETY
     ///
@@ -495,7 +498,8 @@ impl<L, R> Either<L, R> {
     // Getting the contained values
     ////////////////////////////////////////////////////////////////////////////////
 
-    /// If a left value is present, return `Some` containing the value otherwise return `None`.
+    /// If a left value is present, return `Some` containing the value otherwise return
+    /// `None`.
     ///
     /// # Examples
     ///
@@ -517,9 +521,9 @@ impl<L, R> Either<L, R> {
 
     /// Returns [`Right`] if the `Either` is [`Right`] otherwise returns `other`.
     ///
-    /// The `left_and` combinator eagerly evaluates its arguments, which can result in unnecessary
-    /// computations. When chaining operations that involve function calls, use [`left_and_then`]
-    /// instead. It evaluates the function lazily.
+    /// The `left_and` combinator eagerly evaluates its arguments, which can result in
+    /// unnecessary computations. When chaining operations that involve function
+    /// calls, use [`left_and_then`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -570,7 +574,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// If a left value is present, return `Some` containing the value otherwise return `None`.
+    /// If a left value is present, return `Some` containing the value otherwise return
+    /// `None`.
     ///
     /// # Examples
     ///
@@ -592,9 +597,9 @@ impl<L, R> Either<L, R> {
 
     /// Returns [`Left`] if the `Either` is [`Left`] otherwise returns `other`.
     ///
-    /// The `right_and` combinator eagerly evaluates its arguments, which can result in unnecessary
-    /// computations. When chaining operations that involve function calls, use [`right_and_then`]
-    /// instead. It evaluates the function lazily.
+    /// The `right_and` combinator eagerly evaluates its arguments, which can result in
+    /// unnecessary computations. When chaining operations that involve function
+    /// calls, use [`right_and_then`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -652,8 +657,8 @@ impl<L, R> Either<L, R> {
     // Iterators
     ////////////////////////////////////////////////////////////////////////////////
 
-    /// Consumes the inner iterators and returns an iterator that yields items of type `Either<L,
-    /// R>`.
+    /// Consumes the inner iterators and returns an iterator that yields items of type
+    /// `Either<L, R>`.
     ///
     ///
     /// This iterator allows traversing inner iterators with different types
@@ -712,8 +717,8 @@ impl<L, R> Either<L, R> {
         )
     }
 
-    /// Mutably borrows the inner iterators returning an iterator that yields items of type
-    /// `Either<&mut L, &mut R>`.
+    /// Mutably borrows the inner iterators returning an iterator that yields items of
+    /// type `Either<&mut L, &mut R>`.
     ///
     /// This iterator allows traversing inner iterators with different types
     ///
@@ -768,7 +773,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Applies mapping functions to the left and right values returning an `Either<T, U>`.
+    /// Applies mapping functions to the left and right values returning an `Either<T,
+    /// U>`.
     ///
     /// # Examples
     ///
@@ -823,12 +829,12 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns the provided default value if this is a [`Right`] or applies a mapping function to
-    /// the contained left value.
+    /// Returns the provided default value if this is a [`Right`] or applies a mapping
+    /// function to the contained left value.
     ///
     /// The `map_left_or` combinator eagerly evaluates its arguments, which can result in
-    /// unnecessary computations. When chaining operations that involve function calls, use
-    /// [`map_left_or_else`] instead. It evaluates the function lazily.
+    /// unnecessary computations. When chaining operations that involve function calls,
+    /// use [`map_left_or_else`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -852,8 +858,8 @@ impl<L, R> Either<L, R> {
         self.map_left_or_else(|| default, f)
     }
 
-    /// Applies the given function to the left value , mapping `L` to `T` otherwise returns the
-    /// [default value] for type `T`.
+    /// Applies the given function to the left value , mapping `L` to `T` otherwise
+    /// returns the [default value] for type `T`.
     ///
     /// # Examples
     ///
@@ -878,8 +884,8 @@ impl<L, R> Either<L, R> {
         self.map_left_or_else(T::default, f)
     }
 
-    /// Applies the given function to the left value, mapping `L` to `T` otherwise applies a
-    /// different function.
+    /// Applies the given function to the left value, mapping `L` to `T` otherwise applies
+    /// a different function.
     ///
     /// # Examples
     ///
@@ -936,12 +942,12 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns the provided default value if this is a [`Left`] or applies a mapping function to
-    /// the contained right value.
+    /// Returns the provided default value if this is a [`Left`] or applies a mapping
+    /// function to the contained right value.
     ///
     /// The `map_right_or` combinator eagerly evaluates its arguments, which can result in
-    /// unnecessary computations. When chaining operations that involve function calls, use
-    /// [`map_right_or_else`] instead. It evaluates the function lazily.
+    /// unnecessary computations. When chaining operations that involve function calls,
+    /// use [`map_right_or_else`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -965,8 +971,8 @@ impl<L, R> Either<L, R> {
         self.map_right_or_else(|| default, f)
     }
 
-    /// Applies the given function to the right value, mapping `R` to `T` otherwise returns the
-    /// [default value] for type `T`.
+    /// Applies the given function to the right value, mapping `R` to `T` otherwise
+    /// returns the [default value] for type `T`.
     ///
     /// # Examples
     ///
@@ -991,8 +997,8 @@ impl<L, R> Either<L, R> {
         self.map_right_or_else(T::default, f)
     }
 
-    /// Applies the given function to the right value, mapping `R` to `T` otherwise applies a
-    /// different function.
+    /// Applies the given function to the right value, mapping `R` to `T` otherwise
+    /// applies a different function.
     ///
     /// # Examples
     ///
@@ -1024,7 +1030,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Calls functions with a reference to the contained values returning the original `Either`.
+    /// Calls functions with a reference to the contained values returning the original
+    /// `Either`.
     ///
     /// # Examples
     ///
@@ -1057,8 +1064,8 @@ impl<L, R> Either<L, R> {
         self
     }
 
-    /// Calls a function with a reference to the contained left value returning the original
-    /// `Either`.
+    /// Calls a function with a reference to the contained left value returning the
+    /// original `Either`.
     ///
     /// # Examples
     ///
@@ -1090,8 +1097,8 @@ impl<L, R> Either<L, R> {
         self
     }
 
-    /// Calls a function with a reference to the contained right value returning the original
-    /// `Either`.
+    /// Calls a function with a reference to the contained right value returning the
+    /// original `Either`.
     ///
     /// # Examples
     ///
@@ -1123,8 +1130,8 @@ impl<L, R> Either<L, R> {
         self
     }
 
-    /// Consumes this `Either` applying functions to the contained values taking mutable references
-    /// to capture variables.
+    /// Consumes this `Either` applying functions to the contained values taking mutable
+    /// references to capture variables.
     ///
     /// # Examples
     ///
@@ -1140,8 +1147,8 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(left, vec![1]);
     /// ```
     ///
-    /// The following example will not compile with the error: "cannot borrow `both` as mutable more
-    /// than once at a time".
+    /// The following example will not compile with the error: "cannot borrow `both` as
+    /// mutable more than once at a time".
     ///
     /// If you need to apply a function that requires mutable access to both elements
     /// simultaneously, consider using [`biapply_with`] instead.
@@ -1167,7 +1174,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Consumes this `Either` applying functions to the contained values and a given accumulator.
+    /// Consumes this `Either` applying functions to the contained values and a given
+    /// accumulator.
     ///
     /// # Examples
     ///
@@ -1251,8 +1259,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns the contained values applying a mapping function which converts the `L` and `R`
-    /// values to a uniform type.
+    /// Returns the contained values applying a mapping function which converts the `L`
+    /// and `R` values to a uniform type.
     ///
     /// # Examples
     ///
@@ -1282,8 +1290,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns the left value otherwise applies a function to a [`Right`] variant, converting it
-    /// into an `L` value.
+    /// Returns the left value otherwise applies a function to a [`Right`] variant,
+    /// converting it into an `L` value.
     ///
     /// # Example
     ///
@@ -1306,8 +1314,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns the right value otherwise applies a function to a [`Left`] variant, converting it
-    /// into an `R` value.
+    /// Returns the right value otherwise applies a function to a [`Left`] variant,
+    /// converting it into an `R` value.
     ///
     /// # Examples
     ///
@@ -1332,8 +1340,8 @@ impl<L, R> Either<L, R> {
 
     /// Transforms the `Either<L, R>` into a `Result<R, L>`.
     ///
-    /// Following the [convention], the left value represents an error and a right value represents
-    /// a correct value.
+    /// Following the [convention], the left value represents an error and a right value
+    /// represents a correct value.
     ///
     /// # Examples
     ///
@@ -1355,15 +1363,15 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Transforms the `Either<L, R>` into a `Result<R, L>` using the provided `error` as error
-    /// value.
+    /// Transforms the `Either<L, R>` into a `Result<R, L>` using the provided `error` as
+    /// error value.
     ///
-    /// Following the [convention], the left value represents an error and a right value represents
-    /// a correct value.
+    /// Following the [convention], the left value represents an error and a right value
+    /// represents a correct value.
     ///
-    /// The `ok_or` combinator eagerly evaluates its arguments, which can result in unnecessary
-    /// computations. When chaining operations that involve function calls, use [`ok_or_else`]
-    /// instead. It evaluates the function lazily.
+    /// The `ok_or` combinator eagerly evaluates its arguments, which can result in
+    /// unnecessary computations. When chaining operations that involve function
+    /// calls, use [`ok_or_else`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -1383,15 +1391,15 @@ impl<L, R> Either<L, R> {
         self.ok_or_else(|| error)
     }
 
-    /// Transforms the `Either<L, R>` into a `Result<R, L>` using the result of an `error` function
-    /// as error value.
+    /// Transforms the `Either<L, R>` into a `Result<R, L>` using the result of an `error`
+    /// function as error value.
     ///
-    /// Following the [convention], the left value represents an error and a right value represents
-    /// a correct value.
+    /// Following the [convention], the left value represents an error and a right value
+    /// represents a correct value.
     ///
-    /// The `ok_or` combinator eagerly evaluates its arguments, which can result in unnecessary
-    /// computations. When chaining operations that involve function calls, use [`ok_or_else`]
-    /// instead. It evaluates the function lazily.
+    /// The `ok_or` combinator eagerly evaluates its arguments, which can result in
+    /// unnecessary computations. When chaining operations that involve function
+    /// calls, use [`ok_or_else`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -1420,7 +1428,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns a tuple (L, R) with the provided values filling in any missing left or right value.
+    /// Returns a tuple (L, R) with the provided values filling in any missing left or
+    /// right value.
     ///
     /// # Examples
     ///
@@ -1440,8 +1449,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns a tuple (L, R) where any missing left or right value is replaced with its respective
-    /// default value.
+    /// Returns a tuple (L, R) where any missing left or right value is replaced with its
+    /// respective default value.
     ///
     /// # Examples
     ///
@@ -1465,8 +1474,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Returns a tuple (L, R) where any missing left or right value is computed with the given
-    /// functions.
+    /// Returns a tuple (L, R) where any missing left or right value is computed with the
+    /// given functions.
     ///
     /// # Examples
     ///
@@ -1530,8 +1539,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Converts into a [`Left`] variant, using the contained left value or applying a mapping
-    /// function to the [`Right`] value.
+    /// Converts into a [`Left`] variant, using the contained left value or applying a
+    /// mapping function to the [`Right`] value.
     ///
     /// # Examples
     ///
@@ -1554,8 +1563,8 @@ impl<L, R> Either<L, R> {
         }
     }
 
-    /// Converts into a [`Right`] variant, using the contained right value or applying a mapping
-    /// function to the [`Left`] value.
+    /// Converts into a [`Right`] variant, using the contained right value or applying a
+    /// mapping function to the [`Left`] value.
     ///
     /// # Examples
     ///
@@ -1632,8 +1641,8 @@ impl<L, R> Either<L, R> {
 }
 
 impl<T> Either<T, T> {
-    /// Consumes this `Either` applying a function to the contained value (of a uniform type) taking
-    /// mutable references to capture variables.
+    /// Consumes this `Either` applying a function to the contained value (of a uniform
+    /// type) taking mutable references to capture variables.
     ///
     /// # Examples
     ///
@@ -1660,8 +1669,8 @@ impl<T> Either<T, T> {
         }
     }
 
-    /// Calls a function with a reference to the contained value (of a uniform type) returning the
-    /// original `Either`.
+    /// Calls a function with a reference to the contained value (of a uniform type)
+    /// returning the original `Either`.
     ///
     /// # Examples
     ///
@@ -1737,7 +1746,8 @@ impl<T> Either<T, T> {
         IterMutEither::new(self)
     }
 
-    /// Consumes the `Either`, returning an iterator over the contained iterator of a uniform type
+    /// Consumes the `Either`, returning an iterator over the contained iterator of a
+    /// uniform type
     ///
     /// For iteration over contained iterators with non-uniform types, you can use
     /// [`into_iter_swap`] instead.
@@ -1783,10 +1793,11 @@ impl<T> Either<T, T> {
         InnerIterEither::new(self.as_ref().map(IntoIterator::into_iter))
     }
 
-    /// Returns an iterator over the mutable values of the contained iterator of a uniform type
+    /// Returns an iterator over the mutable values of the contained iterator of a uniform
+    /// type
     ///
-    /// For iteration over contained iterators with non-uniform types, you can use [`iter_swap_mut`]
-    /// instead.
+    /// For iteration over contained iterators with non-uniform types, you can use
+    /// [`iter_swap_mut`] instead.
     ///
     /// # Examples
     ///
@@ -1806,8 +1817,8 @@ impl<T> Either<T, T> {
         InnerIterEither::new(self.as_mut().map(IntoIterator::into_iter))
     }
 
-    /// Applies a mapping function to the left and right values (of a uniform type) returning an
-    /// `Either<U, U>`.
+    /// Applies a mapping function to the left and right values (of a uniform type)
+    /// returning an `Either<U, U>`.
     ///
     /// # Examples
     ///
@@ -1850,8 +1861,8 @@ impl<T> Either<T, T> {
         }
     }
 
-    /// Returns the contained [`Left`] or [`Right`] value applying a mapping function to the
-    /// contained values.
+    /// Returns the contained [`Left`] or [`Right`] value applying a mapping function to
+    /// the contained values.
     ///
     /// # Example
     ///
@@ -1922,7 +1933,8 @@ impl<L, R> Either<&L, &R> {
 }
 
 impl<L, R> Either<&mut L, &mut R> {
-    /// Converts an `Either<&mut L, &mut R>` into an `Either<L, R>` by cloning its contents.
+    /// Converts an `Either<&mut L, &mut R>` into an `Either<L, R>` by cloning its
+    /// contents.
     ///
     /// # Examples
     ///
@@ -1944,7 +1956,8 @@ impl<L, R> Either<&mut L, &mut R> {
         }
     }
 
-    /// Converts an `Either<&mut L, &mut R>` into an `Either<L, R>` by copying its contents
+    /// Converts an `Either<&mut L, &mut R>` into an `Either<L, R>` by copying its
+    /// contents
     ///
     /// # Examples
     ///
@@ -1990,8 +2003,8 @@ impl<L1, L2, R1, R2> Either<(L1, R1), (L2, R2)> {
 }
 
 impl<L, R, T> Either<(T, L), (T, R)> {
-    /// Transposes an `Either` of tuples to a tuple of a single value and an `Either` with the left
-    /// value having a uniform type
+    /// Transposes an `Either` of tuples to a tuple of a single value and an `Either` with
+    /// the left value having a uniform type
     ///
     /// # Examples
     ///
@@ -2013,8 +2026,8 @@ impl<L, R, T> Either<(T, L), (T, R)> {
 }
 
 impl<L, R, T> Either<(L, T), (R, T)> {
-    /// Transposes an `Either` of tuples to a tuple of a single value and an `Either` with the right
-    /// value having a uniform type
+    /// Transposes an `Either` of tuples to a tuple of a single value and an `Either` with
+    /// the right value having a uniform type
     ///
     /// # Examples
     ///

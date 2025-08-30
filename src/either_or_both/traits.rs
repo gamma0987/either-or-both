@@ -55,8 +55,8 @@ impl<T> IntoIterator for EitherOrBoth<T, T> {
 
     /// Returns a consuming iterator over the contained values of a uniform type
     ///
-    /// The evaluation order is from left to right if this is a [`Both`] variant. To reverse the
-    /// order use [`flip`].
+    /// The evaluation order is from left to right if this is a [`Both`] variant. To
+    /// reverse the order use [`flip`].
     ///
     /// # Examples
     ///
@@ -106,12 +106,13 @@ impl<'a, T> IntoIterator for &'a mut EitherOrBoth<T, T> {
 
 #[cfg(feature = "std")]
 impl<L, R> FromIterator<EitherOrBoth<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
-    /// Consumes an [`Iterator`] of [`EitherOrBoth`] items, collecting all left and right values
-    /// into separate [vectors].
+    /// Consumes an [`Iterator`] of [`EitherOrBoth`] items, collecting all left and right
+    /// values into separate [vectors].
     ///
     /// - If only left values are present, returns [`Left`] with the left [`Vec`].
     /// - If only right values are present, returns [`Right`] with the right [`Vec`].
-    /// - If none or both left and right values are present, returns [`Both`] with both [`Vec`]s.
+    /// - If none or both left and right values are present, returns [`Both`] with both
+    ///   [`Vec`]s.
     ///
     /// # Examples
     ///
@@ -127,7 +128,7 @@ impl<L, R> FromIterator<EitherOrBoth<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
     ///
     /// assert_eq!(collected, EitherOrBoth::Both(vec![1, 2], vec!['c']));
     /// ```
-    /// 
+    ///
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -138,7 +139,7 @@ impl<L, R> FromIterator<EitherOrBoth<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
     ///
     /// assert_eq!(collected, EitherOrBoth::Left(vec![2]));
     /// ```
-    /// 
+    ///
     /// [vectors]: Vec
     /// [`Left`]: EitherOrBoth::Left
     /// [`Right`]: EitherOrBoth::Right
@@ -163,8 +164,8 @@ where
     S1: core::hash::BuildHasher + Default,
     S2: core::hash::BuildHasher + Default,
 {
-    /// Consumes an [`Iterator`] of [`EitherOrBoth`] items, collecting all left and right values
-    /// into separate [`HashMaps`].
+    /// Consumes an [`Iterator`] of [`EitherOrBoth`] items, collecting all left and right
+    /// values into separate [`HashMaps`].
     ///
     /// - If only left values are present, returns [`Left`] with the left [`HashMap`].
     /// - If only right values are present, returns [`Right`] with the right [`HashMap`].
@@ -196,7 +197,7 @@ where
     ///     )
     /// );
     /// ```
-    /// 
+    ///
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -204,13 +205,15 @@ where
     ///
     /// use either_or_both::EitherOrBoth;
     ///
-    /// let items: Vec<EitherOrBoth<(&str, u8), (&str, char)>> = vec![EitherOrBoth::Left(("left",
-    /// 2))]; let collected: EitherOrBoth<HashMap<&str, u8>, HashMap<&str, char>> =
-    ///     items.into_iter().collect();
+    /// let items: Vec<EitherOrBoth<(&str, u8), (&str, char)>> =
+    ///     vec![EitherOrBoth::Left(("left", 2))];
+    ///
+    /// let collected: EitherOrBoth<HashMap<&str, u8>, HashMap<&str, char>> =
+    ///     items.into_iter(). collect();
     ///
     /// assert_eq!(collected, EitherOrBoth::Left(HashMap::from([("left", 2)]),));
     /// ```
-    /// 
+    ///
     /// [`HashMaps`]: std::collections::HashMap
     /// [`Left`]: EitherOrBoth::Left
     /// [`Right`]: EitherOrBoth::Right
@@ -246,8 +249,8 @@ where
     S1: core::hash::BuildHasher + Default,
     S2: core::hash::BuildHasher + Default,
 {
-    /// Consumes an [`Iterator`] of [`EitherOrBoth`] items, collecting all left and right values
-    /// into separate [`HashSets`].
+    /// Consumes an [`Iterator`] of [`EitherOrBoth`] items, collecting all left and right
+    /// values into separate [`HashSets`].
     ///
     /// - If only left values are present, returns [`Left`] with the left [`HashSet`].
     /// - If only right values are present, returns [`Right`] with the right [`HashSet`].
@@ -266,14 +269,15 @@ where
     /// let items: Vec<EitherOrBoth<u8, char>> =
     ///     vec![EitherOrBoth::Both(1, 'c'), EitherOrBoth::Left(2)];
     ///
-    /// let collected: EitherOrBoth<HashSet<u8>, HashSet<char>> = items.into_iter().collect();
+    /// let collected: EitherOrBoth<HashSet<u8>, HashSet<char>> =
+    ///     items.into_iter().collect();
     ///
     /// assert_eq!(
     ///     collected,
     ///     EitherOrBoth::Both(HashSet::from([1, 2]), HashSet::from(['c']))
     /// );
     /// ```
-    /// 
+    ///
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -282,11 +286,12 @@ where
     /// use either_or_both::EitherOrBoth;
     ///
     /// let items: Vec<EitherOrBoth<u8, char>> = vec![EitherOrBoth::Left(2)];
-    /// let collected: EitherOrBoth<HashSet<u8>, HashSet<char>> = items.into_iter().collect();
+    /// let collected: EitherOrBoth<HashSet<u8>, HashSet<char>> =
+    ///     items.into_iter().collect();
     ///
     /// assert_eq!(collected, EitherOrBoth::Left(HashSet::from([2])));
     /// ```
-    /// 
+    ///
     /// [`HashSets`]: std::collections::HashSet
     /// [`Left`]: EitherOrBoth::Left
     /// [`Right`]: EitherOrBoth::Right
@@ -322,8 +327,8 @@ where
     S1: core::hash::BuildHasher + Default,
     S2: core::hash::BuildHasher + Default,
 {
-    /// Consumes an [`Iterator`] of [`EitherOrBoth`] items, collecting all left and right values
-    /// into separate [`IndexMaps`].
+    /// Consumes an [`Iterator`] of [`EitherOrBoth`] items, collecting all left and right
+    /// values into separate [`IndexMaps`].
     ///
     /// - If only left values are present, returns [`Left`] with the left [`IndexMap`].
     /// - If only right values are present, returns [`Right`] with the right [`IndexMap`].
@@ -354,15 +359,16 @@ where
     ///     )
     /// );
     /// ```
-    /// 
+    ///
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
     /// use either_or_both::EitherOrBoth;
     /// use indexmap::IndexMap;
     ///
-    /// let items: Vec<EitherOrBoth<(&str, u8), (&str, char)>> = vec![EitherOrBoth::Left(("left",
-    /// 2))]; let collected: EitherOrBoth<IndexMap<&str, u8>, IndexMap<&str, char>> =
+    /// let items: Vec<EitherOrBoth<(&str, u8), (&str, char)>> =
+    ///     vec![EitherOrBoth::Left(("left", 2))];
+    /// let collected: EitherOrBoth<IndexMap<&str, u8>, IndexMap<&str, char>> =
     ///     items.into_iter().collect();
     ///
     /// assert_eq!(
@@ -370,7 +376,7 @@ where
     ///     EitherOrBoth::Left(IndexMap::from([("left", 2)]),)
     /// );
     /// ```
-    /// 
+    ///
     /// [`IndexMaps`]: indexmap::IndexMap
     /// [`IndexMap`]: indexmap::IndexMap
     /// [`Left`]: EitherOrBoth::Left
@@ -407,8 +413,8 @@ where
     S1: core::hash::BuildHasher + Default,
     S2: core::hash::BuildHasher + Default,
 {
-    /// Consumes an [`Iterator`] of [`EitherOrBoth`] items, collecting all left and right values
-    /// into separate [`IndexSets`].
+    /// Consumes an [`Iterator`] of [`EitherOrBoth`] items, collecting all left and right
+    /// values into separate [`IndexSets`].
     ///
     /// - If only left values are present, returns [`Left`] with the left [`IndexSet`].
     /// - If only right values are present, returns [`Right`] with the right [`IndexSet`].
@@ -426,14 +432,15 @@ where
     /// let items: Vec<EitherOrBoth<u8, char>> =
     ///     vec![EitherOrBoth::Both(1, 'c'), EitherOrBoth::Left(2)];
     ///
-    /// let collected: EitherOrBoth<IndexSet<u8>, IndexSet<char>> = items.into_iter().collect();
+    /// let collected: EitherOrBoth<IndexSet<u8>, IndexSet<char>> =
+    ///     items.into_iter().collect();
     ///
     /// assert_eq!(
     ///     collected,
     ///     EitherOrBoth::Both(IndexSet::from([1, 2]), IndexSet::from(['c']))
     /// );
     /// ```
-    /// 
+    ///
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -441,11 +448,12 @@ where
     /// use indexmap::IndexSet;
     ///
     /// let items: Vec<EitherOrBoth<u8, char>> = vec![EitherOrBoth::Left(2)];
-    /// let collected: EitherOrBoth<IndexSet<u8>, IndexSet<char>> = items.into_iter().collect();
+    /// let collected: EitherOrBoth<IndexSet<u8>, IndexSet<char>> =
+    ///    items.into_iter().collect();
     ///
     /// assert_eq!(collected, EitherOrBoth::Left(IndexSet::from([2])));
     /// ```
-    /// 
+    ///
     /// [`IndexSets`]: indexmap::IndexSet
     /// [`IndexSet`]: indexmap::IndexSet
     /// [`Left`]: EitherOrBoth::Left
@@ -484,7 +492,8 @@ impl<L, R> FromIterator<Either<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
     ///
     /// - If only left values are present, returns [`Left`] with the left [`Vec`].
     /// - If only right values are present, returns [`Right`] with the right [`Vec`].
-    /// - If none or both left and right values are present, returns [`Both`] with both [`Vec`]s.
+    /// - If none or both left and right values are present, returns [`Both`] with both
+    ///   [`Vec`]s.
     ///
     /// # Examples
     ///
@@ -498,7 +507,7 @@ impl<L, R> FromIterator<Either<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
     ///
     /// assert_eq!(collected, EitherOrBoth::Both(vec![1], vec!['c']));
     /// ```
-    /// 
+    ///
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -509,7 +518,7 @@ impl<L, R> FromIterator<Either<L, R>> for EitherOrBoth<Vec<L>, Vec<R>> {
     ///
     /// assert_eq!(collected, EitherOrBoth::Both(vec![1], vec!['c']));
     /// ```
-    /// 
+    ///
     /// [vectors]: Vec
     /// [`Left`]: EitherOrBoth::Left
     /// [`Right`]: EitherOrBoth::Right
@@ -534,8 +543,8 @@ where
     S1: core::hash::BuildHasher + Default,
     S2: core::hash::BuildHasher + Default,
 {
-    /// Consumes an [`Iterator`] of [`Either`] items, collecting all left and right values into
-    /// separate [`HashMaps`].
+    /// Consumes an [`Iterator`] of [`Either`] items, collecting all left and right values
+    /// into separate [`HashMaps`].
     ///
     /// - If only left values are present, returns [`Left`] with the left [`HashMap`].
     /// - If only right values are present, returns [`Right`] with the right [`HashMap`].
@@ -565,7 +574,7 @@ where
     ///     )
     /// );
     /// ```
-    /// 
+    ///
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -573,13 +582,14 @@ where
     ///
     /// use either_or_both::{Either, EitherOrBoth};
     ///
-    /// let items: Vec<Either<(&str, u8), (&str, char)>> = vec![Either::Left(("left", 2))];
+    /// let items: Vec<Either<(&str, u8), (&str, char)>> =
+    ///     vec![Either::Left(("left", 2))];
     /// let collected: EitherOrBoth<HashMap<&str, u8>, HashMap<&str, char>> =
     ///     items.into_iter().collect();
     ///
     /// assert_eq!(collected, EitherOrBoth::Left(HashMap::from([("left", 2)]),));
     /// ```
-    /// 
+    ///
     /// [`HashMaps`]: std::collections::HashMap
     /// [`Left`]: EitherOrBoth::Left
     /// [`Right`]: EitherOrBoth::Right
@@ -614,8 +624,8 @@ where
     S1: core::hash::BuildHasher + Default,
     S2: core::hash::BuildHasher + Default,
 {
-    /// Consumes an [`Iterator`] of [`Either`] items, collecting all left and right values into
-    /// separate [`HashSets`].
+    /// Consumes an [`Iterator`] of [`Either`] items, collecting all left and right values
+    /// into separate [`HashSets`].
     ///
     /// - If only left values are present, returns [`Left`] with the left [`HashSet`].
     /// - If only right values are present, returns [`Right`] with the right [`HashSet`].
@@ -633,14 +643,15 @@ where
     ///
     /// let items: Vec<Either<u8, char>> = vec![Either::Right('c'), Either::Left(2)];
     ///
-    /// let collected: EitherOrBoth<HashSet<u8>, HashSet<char>> = items.into_iter().collect();
+    /// let collected: EitherOrBoth<HashSet<u8>, HashSet<char>> =
+    ///    items.into_iter().collect();
     ///
     /// assert_eq!(
     ///     collected,
     ///     EitherOrBoth::Both(HashSet::from([2]), HashSet::from(['c']))
     /// );
     /// ```
-    /// 
+    ///
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -649,11 +660,12 @@ where
     /// use either_or_both::{Either, EitherOrBoth};
     ///
     /// let items: Vec<Either<u8, char>> = vec![Either::Left(2)];
-    /// let collected: EitherOrBoth<HashSet<u8>, HashSet<char>> = items.into_iter().collect();
+    /// let collected: EitherOrBoth<HashSet<u8>, HashSet<char>> =
+    ///     items.into_iter().collect();
     ///
     /// assert_eq!(collected, EitherOrBoth::Left(HashSet::from([2])));
     /// ```
-    /// 
+    ///
     /// [`HashSets`]: std::collections::HashSet
     /// [`Left`]: EitherOrBoth::Left
     /// [`Right`]: EitherOrBoth::Right
@@ -689,8 +701,8 @@ where
     S1: core::hash::BuildHasher + Default,
     S2: core::hash::BuildHasher + Default,
 {
-    /// Consumes an [`Iterator`] of [`Either`] items, collecting all left and right values into
-    /// separate [`IndexMaps`].
+    /// Consumes an [`Iterator`] of [`Either`] items, collecting all left and right values
+    /// into separate [`IndexMaps`].
     ///
     /// - If only left values are present, returns [`Left`] with the left [`IndexMap`].
     /// - If only right values are present, returns [`Right`] with the right [`IndexMap`].
@@ -719,14 +731,15 @@ where
     ///     )
     /// );
     /// ```
-    /// 
+    ///
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
     /// use either_or_both::{Either, EitherOrBoth};
     /// use indexmap::IndexMap;
     ///
-    /// let items: Vec<Either<(&str, u8), (&str, char)>> = vec![Either::Left(("left", 2))];
+    /// let items: Vec<Either<(&str, u8), (&str, char)>> =
+    ///     vec![Either::Left(("left", 2))];
     /// let collected: EitherOrBoth<IndexMap<&str, u8>, IndexMap<&str, char>> =
     ///     items.into_iter().collect();
     ///
@@ -735,7 +748,7 @@ where
     ///     EitherOrBoth::Left(IndexMap::from([("left", 2)]),)
     /// );
     /// ```
-    /// 
+    ///
     /// [`IndexMaps`]: indexmap::IndexMap
     /// [`IndexMap`]: indexmap::IndexMap
     /// [`Left`]: EitherOrBoth::Left
@@ -772,8 +785,8 @@ where
     S1: core::hash::BuildHasher + Default,
     S2: core::hash::BuildHasher + Default,
 {
-    /// Consumes an [`Iterator`] of [`Either`] items, collecting all left and right values into
-    /// separate [`IndexSets`].
+    /// Consumes an [`Iterator`] of [`Either`] items, collecting all left and right values
+    /// into separate [`IndexSets`].
     ///
     /// - If only left values are present, returns [`Left`] with the left [`IndexSet`].
     /// - If only right values are present, returns [`Right`] with the right [`IndexSet`].
@@ -789,14 +802,15 @@ where
     /// use indexmap::IndexSet;
     ///
     /// let items: Vec<Either<u8, char>> = vec![Either::Right('c'), Either::Left(2)];
-    /// let collected: EitherOrBoth<IndexSet<u8>, IndexSet<char>> = items.into_iter().collect();
+    /// let collected: EitherOrBoth<IndexSet<u8>, IndexSet<char>> =
+    ///    items.into_iter().collect();
     ///
     /// assert_eq!(
     ///     collected,
     ///     EitherOrBoth::Both(IndexSet::from([2]), IndexSet::from(['c']))
     /// );
     /// ```
-    /// 
+    ///
     /// This example collects into a [`Left`] variant:
     #[cfg_attr(feature = "std", doc = "```rust")]
     #[cfg_attr(not(feature = "std"), doc = "```rust,ignore")]
@@ -804,11 +818,12 @@ where
     /// use indexmap::IndexSet;
     ///
     /// let items: Vec<Either<u8, char>> = vec![Either::Left(2)];
-    /// let collected: EitherOrBoth<IndexSet<u8>, IndexSet<char>> = items.into_iter().collect();
+    /// let collected: EitherOrBoth<IndexSet<u8>, IndexSet<char>> =
+    ///    items.into_iter().collect();
     ///
     /// assert_eq!(collected, EitherOrBoth::Left(IndexSet::from([2])));
     /// ```
-    /// 
+    ///
     /// [`IndexSets`]: indexmap::IndexSet
     /// [`IndexSet`]: indexmap::IndexSet
     /// [`Left`]: EitherOrBoth::Left

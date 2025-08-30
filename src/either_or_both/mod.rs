@@ -79,7 +79,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns `true` if this is a [`Left`] or [`Both`] and the left value satisfies a predicate.
+    /// Returns `true` if this is a [`Left`] or [`Both`] and the left value satisfies a
+    /// predicate.
     ///
     /// # Examples
     ///
@@ -105,8 +106,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns `true` if this is a [`Left`] or [`Both`] or the [`Right`] value satisfies a
-    /// predicate.
+    /// Returns `true` if this is a [`Left`] or [`Both`] or the [`Right`] value satisfies
+    /// a predicate.
     ///
     /// # Examples
     ///
@@ -155,7 +156,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns `true` if this is a [`Right`] or [`Both`] and the right value satisfies a predicate.
+    /// Returns `true` if this is a [`Right`] or [`Both`] and the right value satisfies a
+    /// predicate.
     ///
     /// # Examples
     ///
@@ -184,8 +186,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns `true` if this is a [`Right`] or [`Both`] or the [`Left`] value satisfies a
-    /// predicate.
+    /// Returns `true` if this is a [`Right`] or [`Both`] or the [`Left`] value satisfies
+    /// a predicate.
     ///
     /// # Examples
     ///
@@ -260,8 +262,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns `true` if this is a [`Both`] or if [`Left`] or [`Right`] match their respective
-    /// predicate.
+    /// Returns `true` if this is a [`Both`] or if [`Left`] or [`Right`] match their
+    /// respective predicate.
     ///
     /// # Examples
     ///
@@ -499,9 +501,9 @@ impl<L, R> EitherOrBoth<L, R> {
 
     /// Converts from `EitherOrBoth<L, R>` to `EitherOrBoth<&L::Target, &R::Target>`.
     ///
-    /// This method keeps the original `EitherOrBoth` unchanged, while creating a new instance that
-    /// holds a reference to the original. It also coerces the inner values through the `Deref`
-    /// trait.
+    /// This method keeps the original `EitherOrBoth` unchanged, while creating a new
+    /// instance that holds a reference to the original. It also coerces the inner
+    /// values through the `Deref` trait.
     ///
     /// ```
     /// use either_or_both::EitherOrBoth;
@@ -522,10 +524,12 @@ impl<L, R> EitherOrBoth<L, R> {
         map_each!(self; l, r => &**l, &**r)
     }
 
-    /// Converts from `EitherOrBoth<L, R>` to `EitherOrBoth<&mut L::Target, &mut R::Target>`.
+    /// Converts from `EitherOrBoth<L, R>` to `EitherOrBoth<&mut L::Target, &mut
+    /// R::Target>`.
     ///
-    /// This method keeps the original `EitherOrBoth` unchanged, while creating a new instance that
-    /// holds a mutable reference to the inner type's [`Deref::Target`] type.
+    /// This method keeps the original `EitherOrBoth` unchanged, while creating a new
+    /// instance that holds a mutable reference to the inner type's [`Deref::Target`]
+    /// type.
     ///
     /// ```
     /// use either_or_both::EitherOrBoth;
@@ -562,7 +566,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Converts from `Pin<&mut EitherOrBoth<L, R>>` to `EitherOrBoth<Pin<&mut L>, Pin<&mut R>>`.
+    /// Converts from `Pin<&mut EitherOrBoth<L, R>>` to `EitherOrBoth<Pin<&mut L>,
+    /// Pin<&mut R>>`.
     pub fn as_pin_mut(self: Pin<&mut Self>) -> EitherOrBoth<Pin<&mut L>, Pin<&mut R>> {
         // SAFETY: `get_unchecked_mut` is never used to move the `EitherOrBoth` inside `self`. `x`
         // is guaranteed to be pinned because it comes from `self` which is pinned.
@@ -581,8 +586,8 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// # Panics
     ///
-    /// Panics with a custom panic message provided by `msg` if only a [`Left`] or [`Right`] value
-    /// is present
+    /// Panics with a custom panic message provided by `msg` if only a [`Left`] or
+    /// [`Right`] value is present
     ///
     /// # Examples
     ///
@@ -612,7 +617,8 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// # Panics
     ///
-    /// Panics with a custom panic message provided by `msg` if there is no left value present
+    /// Panics with a custom panic message provided by `msg` if there is no left value
+    /// present
     ///
     /// # Examples
     ///
@@ -645,7 +651,8 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// # Panics
     ///
-    /// Panics with a custom panic message provided by `msg` if `EitherOrBoth` is not [`Left`]
+    /// Panics with a custom panic message provided by `msg` if `EitherOrBoth` is not
+    /// [`Left`]
     ///
     /// # Examples
     ///
@@ -682,7 +689,8 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// # Panics
     ///
-    /// Panics with a custom panic message provided by `msg` if there is no right value present
+    /// Panics with a custom panic message provided by `msg` if there is no right value
+    /// present
     ///
     /// # Examples
     ///
@@ -715,7 +723,8 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// # Panics
     ///
-    /// Panics with a custom panic message provided by `msg` if there is no [`Right`] value present
+    /// Panics with a custom panic message provided by `msg` if there is no [`Right`]
+    /// value present
     ///
     /// # Examples
     ///
@@ -773,8 +782,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self.expect_both("Called `EitherOrBoth::unwrap_both` on a `Left` or `Right` value")
     }
 
-    /// Returns the contained [`Both`] values as tuple consuming `self`, without checking that the
-    /// value is not [`Both`].
+    /// Returns the contained [`Both`] values as tuple consuming `self`, without checking
+    /// that the value is not [`Both`].
     ///
     /// # SAFETY
     ///
@@ -807,7 +816,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns the contained left value of a [`Left`] or [`Both`] variant consuming `self`.
+    /// Returns the contained left value of a [`Left`] or [`Both`] variant consuming
+    /// `self`.
     ///
     /// # Panics
     ///
@@ -835,8 +845,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self.expect_left("Called `EitherOrBoth::unwrap_left` on a `Right` value")
     }
 
-    /// Returns the contained left value of a [`Left`] or [`Both`] variant consuming `self`, without
-    /// checking that the value is not [`Left`] or [`Both`].
+    /// Returns the contained left value of a [`Left`] or [`Both`] variant consuming
+    /// `self`, without checking that the value is not [`Left`] or [`Both`].
     ///
     /// # SAFETY
     ///
@@ -940,7 +950,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns the contained right value of a [`Right`] or [`Both`] variant consuming `self`.
+    /// Returns the contained right value of a [`Right`] or [`Both`] variant consuming
+    /// `self`.
     ///
     /// # Panics
     ///
@@ -968,8 +979,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self.expect_right("Called EitherOrBoth::unwrap_right` on a `Left` value")
     }
 
-    /// Returns the contained right value of a [`Right`] or [`Both`] variant consuming `self`,
-    /// without checking that the value is not [`Right`] or [`Both`].
+    /// Returns the contained right value of a [`Right`] or [`Both`] variant consuming
+    /// `self`, without checking that the value is not [`Right`] or [`Both`].
     ///
     /// # SAFETY
     ///
@@ -1077,7 +1088,8 @@ impl<L, R> EitherOrBoth<L, R> {
     // Getting the contained values safely
     ////////////////////////////////////////////////////////////////////////////////
 
-    /// If both values are present, return `Some` containing the values otherwise return `None`.
+    /// If both values are present, return `Some` containing the values otherwise return
+    /// `None`.
     ///
     /// # Examples
     ///
@@ -1100,12 +1112,12 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns [`Right`] or [`Left`] if the `EitherOrBoth` is not [`Both`] otherwise returns
-    /// `other`.
+    /// Returns [`Right`] or [`Left`] if the `EitherOrBoth` is not [`Both`] otherwise
+    /// returns `other`.
     ///
-    /// The `both_and` combinator eagerly evaluates its arguments, which can result in unnecessary
-    /// computations. When chaining operations that involve function calls, use [`both_and_then`]
-    /// instead. It evaluates the function lazily.
+    /// The `both_and` combinator eagerly evaluates its arguments, which can result in
+    /// unnecessary computations. When chaining operations that involve function
+    /// calls, use [`both_and_then`] instead. It evaluates the function lazily.
     ///
     /// [`both_and_then`]: EitherOrBoth::both_and_then
     ///
@@ -1133,8 +1145,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns [`Right`] or [`Left`] if the `EitherOrBoth` is not [`Both`] otherwise calls `f`
-    /// with both values and returns the result.
+    /// Returns [`Right`] or [`Left`] if the `EitherOrBoth` is not [`Both`] otherwise
+    /// calls `f` with both values and returns the result.
     ///
     /// # Examples
     ///
@@ -1164,7 +1176,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// If a left value is present, return `Some` containing the value otherwise return `None`.
+    /// If a left value is present, return `Some` containing the value otherwise return
+    /// `None`.
     ///
     /// # Examples
     ///
@@ -1189,9 +1202,9 @@ impl<L, R> EitherOrBoth<L, R> {
 
     /// Returns [`Right`] if the `EitherOrBoth` is [`Right`] otherwise returns `other`.
     ///
-    /// The `left_and` combinator eagerly evaluates its arguments, which can result in unnecessary
-    /// computations. When chaining operations that involve function calls, use [`left_and_then`]
-    /// instead. It evaluates the function lazily.
+    /// The `left_and` combinator eagerly evaluates its arguments, which can result in
+    /// unnecessary computations. When chaining operations that involve function
+    /// calls, use [`left_and_then`] instead. It evaluates the function lazily.
     ///
     /// [`left_and_then`]: EitherOrBoth::left_and_then
     ///
@@ -1278,7 +1291,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// If a left value is present, return `Some` containing the value otherwise return `None`.
+    /// If a left value is present, return `Some` containing the value otherwise return
+    /// `None`.
     ///
     /// # Examples
     ///
@@ -1303,9 +1317,9 @@ impl<L, R> EitherOrBoth<L, R> {
 
     /// Returns [`Left`] if the `EitherOrBoth` is [`Left`] otherwise returns `other`.
     ///
-    /// The `right_and` combinator eagerly evaluates its arguments, which can result in unnecessary
-    /// computations. When chaining operations that involve function calls, use [`right_and_then`]
-    /// instead. It evaluates the function lazily.
+    /// The `right_and` combinator eagerly evaluates its arguments, which can result in
+    /// unnecessary computations. When chaining operations that involve function
+    /// calls, use [`right_and_then`] instead. It evaluates the function lazily.
     ///
     /// [`right_and_then`]: EitherOrBoth::right_and_then
     ///
@@ -1480,8 +1494,8 @@ impl<L, R> EitherOrBoth<L, R> {
         )
     }
 
-    /// Mutably borrows the inner iterators returning an iterator that yields items of type
-    /// `EitherOrBoth<&mut L, &mut R>`, combining the iterators.
+    /// Mutably borrows the inner iterators returning an iterator that yields items of
+    /// type `EitherOrBoth<&mut L, &mut R>`, combining the iterators.
     ///
     /// This iterator allows traversing inner iterators with different types
     ///
@@ -1537,7 +1551,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Applies mapping functions to the left and right values returning an `EitherOrBoth<T, U>`.
+    /// Applies mapping functions to the left and right values returning an
+    /// `EitherOrBoth<T, U>`.
     ///
     /// # Examples
     ///
@@ -1596,12 +1611,12 @@ impl<L, R> EitherOrBoth<L, R> {
         map_each!(self; l, r => f(l), r)
     }
 
-    /// Returns the provided default value if this is a [`Right`] or applies a mapping function to
-    /// the contained left value.
+    /// Returns the provided default value if this is a [`Right`] or applies a mapping
+    /// function to the contained left value.
     ///
     /// The `map_left_or` combinator eagerly evaluates its arguments, which can result in
-    /// unnecessary computations. When chaining operations that involve function calls, use
-    /// [`map_left_or_else`] instead. It evaluates the function lazily.
+    /// unnecessary computations. When chaining operations that involve function calls,
+    /// use [`map_left_or_else`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -1628,8 +1643,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self.map_left_or_else(|| default, f)
     }
 
-    /// Applies the given function to the left value of [`Left`] or [`Both`], mapping `L` to
-    /// `T` otherwise returns the [default value] for type `T`.
+    /// Applies the given function to the left value of [`Left`] or [`Both`], mapping `L`
+    /// to `T` otherwise returns the [default value] for type `T`.
     ///
     /// # Examples
     ///
@@ -1657,8 +1672,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self.map_left_or_else(T::default, f)
     }
 
-    /// Applies the given function to the left value of [`Left`] or [`Both`], mapping `L` to `T`
-    /// otherwise applies a different function.
+    /// Applies the given function to the left value of [`Left`] or [`Both`], mapping `L`
+    /// to `T` otherwise applies a different function.
     ///
     /// # Examples
     ///
@@ -1696,8 +1711,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Applies a mapping function to the right value of [`Both`] or [`Right`] returning an
-    /// `EitherOrBoth<L, T>`.
+    /// Applies a mapping function to the right value of [`Both`] or [`Right`] returning
+    /// an `EitherOrBoth<L, T>`.
     ///
     /// # Examples
     ///
@@ -1725,12 +1740,12 @@ impl<L, R> EitherOrBoth<L, R> {
         map_each!(self; l, r => l, f(r))
     }
 
-    /// Returns the provided default value if this is a [`Left`] or applies a mapping function to
-    /// the contained right value.
+    /// Returns the provided default value if this is a [`Left`] or applies a mapping
+    /// function to the contained right value.
     ///
     /// The `map_right_or` combinator eagerly evaluates its arguments, which can result in
-    /// unnecessary computations. When chaining operations that involve function calls, use
-    /// [`map_right_or_else`] instead. It evaluates the function lazily.
+    /// unnecessary computations. When chaining operations that involve function calls,
+    /// use [`map_right_or_else`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -1760,8 +1775,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Applies the given function to the right value of [`Right`] or [`Both`], mapping `R` to
-    /// `T` otherwise returns the [default value] for type `T`.
+    /// Applies the given function to the right value of [`Right`] or [`Both`], mapping
+    /// `R` to `T` otherwise returns the [default value] for type `T`.
     ///
     /// # Examples
     ///
@@ -1789,8 +1804,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self.map_right_or_else(T::default, f)
     }
 
-    /// Applies the given function to the right value of [`Right`] or [`Both`], mapping `R` to `T`
-    /// otherwise applies a different function.
+    /// Applies the given function to the right value of [`Right`] or [`Both`], mapping
+    /// `R` to `T` otherwise applies a different function.
     ///
     /// # Examples
     ///
@@ -1831,8 +1846,8 @@ impl<L, R> EitherOrBoth<L, R> {
     /// Calls functions with a reference to the contained values returning the original
     /// `EitherOrBoth`.
     ///
-    /// The evaluation order is from left to right if this is a [`Both`] variant. To reverse the
-    /// order use [`flip`].
+    /// The evaluation order is from left to right if this is a [`Both`] variant. To
+    /// reverse the order use [`flip`].
     ///
     /// # Examples
     ///
@@ -1875,8 +1890,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self
     }
 
-    /// Calls a function with a reference to the contained left value if this is a [`Left`] or
-    /// [`Both`] returning the original `EitherOrBoth`.
+    /// Calls a function with a reference to the contained left value if this is a
+    /// [`Left`] or [`Both`] returning the original `EitherOrBoth`.
     ///
     /// # Examples
     ///
@@ -1910,8 +1925,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self
     }
 
-    /// Calls a function with a reference to the contained right value if this is a [`Right`] or
-    /// [`Both`] returning the original `EitherOrBoth`.
+    /// Calls a function with a reference to the contained right value if this is a
+    /// [`Right`] or [`Both`] returning the original `EitherOrBoth`.
     ///
     /// # Examples
     ///
@@ -1945,11 +1960,11 @@ impl<L, R> EitherOrBoth<L, R> {
         self
     }
 
-    /// Consumes this `EitherOrBoth` applying functions to the contained values taking mutable
-    /// references to capture variables.
+    /// Consumes this `EitherOrBoth` applying functions to the contained values taking
+    /// mutable references to capture variables.
     ///
-    /// The evaluation order is from left to right if this is a [`Both`] variant. To reverse the
-    /// order use [`flip`].
+    /// The evaluation order is from left to right if this is a [`Both`] variant. To
+    /// reverse the order use [`flip`].
     ///
     /// # Examples
     ///
@@ -1966,8 +1981,8 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(right, vec!['c']);
     /// ```
     ///
-    /// The following example will not compile with the error: "cannot borrow `both` as mutable more
-    /// than once at a time".
+    /// The following example will not compile with the error: "cannot borrow `both` as
+    /// mutable more than once at a time".
     ///
     /// If you need to apply a function that requires mutable access to both elements
     /// simultaneously, consider using [`biapply_with`] instead.
@@ -1998,11 +2013,11 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Consumes this `EitherOrBoth` applying functions to the contained values and a given
-    /// accumulator.
+    /// Consumes this `EitherOrBoth` applying functions to the contained values and a
+    /// given accumulator.
     ///
-    /// The evaluation order is from left to right if this is a [`Both`] variant. To reverse the
-    /// order use [`flip`].
+    /// The evaluation order is from left to right if this is a [`Both`] variant. To
+    /// reverse the order use [`flip`].
     ///
     /// # Examples
     ///
@@ -2033,8 +2048,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Consumes this `EitherOrBoth` applying a function to the contained left value if this is a
-    /// [`Left`] or [`Both`] value.
+    /// Consumes this `EitherOrBoth` applying a function to the contained left value if
+    /// this is a [`Left`] or [`Both`] value.
     ///
     /// # Examples
     ///
@@ -2061,8 +2076,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Consumes this `EitherOrBoth` applying a function to the contained right value if this is a
-    /// [`Right`] or [`Both`] value.
+    /// Consumes this `EitherOrBoth` applying a function to the contained right value if
+    /// this is a [`Right`] or [`Both`] value.
     ///
     /// # Examples
     ///
@@ -2089,8 +2104,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns the left value otherwise applies a function to a [`Right`] variant, converting it
-    /// into an `L` value.
+    /// Returns the left value otherwise applies a function to a [`Right`] variant,
+    /// converting it into an `L` value.
     ///
     /// # Example
     ///
@@ -2113,8 +2128,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self.reduce_map_left(|l| l, f)
     }
 
-    /// Like [`reduce_left`] but with mapping functions which convert the `L` and `R` values to a
-    /// uniform type.
+    /// Like [`reduce_left`] but with mapping functions which convert the `L` and `R`
+    /// values to a uniform type.
     ///
     /// # Examples
     ///
@@ -2153,8 +2168,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns the right value otherwise applies a function to a [`Left`] variant, converting it
-    /// into an `R` value.
+    /// Returns the right value otherwise applies a function to a [`Left`] variant,
+    /// converting it into an `R` value.
     ///
     /// # Example
     ///
@@ -2177,8 +2192,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self.reduce_map_right(f, |r| r)
     }
 
-    /// Like [`reduce_right`] but with mapping functions which convert the `L` and `R` values to a
-    /// uniform type.
+    /// Like [`reduce_right`] but with mapping functions which convert the `L` and `R`
+    /// values to a uniform type.
     ///
     /// # Examples
     ///
@@ -2219,9 +2234,9 @@ impl<L, R> EitherOrBoth<L, R> {
 
     /// Transforms the `EitherOrBoth<L, R>` into a `Result<R, L>`.
     ///
-    /// Following the [convention], the left value represents an error and a right value represents
-    /// a correct value. Also, the evaluation of error values takes precedence if [`Both`]
-    /// values are present.
+    /// Following the [convention], the left value represents an error and a right value
+    /// represents a correct value. Also, the evaluation of error values takes
+    /// precedence if [`Both`] values are present.
     ///
     /// # Examples
     ///
@@ -2246,16 +2261,16 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Transforms the `EitherOrBoth<L, R>` into a `Result<R, L>` using the provided `error` as
-    /// error value.
+    /// Transforms the `EitherOrBoth<L, R>` into a `Result<R, L>` using the provided
+    /// `error` as error value.
     ///
-    /// Following the [convention], the left value represents an error and a right value represents
-    /// a correct value. Also, the evaluation of the `error` value takes precedence if [`Both`]
-    /// values are present.
+    /// Following the [convention], the left value represents an error and a right value
+    /// represents a correct value. Also, the evaluation of the `error` value takes
+    /// precedence if [`Both`] values are present.
     ///
-    /// The `ok_or` combinator eagerly evaluates its arguments, which can result in unnecessary
-    /// computations. When chaining operations that involve function calls, use [`ok_or_else`]
-    /// instead. It evaluates the function lazily.
+    /// The `ok_or` combinator eagerly evaluates its arguments, which can result in
+    /// unnecessary computations. When chaining operations that involve function
+    /// calls, use [`ok_or_else`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -2278,16 +2293,16 @@ impl<L, R> EitherOrBoth<L, R> {
         self.ok_or_else(|| error)
     }
 
-    /// Transforms the `EitherOrBoth<L, R>` into a `Result<R, L>` using the result of an `error`
-    /// function as error value.
+    /// Transforms the `EitherOrBoth<L, R>` into a `Result<R, L>` using the result of an
+    /// `error` function as error value.
     ///
-    /// Following the [convention], the left value represents an error and a right value represents
-    /// a correct value. Also, the evaluation of the `error` value takes precedence if [`Both`]
-    /// values are present.
+    /// Following the [convention], the left value represents an error and a right value
+    /// represents a correct value. Also, the evaluation of the `error` value takes
+    /// precedence if [`Both`] values are present.
     ///
     /// The `ok_or` combinator eagerly evaluates its arguments, which can result in
-    /// unnecessary computations. When chaining operations that involve function calls, use
-    /// [`ok_or_else`] instead. It evaluates the function lazily.
+    /// unnecessary computations. When chaining operations that involve function calls,
+    /// use [`ok_or_else`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -2322,7 +2337,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns a tuple (L, R) with the provided values filling in any missing left or right value.
+    /// Returns a tuple (L, R) with the provided values filling in any missing left or
+    /// right value.
     ///
     /// # Examples
     ///
@@ -2346,8 +2362,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns a tuple (L, R) where any missing left or right value is replaced with its respective
-    /// default value.
+    /// Returns a tuple (L, R) where any missing left or right value is replaced with its
+    /// respective default value.
     ///
     /// # Examples
     ///
@@ -2375,8 +2391,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns a tuple (L, R) where any missing left or right value is computed with the given
-    /// functions.
+    /// Returns a tuple (L, R) where any missing left or right value is computed with the
+    /// given functions.
     ///
     /// # Examples
     ///
@@ -2404,8 +2420,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Converts into a [`Left`] variant, using the contained left value or applying a mapping
-    /// function to the [`Right`] value.
+    /// Converts into a [`Left`] variant, using the contained left value or applying a
+    /// mapping function to the [`Right`] value.
     ///
     /// # Examples
     ///
@@ -2432,8 +2448,8 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Converts into a [`Right`] variant, using the contained right value or applying a mapping
-    /// function to the [`Left`] value.
+    /// Converts into a [`Right`] variant, using the contained right value or applying a
+    /// mapping function to the [`Left`] value.
     ///
     /// # Examples
     ///
@@ -2560,12 +2576,13 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns a mutable reference to the contained left value if present; otherwise, inserts
-    /// `value` into the [`Right`] variant and returns a mutable reference to it.
+    /// Returns a mutable reference to the contained left value if present; otherwise,
+    /// inserts `value` into the [`Right`] variant and returns a mutable reference to
+    /// it.
     ///
-    /// The `left_or_insert` combinator eagerly evaluates its arguments, which can result in
-    /// unnecessary computations. When chaining operations that involve function calls, use
-    /// [`left_or_insert_with`] instead. It evaluates the function lazily.
+    /// The `left_or_insert` combinator eagerly evaluates its arguments, which can result
+    /// in unnecessary computations. When chaining operations that involve function
+    /// calls, use [`left_or_insert_with`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -2593,8 +2610,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self.left_or_insert_with(|| value)
     }
 
-    /// Like [`left_or_insert`] but inserts the default `L` value into the [`Right`] variant and
-    /// returns a mutable reference to it.
+    /// Like [`left_or_insert`] but inserts the default `L` value into the [`Right`]
+    /// variant and returns a mutable reference to it.
     ///
     /// # Examples
     ///
@@ -2625,8 +2642,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self.left_or_insert_with(L::default)
     }
 
-    /// Like [`left_or_insert`] but computes a left value from a given function inserting into the
-    /// [`Right`] variant and returning a mutable reference to it.
+    /// Like [`left_or_insert`] but computes a left value from a given function inserting
+    /// into the [`Right`] variant and returning a mutable reference to it.
     ///
     /// # Examples
     ///
@@ -2660,12 +2677,13 @@ impl<L, R> EitherOrBoth<L, R> {
         }
     }
 
-    /// Returns a mutable reference to the contained right value if present; otherwise, inserts
-    /// `value` into the [`Left`] variant and returns a mutable reference to it.
+    /// Returns a mutable reference to the contained right value if present; otherwise,
+    /// inserts `value` into the [`Left`] variant and returns a mutable reference to
+    /// it.
     ///
-    /// The `right_or_insert` combinator eagerly evaluates its arguments, which can result in
-    /// unnecessary computations. When chaining operations that involve function calls, use
-    /// [`right_or_insert_with`] instead. It evaluates the function lazily.
+    /// The `right_or_insert` combinator eagerly evaluates its arguments, which can result
+    /// in unnecessary computations. When chaining operations that involve function
+    /// calls, use [`right_or_insert_with`] instead. It evaluates the function lazily.
     ///
     /// # Examples
     ///
@@ -2693,8 +2711,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self.right_or_insert_with(|| value)
     }
 
-    /// Like [`right_or_insert`] but inserts the default `R` value into the [`Left`] variant and
-    /// returns a mutable reference to it.
+    /// Like [`right_or_insert`] but inserts the default `R` value into the [`Left`]
+    /// variant and returns a mutable reference to it.
     ///
     /// # Examples
     ///
@@ -2725,8 +2743,8 @@ impl<L, R> EitherOrBoth<L, R> {
         self.right_or_insert_with(R::default)
     }
 
-    /// Like [`right_or_insert`] but computes a right value from a given function inserting into the
-    /// [`Left`] variant and returning a mutable reference to it.
+    /// Like [`right_or_insert`] but computes a right value from a given function
+    /// inserting into the [`Left`] variant and returning a mutable reference to it.
     ///
     /// # Examples
     ///
@@ -2846,11 +2864,11 @@ impl<L, R> EitherOrBoth<L, R> {
 }
 
 impl<T> EitherOrBoth<T, T> {
-    /// Consumes this `EitherOrBoth` applying a function to the contained values (of a uniform type)
-    /// taking mutable references to capture variables.
+    /// Consumes this `EitherOrBoth` applying a function to the contained values (of a
+    /// uniform type) taking mutable references to capture variables.
     ///
-    /// The evaluation order is from left to right if this is a [`Both`] variant. To reverse the
-    /// order use [`flip`].
+    /// The evaluation order is from left to right if this is a [`Both`] variant. To
+    /// reverse the order use [`flip`].
     ///
     /// # Examples
     ///
@@ -2880,11 +2898,11 @@ impl<T> EitherOrBoth<T, T> {
         }
     }
 
-    /// Calls a function with a reference to the contained values (of a uniform type) returning the
-    /// original `EitherOrBoth`.
+    /// Calls a function with a reference to the contained values (of a uniform type)
+    /// returning the original `EitherOrBoth`.
     ///
-    /// The evaluation order is from left to right if this is a [`Both`] variant. To reverse the
-    /// order use [`flip`].
+    /// The evaluation order is from left to right if this is a [`Both`] variant. To
+    /// reverse the order use [`flip`].
     ///
     /// # Examples
     ///
@@ -2925,8 +2943,8 @@ impl<T> EitherOrBoth<T, T> {
         self
     }
 
-    /// Applies a mapping function to the left and right values (of a uniform type) returning an
-    /// `EitherOrBoth<U, U>`.
+    /// Applies a mapping function to the left and right values (of a uniform type)
+    /// returning an `EitherOrBoth<U, U>`.
     ///
     /// # Examples
     ///
@@ -2952,8 +2970,8 @@ impl<T> EitherOrBoth<T, T> {
         map_each!(self; l, r => f(l), f(r))
     }
 
-    /// Returns the contained [`Left`] or [`Right`] value otherwise applies a function, converting
-    /// [`Both`] into an single value.
+    /// Returns the contained [`Left`] or [`Right`] value otherwise applies a function,
+    /// converting [`Both`] into an single value.
     ///
     /// # Example
     ///
@@ -2986,8 +3004,8 @@ impl<T> EitherOrBoth<T, T> {
 
     /// Returns an iterator over the contained values of a uniform type
     ///
-    /// The evaluation order is from left to right if this is a [`Both`] variant. To reverse the
-    /// order use [`flip`].
+    /// The evaluation order is from left to right if this is a [`Both`] variant. To
+    /// reverse the order use [`flip`].
     ///
     /// # Examples
     ///
@@ -3013,8 +3031,8 @@ impl<T> EitherOrBoth<T, T> {
 
     /// Returns an iterator over the contained mutable values of a uniform type
     ///
-    /// The evaluation order is from left to right if this is a [`Both`] variant. To reverse the
-    /// order use [`flip`].
+    /// The evaluation order is from left to right if this is a [`Both`] variant. To
+    /// reverse the order use [`flip`].
     ///
     /// # Examples
     ///
@@ -3038,11 +3056,11 @@ impl<T> EitherOrBoth<T, T> {
         IterMutEitherOrBoth::new(self)
     }
 
-    /// Consumes the `EitherOrBoth`, returning a chained iterator over the contained iterators of a
-    /// uniform type
+    /// Consumes the `EitherOrBoth`, returning a chained iterator over the contained
+    /// iterators of a uniform type
     ///
-    /// The evaluation order is from left to right if this is a [`Both`] variant. To reverse the
-    /// order use [`flip`].
+    /// The evaluation order is from left to right if this is a [`Both`] variant. To
+    /// reverse the order use [`flip`].
     ///
     /// For iteration over contained iterators with non-uniform types, you can use
     /// [`into_iter_swap`] instead.
@@ -3072,8 +3090,8 @@ impl<T> EitherOrBoth<T, T> {
 
     /// Returns a chained iterator over the contained iterators of a uniform type
     ///
-    /// The evaluation order is from left to right if this is a [`Both`] variant. To reverse the
-    /// order use [`flip`].
+    /// The evaluation order is from left to right if this is a [`Both`] variant. To
+    /// reverse the order use [`flip`].
     ///
     /// For iteration over contained iterators with non-uniform types, you can use
     /// [`iter_swap`] instead.
@@ -3101,11 +3119,11 @@ impl<T> EitherOrBoth<T, T> {
         ChainedIterEitherOrBoth::new(self.as_ref().map(IntoIterator::into_iter))
     }
 
-    /// Returns a chained iterator over the mutable values of the contained iterators of a uniform
-    /// type
+    /// Returns a chained iterator over the mutable values of the contained iterators of a
+    /// uniform type
     ///
-    /// The evaluation order is from left to right if this is a [`Both`] variant. To reverse the
-    /// order use [`flip`].
+    /// The evaluation order is from left to right if this is a [`Both`] variant. To
+    /// reverse the order use [`flip`].
     ///
     /// For iteration over contained iterators with non-uniform types, you can use
     /// [`iter_swap_mut`] instead.
@@ -3135,7 +3153,8 @@ impl<T> EitherOrBoth<T, T> {
 }
 
 impl<L, R> EitherOrBoth<&L, &R> {
-    /// Converts an `EitherOrBoth<&L, &R>` into an `EitherOrBoth<L, R>` by cloning its contents
+    /// Converts an `EitherOrBoth<&L, &R>` into an `EitherOrBoth<L, R>` by cloning its
+    /// contents
     ///
     /// # Examples
     ///
@@ -3158,7 +3177,8 @@ impl<L, R> EitherOrBoth<&L, &R> {
         map_each!(self; l, r => l.clone(), r.clone())
     }
 
-    /// Converts an `EitherOrBoth<&L, &R>` into an `EitherOrBoth<L, R>` by copying its contents
+    /// Converts an `EitherOrBoth<&L, &R>` into an `EitherOrBoth<L, R>` by copying its
+    /// contents
     ///
     /// # Examples
     ///
@@ -3183,8 +3203,8 @@ impl<L, R> EitherOrBoth<&L, &R> {
 }
 
 impl<L, R> EitherOrBoth<&mut L, &mut R> {
-    /// Converts an `EitherOrBoth<&mut L, &mut R>` into an `EitherOrBoth<L, R>` by cloning its
-    /// contents
+    /// Converts an `EitherOrBoth<&mut L, &mut R>` into an `EitherOrBoth<L, R>` by cloning
+    /// its contents
     ///
     /// # Examples
     ///
@@ -3207,8 +3227,8 @@ impl<L, R> EitherOrBoth<&mut L, &mut R> {
         map_each!(self; l, r => l.clone(), r.clone())
     }
 
-    /// Converts an `EitherOrBoth<&mut L, &mut R>` into an `EitherOrBoth<L, R>` by copying its
-    /// contents
+    /// Converts an `EitherOrBoth<&mut L, &mut R>` into an `EitherOrBoth<L, R>` by copying
+    /// its contents
     ///
     /// # Examples
     ///
@@ -3268,8 +3288,8 @@ impl<L1, L2, R1, R2> EitherOrBoth<(L1, R1), (L2, R2)> {
 }
 
 impl<L, R1, R2> EitherOrBoth<(L, R1), (L, R2)> {
-    /// Transposes an `EitherOrBoth` of tuples to a tuple of a single value and an `EitherOrBoth`
-    /// with the left value having a uniform type
+    /// Transposes an `EitherOrBoth` of tuples to a tuple of a single value and an
+    /// `EitherOrBoth` with the left value having a uniform type
     ///
     /// # Examples
     ///
@@ -3307,8 +3327,8 @@ impl<L, R1, R2> EitherOrBoth<(L, R1), (L, R2)> {
 }
 
 impl<L1, L2, R> EitherOrBoth<(L1, R), (L2, R)> {
-    /// Transposes an `EitherOrBoth` of tuples to a tuple of a single value and an `EitherOrBoth`
-    /// with the right value having a uniform type
+    /// Transposes an `EitherOrBoth` of tuples to a tuple of a single value and an
+    /// `EitherOrBoth` with the right value having a uniform type
     ///
     /// # Examples
     ///
@@ -3348,8 +3368,9 @@ impl<L1, L2, R> EitherOrBoth<(L1, R), (L2, R)> {
 impl<L, R> EitherOrBoth<Option<L>, Option<R>> {
     /// Transposes an `EitherOrBoth` of [`Options`] to an option of `EitherOrBoths`
     ///
-    /// Per [convention], if this variant is [`Both`] and at least one of the values is `None`, the
-    /// evaluation of the `None` value takes precedence and results in a `None`  value.
+    /// Per [convention], if this variant is [`Both`] and at least one of the values is
+    /// `None`, the evaluation of the `None` value takes precedence and results in a
+    /// `None`  value.
     ///
     /// # Examples
     ///
@@ -3386,9 +3407,9 @@ impl<L, R> EitherOrBoth<Option<L>, Option<R>> {
 impl<L, R, E1, E2> EitherOrBoth<Result<L, E1>, Result<R, E2>> {
     /// Transposes an `EitherOrBoth` of [`Results`] to a [`Result`] of `EitherOrBoths`
     ///
-    /// Per [convention], if this variant is [`Both`] and at least one of the values is an error
-    /// value `Err`, the evaluation of the `Err` value takes precedence and results in a `Err`
-    /// value.
+    /// Per [convention], if this variant is [`Both`] and at least one of the values is an
+    /// error value `Err`, the evaluation of the `Err` value takes precedence and
+    /// results in a `Err` value.
     ///
     /// # Examples
     ///
@@ -3433,14 +3454,15 @@ impl<L, R, E1, E2> EitherOrBoth<Result<L, E1>, Result<R, E2>> {
 }
 
 impl<L, R, E> EitherOrBoth<Result<L, E>, Result<R, E>> {
-    /// Transposes an `EitherOrBoth` of [`Results`] to a [`Result`] with an uniform error type
+    /// Transposes an `EitherOrBoth` of [`Results`] to a [`Result`] with an uniform error
+    /// type
     ///
-    /// When [`Both`] contains two error values, the provided function merges them into a unified
-    /// error.
+    /// When [`Both`] contains two error values, the provided function merges them into a
+    /// unified error.
     ///
-    /// Per [convention], if this variant is [`Both`] and at least one of the values is an error
-    /// value `Err`, the evaluation of the `Err` value takes precedence and results in a `Err`
-    /// value.
+    /// Per [convention], if this variant is [`Both`] and at least one of the values is an
+    /// error value `Err`, the evaluation of the `Err` value takes precedence and
+    /// results in a `Err` value.
     ///
     /// # Examples
     ///
@@ -3488,14 +3510,15 @@ impl<L, R, E> EitherOrBoth<Result<L, E>, Result<R, E>> {
 }
 
 impl<T, E1, E2> EitherOrBoth<Result<T, E1>, Result<T, E2>> {
-    /// Transposes an `EitherOrBoth` of [`Results`] to a [`Result`] with an uniform correct type
+    /// Transposes an `EitherOrBoth` of [`Results`] to a [`Result`] with an uniform
+    /// correct type
     ///
-    /// When [`Both`] contains two correct values, the provided function merges them into a unified
-    /// value.
+    /// When [`Both`] contains two correct values, the provided function merges them into
+    /// a unified value.
     ///
-    /// Per [convention], if this variant is [`Both`] and at least one of the values is an error
-    /// value `Err`, the evaluation of the `Err` value takes precedence and results in a `Err`
-    /// value.
+    /// Per [convention], if this variant is [`Both`] and at least one of the values is an
+    /// error value `Err`, the evaluation of the `Err` value takes precedence and
+    /// results in a `Err` value.
     ///
     /// # Examples
     ///

@@ -9,7 +9,6 @@ publish = false
 either-or-both = { version = "0.2.0", path = ".." }
 iai-callgrind = "0.16.1"
 
-# TODO: rename to either_or_both or either_or_both_iter
 [[bench]]
 harness = false
 name = "iai_callgrind"
