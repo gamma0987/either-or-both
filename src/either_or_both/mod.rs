@@ -608,6 +608,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<&str> = EitherOrBoth::Left("left");
     /// value.expect_both("should be both");
     /// ```
+    #[track_caller]
     pub fn expect_both(self, msg: &str) -> (L, R) {
         match self {
             Self::Both(left, right) => (left, right),
@@ -642,6 +643,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<&str> = EitherOrBoth::Right("right");
     /// value.expect_left("should be left");
     /// ```
+    #[track_caller]
     pub fn expect_left(self, msg: &str) -> L {
         match self {
             Self::Both(left, _) | Self::Left(left) => left,
@@ -680,6 +682,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<&str> = EitherOrBoth::Right("right");
     /// value.expect_only_left("should be left"); // panics with the message `should be left`
     /// ```
+    #[track_caller]
     pub fn expect_only_left(self, msg: &str) -> L {
         match self {
             Self::Left(left) => left,
@@ -714,6 +717,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<&str> = EitherOrBoth::Left("left");
     /// value.expect_right("should be right");
     /// ```
+    #[track_caller]
     pub fn expect_right(self, msg: &str) -> R {
         match self {
             Self::Both(_, right) | Self::Right(right) => right,
@@ -752,6 +756,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<&str> = EitherOrBoth::Left("left");
     /// value.expect_only_right("should be right"); // panics with the message `should be right`
     /// ```
+    #[track_caller]
     pub fn expect_only_right(self, msg: &str) -> R {
         match self {
             Self::Right(right) => right,
@@ -780,6 +785,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<&str> = EitherOrBoth::Left("left");
     /// value.unwrap_both(); // panics
     /// ```
+    #[track_caller]
     pub fn unwrap_both(self) -> (L, R) {
         self.expect_both("Called `EitherOrBoth::unwrap_both` on a `Left` or `Right` value")
     }
@@ -810,6 +816,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value = EitherOrBoth::Left("left");
     /// assert_eq!(unsafe { value.unwrap_both_unchecked() }, ("left", "right"));
     /// ```
+    #[track_caller]
     pub unsafe fn unwrap_both_unchecked(self) -> (L, R) {
         match self {
             Self::Both(left, right) => (left, right),
@@ -843,6 +850,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<&str> = EitherOrBoth::Right("right");
     /// value.unwrap_left(); // panics
     /// ```
+    #[track_caller]
     pub fn unwrap_left(self) -> L {
         self.expect_left("Called `EitherOrBoth::unwrap_left` on a `Right` value")
     }
@@ -876,6 +884,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
+    #[track_caller]
     pub unsafe fn unwrap_left_unchecked(self) -> L {
         match self {
             Self::Both(left, _) | Self::Left(left) => left,
@@ -914,6 +923,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<&str> = EitherOrBoth::Right("right");
     /// value.unwrap_only_left(); // panics
     /// ```
+    #[track_caller]
     pub fn unwrap_only_left(self) -> L {
         self.expect_only_left("Called `EitherOrBoth::unwrap_only_left` on a `Both` or `Right` value")
     }
@@ -944,6 +954,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<&str> = EitherOrBoth::Right("right");
     /// assert_eq!(unsafe { value.unwrap_only_left_unchecked() }, "left");
     /// ```
+    #[track_caller]
     pub unsafe fn unwrap_only_left_unchecked(self) -> L {
         match self {
             Self::Left(left) => left,
@@ -977,6 +988,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<&str> = EitherOrBoth::Left("left");
     /// value.unwrap_right(); // panics
     /// ```
+    #[track_caller]
     pub fn unwrap_right(self) -> R {
         self.expect_right("Called EitherOrBoth::unwrap_right` on a `Left` value")
     }
@@ -1010,6 +1022,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
+    #[track_caller]
     pub unsafe fn unwrap_right_unchecked(self) -> R {
         match self {
             Self::Both(_, right) | Self::Right(right) => right,
@@ -1048,6 +1061,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<&str> = EitherOrBoth::Left("left");
     /// value.unwrap_only_right(); // panics
     /// ```
+    #[track_caller]
     pub fn unwrap_only_right(self) -> R {
         self.expect_only_right("Called EitherOrBoth::unwrap_only_right` on a `Both` or `Left` value")
     }
@@ -1078,6 +1092,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<&str> = EitherOrBoth::Left("left");
     /// assert_eq!(unsafe { value.unwrap_only_right_unchecked() }, "right");
     /// ```
+    #[track_caller]
     pub unsafe fn unwrap_only_right_unchecked(self) -> R {
         match self {
             Self::Right(right) => right,

@@ -340,6 +340,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<&str> = Either::Right("right");
     /// value.expect_left("should be left");
     /// ```
+    #[track_caller]
     pub fn expect_left(self, msg: &str) -> L {
         match self {
             Self::Left(left) => left,
@@ -371,6 +372,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<&str> = Either::Left("left");
     /// value.expect_right("should be right");
     /// ```
+    #[track_caller]
     pub fn expect_right(self, msg: &str) -> R {
         match self {
             Self::Left(_) => unwrap_failed(msg),
@@ -399,6 +401,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<&str> = Either::Right("right");
     /// value.unwrap_left(); // panics
     /// ```
+    #[track_caller]
     pub fn unwrap_left(self) -> L {
         self.expect_left("Called `Either::unwrap_left` on a `Right` value")
     }
@@ -429,6 +432,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
+    #[track_caller]
     pub unsafe fn unwrap_left_unchecked(self) -> L {
         match self {
             Self::Left(left) => left,
@@ -458,6 +462,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<&str> = Either::Left("left");
     /// value.unwrap_right(); // panics
     /// ```
+    #[track_caller]
     pub fn unwrap_right(self) -> R {
         self.expect_right("Called `Either::unwrap_right` on a `Left` value")
     }
@@ -488,6 +493,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
+    #[track_caller]
     pub unsafe fn unwrap_right_unchecked(self) -> R {
         match self {
             // SAFETY: the safety contract must be upheld by the caller.
