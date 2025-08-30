@@ -17,6 +17,27 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-08-30
+
+### Added
+
+* ([#12](https://github.com/gamma0987/either-or-both/pull/12)): New
+  methods `EitherOrBoth::both_and`, `EitherOrBoth::both_and_then`.
+* ([#12](https://github.com/gamma0987/either-or-both/pull/12)): FromIterator
+  implementations of iterators over `Either` or `EitherOrBoth` into
+  `EitherOrBoths` of `IndexMap`, `IndexSet`, `HashMap`, `HashSet`.
+
+### Changed
+
+* ([#12](https://github.com/gamma0987/either-or-both/pull/12)): Add
+  `#[must_use]` annotations where appropriate.
+* ([#12](https://github.com/gamma0987/either-or-both/pull/12)): Use `const` on
+  methods that allow it.
+* ([#12](https://github.com/gamma0987/either-or-both/pull/12)): Add
+  `#[track_caller]` on all `unwrap`- and `extend`-like methods
+* ([#12](https://github.com/gamma0987/either-or-both/pull/12)): Add `#[inline]`
+  for most methods.
+
 ## [0.2.0] - 2025-08-28
 
 ### Added

@@ -17,11 +17,18 @@ concurrency:
 
 jobs:
   deny:
-    name: Check dependencies/ubuntu-latest
+    name: Check dependencies
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@1.74.1
+      - uses: dtolnay/rust-toolchain@1.63.0
+      - name: Cache/Restore cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: deny-cargo-registry
       - uses: taiki-e/install-action@cargo-deny
       - uses: taiki-e/install-action@just
       - name: Check advisories
@@ -72,6 +79,10 @@ jobs:
       - uses: taiki-e/install-action@cargo-binstall
       - uses: taiki-e/install-action@just
       - run: cargo binstall --no-confirm --no-symlinks taplo-cli
+      # Using the rust-cache action here to also cache the binaries. Especially
+      # taplo-cli is slow to build
+      - name: Cache/Restore rust cache
+        uses: Swatinem/rust-cache@v2
       - run: just check-fmt-all
 
   base:
@@ -98,6 +109,11 @@ jobs:
         if: matrix.toolchain != 'stable'
         run: |
           rustup toolchain install stable --no-self-update --component clippy
+      - name: Lock msrv dependencies
+        if: matrix.toolchain == '1.63.0'
+        run: cargo +stable generate-lockfile
+        env:
+          CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS: fallback
       - name: "Prepare: Run cargo update"
         if: matrix.toolchain == 'stable' || matrix.toolchain == 'nightly'
         run: |
