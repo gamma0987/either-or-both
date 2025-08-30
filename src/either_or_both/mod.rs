@@ -72,6 +72,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.has_left(), false);
     /// ```
+    #[inline]
     pub const fn has_left(&self) -> bool {
         match self {
             Self::Left(_) | Self::Both(_, _) => true,
@@ -96,6 +97,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.has_left_and(|l| l == 1), false);
     /// ```
+    #[inline]
     pub fn has_left_and<F>(self, f: F) -> bool
     where
         F: FnOnce(L) -> bool,
@@ -123,6 +125,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.has_left_or(|r| r != 'c'), false);
     /// ```
+    #[inline]
     pub fn has_left_or<F>(self, f: F) -> bool
     where
         F: FnOnce(R) -> bool,
@@ -149,6 +152,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
     /// assert_eq!(value.has_right(), true);
     /// ```
+    #[inline]
     pub const fn has_right(&self) -> bool {
         match self {
             Self::Right(_) | Self::Both(_, _) => true,
@@ -176,6 +180,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
     /// assert_eq!(value.has_right_and(|r| r == 'c'), true);
     /// ```
+    #[inline]
     pub fn has_right_and<F>(self, f: F) -> bool
     where
         F: FnOnce(R) -> bool,
@@ -206,6 +211,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
     /// assert_eq!(value.has_right_or(|l| l == 2), true);
     /// ```
+    #[inline]
     pub fn has_right_or<F>(self, f: F) -> bool
     where
         F: FnOnce(L) -> bool,
@@ -229,6 +235,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.is_both(), false);
     /// ```
+    #[inline]
     pub const fn is_both(&self) -> bool {
         matches!(self, Self::Both(_, _))
     }
@@ -252,6 +259,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.is_both_and(|_, r| r == 'c'), false);
     /// ```
+    #[inline]
     pub fn is_both_and<F>(self, f: F) -> bool
     where
         F: FnOnce(L, R) -> bool,
@@ -282,6 +290,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.is_both_or(|l| l == 1, |r| r == 'm'), false);
     /// ```
+    #[inline]
     pub fn is_both_or<F, G>(self, f: F, g: G) -> bool
     where
         F: FnOnce(L) -> bool,
@@ -310,6 +319,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.is_left(), false);
     /// ```
+    #[inline]
     pub const fn is_left(&self) -> bool {
         matches!(self, Self::Left(_))
     }
@@ -330,6 +340,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.is_left_and(|l| l == 1), false);
     /// ```
+    #[inline]
     pub fn is_left_and<F>(self, f: F) -> bool
     where
         F: FnOnce(L) -> bool,
@@ -359,6 +370,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.is_left_or(|r| r == 'c'), true);
     /// ```
+    #[inline]
     pub fn is_left_or<F>(self, f: F) -> bool
     where
         F: FnOnce(R) -> bool,
@@ -384,6 +396,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
     /// assert_eq!(value.is_right(), false);
+    #[inline]
     pub const fn is_right(&self) -> bool {
         matches!(self, Self::Right(_))
     }
@@ -407,6 +420,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
     /// assert_eq!(value.is_right_and(|r| r == 'c'), false);
     /// ```
+    #[inline]
     pub fn is_right_and<F>(self, f: F) -> bool
     where
         F: FnOnce(R) -> bool,
@@ -436,6 +450,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Both(1, 'c');
     /// assert_eq!(value.is_right_or(|l| l == 1), true);
     /// ```
+    #[inline]
     pub fn is_right_or<F>(self, f: F) -> bool
     where
         F: FnOnce(L) -> bool,
@@ -471,6 +486,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// println!("`text` has not been moved: {:?}", &text);
     /// ```
+    #[inline]
     pub const fn as_ref(&self) -> EitherOrBoth<&L, &R> {
         map_each!(self)
     }
@@ -495,6 +511,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// assert_eq!(both, EitherOrBoth::Both(2, 'm'))
     /// ```
+    #[inline]
     pub fn as_mut(&mut self) -> EitherOrBoth<&mut L, &mut R> {
         map_each!(self)
     }
@@ -516,6 +533,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let deref: EitherOrBoth<&str> = values.as_deref();
     /// assert_eq!(deref.left(), Some("left"));
     /// ```
+    #[inline]
     pub fn as_deref(&self) -> EitherOrBoth<&<L as Deref>::Target, &<R as Deref>::Target>
     where
         L: Deref,
@@ -548,6 +566,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///     ))
     /// );
     /// ```
+    #[inline]
     pub fn as_deref_mut(
         &mut self,
     ) -> EitherOrBoth<&mut <L as Deref>::Target, &mut <R as Deref>::Target>
@@ -560,6 +579,7 @@ impl<L, R> EitherOrBoth<L, R> {
 
     /// Converts from `Pin<&EitherOrBoth<L, R>>` to `EitherOrBoth<Pin<&L>, Pin<&R>>`.
     #[must_use]
+    #[inline]
     pub fn as_pin_ref(self: Pin<&Self>) -> EitherOrBoth<Pin<&L>, Pin<&R>> {
         // SAFETY: `x` is guaranteed to be pinned because it comes from `self` which is pinned.
         unsafe {
@@ -570,6 +590,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// Converts from `Pin<&mut EitherOrBoth<L, R>>` to `EitherOrBoth<Pin<&mut L>,
     /// Pin<&mut R>>`.
     #[must_use]
+    #[inline]
     pub fn as_pin_mut(self: Pin<&mut Self>) -> EitherOrBoth<Pin<&mut L>, Pin<&mut R>> {
         // SAFETY: `get_unchecked_mut` is never used to move the `EitherOrBoth` inside `self`. `x`
         // is guaranteed to be pinned because it comes from `self` which is pinned.
@@ -609,6 +630,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// value.expect_both("should be both");
     /// ```
     #[track_caller]
+    #[inline]
     pub fn expect_both(self, msg: &str) -> (L, R) {
         match self {
             Self::Both(left, right) => (left, right),
@@ -644,6 +666,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// value.expect_left("should be left");
     /// ```
     #[track_caller]
+    #[inline]
     pub fn expect_left(self, msg: &str) -> L {
         match self {
             Self::Both(left, _) | Self::Left(left) => left,
@@ -683,6 +706,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// value.expect_only_left("should be left"); // panics with the message `should be left`
     /// ```
     #[track_caller]
+    #[inline]
     pub fn expect_only_left(self, msg: &str) -> L {
         match self {
             Self::Left(left) => left,
@@ -718,6 +742,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// value.expect_right("should be right");
     /// ```
     #[track_caller]
+    #[inline]
     pub fn expect_right(self, msg: &str) -> R {
         match self {
             Self::Both(_, right) | Self::Right(right) => right,
@@ -757,6 +782,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// value.expect_only_right("should be right"); // panics with the message `should be right`
     /// ```
     #[track_caller]
+    #[inline]
     pub fn expect_only_right(self, msg: &str) -> R {
         match self {
             Self::Right(right) => right,
@@ -786,6 +812,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// value.unwrap_both(); // panics
     /// ```
     #[track_caller]
+    #[inline]
     pub fn unwrap_both(self) -> (L, R) {
         self.expect_both("Called `EitherOrBoth::unwrap_both` on a `Left` or `Right` value")
     }
@@ -851,6 +878,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// value.unwrap_left(); // panics
     /// ```
     #[track_caller]
+    #[inline]
     pub fn unwrap_left(self) -> L {
         self.expect_left("Called `EitherOrBoth::unwrap_left` on a `Right` value")
     }
@@ -924,6 +952,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// value.unwrap_only_left(); // panics
     /// ```
     #[track_caller]
+    #[inline]
     pub fn unwrap_only_left(self) -> L {
         self.expect_only_left("Called `EitherOrBoth::unwrap_only_left` on a `Both` or `Right` value")
     }
@@ -989,6 +1018,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// value.unwrap_right(); // panics
     /// ```
     #[track_caller]
+    #[inline]
     pub fn unwrap_right(self) -> R {
         self.expect_right("Called EitherOrBoth::unwrap_right` on a `Left` value")
     }
@@ -1062,6 +1092,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// value.unwrap_only_right(); // panics
     /// ```
     #[track_caller]
+    #[inline]
     pub fn unwrap_only_right(self) -> R {
         self.expect_only_right("Called EitherOrBoth::unwrap_only_right` on a `Both` or `Left` value")
     }
@@ -1122,6 +1153,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.both(), None);
     /// ```
+    #[inline]
     pub fn both(self) -> Option<(L, R)> {
         match self {
             Self::Both(left, right) => Some((left, right)),
@@ -1155,6 +1187,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let y: EitherOrBoth<u8, char> = EitherOrBoth::Left(2);
     /// assert_eq!(x.both_and(y), EitherOrBoth::Right('c'));
     /// ```
+    #[inline]
     pub fn both_and(self, other: Self) -> Self {
         match self {
             Self::Both(_, _) => other,
@@ -1183,6 +1216,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let x: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(x.both_and_then(apply_to_both), EitherOrBoth::Right('c'));
     /// ```
+    #[inline]
     pub fn both_and_then<F>(self, f: F) -> Self
     where
         F: FnOnce(L, R) -> Self,
@@ -1210,6 +1244,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.left(), None);
     /// ```
+    #[inline]
     pub fn left(self) -> Option<L> {
         match self {
             Self::Left(left) | Self::Both(left, _) => Some(left),
@@ -1242,6 +1277,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let y: EitherOrBoth<&str, char> = EitherOrBoth::Left("left");
     /// assert_eq!(x.left_and(y), EitherOrBoth::Right('c'));
     /// ```
+    #[inline]
     pub fn left_and<T>(self, other: EitherOrBoth<T, R>) -> EitherOrBoth<T, R> {
         match self {
             Self::Left(_) | Self::Both(_, _) => other,
@@ -1275,6 +1311,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let x: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(x.left_and_then(left_to_string), EitherOrBoth::Right('c'));
     /// ```
+    #[inline]
     pub fn left_and_then<F, T>(self, f: F) -> EitherOrBoth<T, R>
     where
         F: FnOnce(L) -> EitherOrBoth<T, R>,
@@ -1301,6 +1338,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.only_left(), None);
     /// ```
+    #[inline]
     pub fn only_left(self) -> Option<L> {
         match self {
             Self::Left(left) => Some(left),
@@ -1325,6 +1363,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Left(1);
     /// assert_eq!(value.right(), None);
     /// ```
+    #[inline]
     pub fn right(self) -> Option<R> {
         match self {
             Self::Right(right) | Self::Both(_, right) => Some(right),
@@ -1357,6 +1396,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let y: EitherOrBoth<u8, &str> = EitherOrBoth::Right("right");
     /// assert_eq!(x.right_and(y), EitherOrBoth::Left(1));
     /// ```
+    #[inline]
     pub fn right_and<T>(self, other: EitherOrBoth<L, T>) -> EitherOrBoth<L, T> {
         match self {
             Self::Right(_) | Self::Both(_, _) => other,
@@ -1390,6 +1430,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let x: EitherOrBoth<u8, char> = EitherOrBoth::Left(1);
     /// assert_eq!(x.right_and_then(right_to_string), EitherOrBoth::Left(1));
     /// ```
+    #[inline]
     pub fn right_and_then<F, T>(self, f: F) -> EitherOrBoth<L, T>
     where
         F: FnOnce(R) -> EitherOrBoth<L, T>,
@@ -1416,6 +1457,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Left(1);
     /// assert_eq!(value.only_right(), None);
     /// ```
+    #[inline]
     pub fn only_right(self) -> Option<R> {
         match self {
             Self::Right(right) => Some(right),
@@ -1561,6 +1603,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(value.flip(), EitherOrBoth::Right(1));
     /// ```
     #[must_use]
+    #[inline]
     pub fn flip(self) -> EitherOrBoth<R, L> {
         match self {
             Self::Both(left, right) => Both(right, left),
@@ -1592,6 +1635,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///     EitherOrBoth::Left("1".to_owned())
     /// );
     /// ```
+    #[inline]
     pub fn bimap<F, G, T, U>(self, f: F, g: G) -> EitherOrBoth<T, U>
     where
         F: FnOnce(L) -> T,
@@ -1622,6 +1666,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.map_left(map_left), EitherOrBoth::Right('c'));
     /// ```
+    #[inline]
     pub fn map_left<F, T>(self, f: F) -> EitherOrBoth<T, R>
     where
         F: FnOnce(L) -> T,
@@ -1654,6 +1699,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [`map_left_or_else`]: EitherOrBoth::map_left_or_else
+    #[inline]
     pub fn map_left_or<F, T>(self, default: T, f: F) -> T
     where
         F: FnOnce(L) -> T,
@@ -1682,6 +1728,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [default value]: Default::default
+    #[inline]
     pub fn map_left_or_default<T, F>(self, f: F) -> T
     where
         T: Default,
@@ -1718,6 +1765,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///     1.to_string()
     /// );
     /// ```
+    #[inline]
     pub fn map_left_or_else<D, F, T>(self, default: D, f: F) -> T
     where
         D: FnOnce() -> T,
@@ -1754,6 +1802,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Left(1);
     /// assert_eq!(value.map_right(map_right), EitherOrBoth::Left(1));
     /// ```
+    #[inline]
     pub fn map_right<T>(self, f: fn(R) -> T) -> EitherOrBoth<L, T> {
         map_each!(self; l, r => l, f(r))
     }
@@ -1783,6 +1832,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [`map_right_or_else`]: EitherOrBoth::map_right_or_else
+    #[inline]
     pub fn map_right_or<U, F>(self, default: U, f: F) -> U
     where
         F: FnOnce(R) -> U,
@@ -1814,6 +1864,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [default value]: Default::default
+    #[inline]
     pub fn map_right_or_default<T, F>(self, f: F) -> T
     where
         T: Default,
@@ -1850,6 +1901,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///     String::from("right")
     /// );
     /// ```
+    #[inline]
     pub fn map_right_or_else<U, D, F>(self, default: D, f: F) -> U
     where
         D: FnOnce() -> U,
@@ -1891,6 +1943,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [`flip`]: EitherOrBoth::flip
+    #[inline]
     pub fn biinspect<F, G>(self, f: F, g: G) -> Self
     where
         for<'a> F: Fn(&'a L),
@@ -1931,6 +1984,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// assert_eq!(right, 'c');
     /// ```
+    #[inline]
     pub fn inspect_left<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a L),
@@ -1966,6 +2020,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// assert_eq!(left, 1);
     /// ```
+    #[inline]
     pub fn inspect_right<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a R),
@@ -2016,6 +2071,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// [`flip`]: EitherOrBoth::flip
     /// [`biapply_with`]: EitherOrBoth::biapply_with
+    #[inline]
     pub fn biapply<F, G>(self, mut f: F, mut g: G)
     where
         F: FnMut(L),
@@ -2051,6 +2107,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [`flip`]: EitherOrBoth::flip
+    #[inline]
     pub fn biapply_with<F, G, Acc>(self, acc: &mut Acc, mut f: F, mut g: G)
     where
         for<'a> F: FnMut(&'a mut Acc, L),
@@ -2084,6 +2141,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// value.apply_left(|l| left.push(l));
     /// assert_eq!(left.is_empty(), true);
     /// ```
+    #[inline]
     pub fn apply_left<F>(self, mut f: F)
     where
         F: FnMut(L),
@@ -2112,6 +2170,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// value.apply_right(|r| right.push(r));
     /// assert_eq!(right.is_empty(), true);
     /// ```
+    #[inline]
     pub fn apply_right<F>(self, mut f: F)
     where
         F: FnMut(R),
@@ -2139,6 +2198,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Left(1);
     /// assert_eq!(value.reduce_left(|r| r as u8), 1);
     /// ```
+    #[inline]
     pub fn reduce_left<F>(self, f: F) -> L
     where
         F: FnOnce(R) -> L,
@@ -2175,6 +2235,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// [`bimap`]: EitherOrBoth::bimap
     /// [`reduce_left`]: EitherOrBoth::reduce_left
+    #[inline]
     pub fn reduce_map_left<F, G, T>(self, f: F, g: G) -> T
     where
         F: FnOnce(L) -> T,
@@ -2203,6 +2264,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Left(0);
     /// assert_eq!(value.reduce_right(|l| l as char), '\0');
     /// ```
+    #[inline]
     pub fn reduce_right<F>(self, f: F) -> R
     where
         F: FnOnce(L) -> R,
@@ -2239,6 +2301,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// [`bimap`]: EitherOrBoth::bimap
     /// [`reduce_right`]: EitherOrBoth::reduce_right
+    #[inline]
     pub fn reduce_map_right<F, G, T>(self, f: F, g: G) -> T
     where
         F: FnOnce(L) -> T,
@@ -2273,6 +2336,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// [convention]: ./index.html#conventions-and-edge-cases
     #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn ok(self) -> Result<R, L> {
         match self {
             Self::Both(left, _) | Self::Left(left) => Err(left),
@@ -2309,6 +2373,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// [`ok_or_else`]: EitherOrBoth::ok_or_else
     /// [convention]: ./index.html#conventions-and-edge-cases
     #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn ok_or<E>(self, error: E) -> Result<R, E> {
         self.ok_or_else(|| error)
     }
@@ -2348,6 +2413,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// [`ok_or_else`]: EitherOrBoth::ok_or_else
     /// [convention]: ./index.html#conventions-and-edge-cases
     #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn ok_or_else<F, E>(self, error: F) -> Result<R, E>
     where
         F: FnOnce() -> E,
@@ -2375,6 +2441,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.or(2, 'm'), (2, 'c'));
     /// ```
+    #[inline]
     pub fn or(self, left: L, right: R) -> (L, R) {
         match self {
             Self::Both(left, right) => (left, right),
@@ -2400,6 +2467,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.or_default(), (0, 'c'));
     /// ```
+    #[inline]
     pub fn or_default(self) -> (L, R)
     where
         L: Default,
@@ -2429,6 +2497,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.or_else(|| 1 + 1, || char::from(100)), (2, 'c'));
     /// ```
+    #[inline]
     pub fn or_else<F, G>(self, f: F, g: G) -> (L, R)
     where
         F: FnOnce() -> L,
@@ -2458,6 +2527,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.into_left(|r| r as u8), EitherOrBoth::Left(99));
     /// ```
+    #[inline]
     pub fn into_left<F>(self, f: F) -> Self
     where
         F: FnOnce(R) -> L,
@@ -2486,6 +2556,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Left(0);
     /// assert_eq!(value.into_right(|l| l as char), EitherOrBoth::Right('\0'));
     /// ```
+    #[inline]
     pub fn into_right<F>(self, f: F) -> Self
     where
         F: FnOnce(L) -> R,
@@ -2525,6 +2596,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(*x, 2);
     /// assert_eq!(value, EitherOrBoth::Left(2));
     /// ```
+    #[inline]
     pub fn insert_left(&mut self, left: L) -> &mut L {
         match self {
             Self::Both(old_left, _) | Self::Left(old_left) => {
@@ -2573,6 +2645,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(*x, 'm');
     /// assert_eq!(value, EitherOrBoth::Right('m'));
     /// ```
+    #[inline]
     pub fn insert_right(&mut self, right: R) -> &mut R {
         match self {
             Self::Both(_, old_right) | Self::Right(old_right) => {
@@ -2627,6 +2700,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [`left_or_insert_with`]: EitherOrBoth::left_or_insert_with
+    #[inline]
     pub fn left_or_insert(&mut self, value: L) -> &mut L {
         self.left_or_insert_with(|| value)
     }
@@ -2656,6 +2730,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [`left_or_insert`]: EitherOrBoth::left_or_insert
+    #[inline]
     pub fn left_or_insert_default(&mut self) -> &mut L
     where
         L: Default,
@@ -2688,6 +2763,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [`left_or_insert`]: EitherOrBoth::left_or_insert
+    #[inline]
     pub fn left_or_insert_with<F>(&mut self, f: F) -> &mut L
     where
         F: FnOnce() -> L,
@@ -2728,6 +2804,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [`right_or_insert_with`]: EitherOrBoth::right_or_insert_with
+    #[inline]
     pub fn right_or_insert(&mut self, value: R) -> &mut R {
         self.right_or_insert_with(|| value)
     }
@@ -2757,6 +2834,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [`right_or_insert`]: EitherOrBoth::right_or_insert
+    #[inline]
     pub fn right_or_insert_default(&mut self) -> &mut R
     where
         R: Default,
@@ -2789,6 +2867,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// ```
     ///
     /// [`right_or_insert`]: EitherOrBoth::right_or_insert
+    #[inline]
     pub fn right_or_insert_with<F>(&mut self, f: F) -> &mut R
     where
         F: FnOnce() -> R,
@@ -2821,6 +2900,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(old, EitherOrBoth::Right('c'));
     /// assert_eq!(value, EitherOrBoth::Right('m'));
     /// ```
+    #[inline]
     pub fn replace_any(&mut self, left: L, right: R) -> Self {
         map_each!(self; l, r => mem::replace(l, left), mem::replace(r, right))
     }
@@ -2847,6 +2927,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(old, None);
     /// assert_eq!(value, EitherOrBoth::Right('c'));
     /// ```
+    #[inline]
     pub fn replace_left(&mut self, value: L) -> Option<L> {
         match self {
             Self::Both(left, _) | Self::Left(left) => Some(mem::replace(left, value)),
@@ -2876,6 +2957,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(old, None);
     /// assert_eq!(value, EitherOrBoth::Left(1));
     /// ```
+    #[inline]
     pub fn replace_right(&mut self, value: R) -> Option<R> {
         match self {
             Self::Both(_, right) | Self::Right(right) => Some(mem::replace(right, value)),
@@ -2905,6 +2987,7 @@ impl<T> EitherOrBoth<T, T> {
     /// ```
     ///
     /// [`flip`]: EitherOrBoth::flip
+    #[inline]
     pub fn apply<F>(self, mut f: F)
     where
         F: FnMut(T),
@@ -2949,6 +3032,7 @@ impl<T> EitherOrBoth<T, T> {
     /// ```
     ///
     /// [`flip`]: EitherOrBoth::flip
+    #[inline]
     pub fn inspect<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a T),
@@ -2984,6 +3068,7 @@ impl<T> EitherOrBoth<T, T> {
     ///     EitherOrBoth::Left("c".to_owned())
     /// );
     /// ```
+    #[inline]
     pub fn map<F, U>(self, f: F) -> EitherOrBoth<U, U>
     where
         F: Fn(T) -> U,
@@ -3008,6 +3093,7 @@ impl<T> EitherOrBoth<T, T> {
     /// let value: EitherOrBoth<u8> = EitherOrBoth::Left(3);
     /// assert_eq!(value.reduce(|l, r| l + r), 3);
     /// ```
+    #[inline]
     pub fn reduce<F>(self, f: F) -> T
     where
         F: FnOnce(T, T) -> T,
@@ -3046,6 +3132,7 @@ impl<T> EitherOrBoth<T, T> {
     /// ```
     ///
     /// [`flip`]: EitherOrBoth::flip
+    #[inline]
     pub fn iter(&self) -> IterEitherOrBoth<'_, T> {
         IterEitherOrBoth::new(self)
     }
@@ -3073,6 +3160,7 @@ impl<T> EitherOrBoth<T, T> {
     /// ```
     ///
     /// [`flip`]: EitherOrBoth::flip
+    #[inline]
     pub fn iter_mut(&mut self) -> IterMutEitherOrBoth<'_, T> {
         IterMutEitherOrBoth::new(self)
     }

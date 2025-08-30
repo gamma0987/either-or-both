@@ -67,6 +67,7 @@ impl<L, R> Either<L, R> {
     /// let either = Either::<u8>::Right(1);
     /// assert_eq!(either.is_left(), false);
     /// ```
+    #[inline]
     pub const fn is_left(&self) -> bool {
         matches!(self, Self::Left(_))
     }
@@ -87,6 +88,7 @@ impl<L, R> Either<L, R> {
     /// let either: Either<u8> = Either::Right(1);
     /// assert_eq!(either.is_left_and(|l| l == 1), false);
     /// ```
+    #[inline]
     pub fn is_left_and<F>(self, f: F) -> bool
     where
         F: FnOnce(L) -> bool,
@@ -112,6 +114,7 @@ impl<L, R> Either<L, R> {
     /// let either: Either<u8, char> = Either::Right('c');
     /// assert_eq!(either.is_left_or(|r| r == 'm'), false);
     /// ```
+    #[inline]
     pub fn is_left_or<F>(self, f: F) -> bool
     where
         F: FnOnce(R) -> bool,
@@ -135,6 +138,7 @@ impl<L, R> Either<L, R> {
     /// let either = Either::<u8, char>::Left(1);
     /// assert_eq!(either.is_right(), false);
     /// ```
+    #[inline]
     pub const fn is_right(&self) -> bool {
         matches!(self, Self::Right(_))
     }
@@ -156,6 +160,7 @@ impl<L, R> Either<L, R> {
     /// let either: Either<u8, char> = Either::Left(1);
     /// assert_eq!(either.is_right_and(|r| r == 'c'), false);
     /// ```
+    #[inline]
     pub fn is_right_and<F>(self, f: F) -> bool
     where
         F: FnOnce(R) -> bool,
@@ -182,6 +187,7 @@ impl<L, R> Either<L, R> {
     /// let either: Either<u8, char> = Either::Left(2);
     /// assert_eq!(either.is_right_or(|l| l == 1), false);
     /// ```
+    #[inline]
     pub fn is_right_or<F>(self, f: F) -> bool
     where
         F: FnOnce(L) -> bool,
@@ -218,6 +224,7 @@ impl<L, R> Either<L, R> {
     /// println!("`text` has not been moved: {:?}", &text);
     /// ```
     #[allow(clippy::same_name_method)]
+    #[inline]
     pub const fn as_ref(&self) -> Either<&L, &R> {
         map_each!(self)
     }
@@ -239,6 +246,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(either, Either::Left(3))
     /// ```
     #[allow(clippy::same_name_method)]
+    #[inline]
     pub fn as_mut(&mut self) -> Either<&mut L, &mut R> {
         map_each!(self)
     }
@@ -256,6 +264,7 @@ impl<L, R> Either<L, R> {
     /// let deref: Either<&str> = values.as_deref();
     /// assert_eq!(deref.left(), Some("left"));
     /// ```
+    #[inline]
     pub fn as_deref(&self) -> Either<&<L as Deref>::Target, &<R as Deref>::Target>
     where
         L: Deref,
@@ -280,6 +289,7 @@ impl<L, R> Either<L, R> {
     ///
     /// assert_eq!(upper_case.left(), Some("LEFT".to_owned().as_mut_str()));
     /// ```
+    #[inline]
     pub fn as_deref_mut(&mut self) -> Either<&mut <L as Deref>::Target, &mut <R as Deref>::Target>
     where
         L: DerefMut,
@@ -290,6 +300,7 @@ impl<L, R> Either<L, R> {
 
     /// Converts from `Pin<&Either<L, R>>` to `Either<Pin<&L>, Pin<&R>>`.
     #[must_use]
+    #[inline]
     pub fn as_pin_ref(self: Pin<&Self>) -> Either<Pin<&L>, Pin<&R>> {
         // SAFETY: `x` is guaranteed to be pinned because it comes from `self` which is pinned.
         unsafe {
@@ -302,6 +313,7 @@ impl<L, R> Either<L, R> {
 
     /// Converts from `Pin<&mut Either<L, R>>` to `Either<Pin<&mut L>, Pin<&mut R>>`.
     #[must_use]
+    #[inline]
     pub fn as_pin_mut(self: Pin<&mut Self>) -> Either<Pin<&mut L>, Pin<&mut R>> {
         // SAFETY: `x` is guaranteed to be pinned because it comes from `self` which is pinned.
         unsafe {
@@ -341,6 +353,7 @@ impl<L, R> Either<L, R> {
     /// value.expect_left("should be left");
     /// ```
     #[track_caller]
+    #[inline]
     pub fn expect_left(self, msg: &str) -> L {
         match self {
             Self::Left(left) => left,
@@ -373,6 +386,7 @@ impl<L, R> Either<L, R> {
     /// value.expect_right("should be right");
     /// ```
     #[track_caller]
+    #[inline]
     pub fn expect_right(self, msg: &str) -> R {
         match self {
             Self::Left(_) => unwrap_failed(msg),
@@ -402,6 +416,7 @@ impl<L, R> Either<L, R> {
     /// value.unwrap_left(); // panics
     /// ```
     #[track_caller]
+    #[inline]
     pub fn unwrap_left(self) -> L {
         self.expect_left("Called `Either::unwrap_left` on a `Right` value")
     }
@@ -433,6 +448,7 @@ impl<L, R> Either<L, R> {
     ///
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
     #[track_caller]
+    #[inline]
     pub unsafe fn unwrap_left_unchecked(self) -> L {
         match self {
             Self::Left(left) => left,
@@ -463,6 +479,7 @@ impl<L, R> Either<L, R> {
     /// value.unwrap_right(); // panics
     /// ```
     #[track_caller]
+    #[inline]
     pub fn unwrap_right(self) -> R {
         self.expect_right("Called `Either::unwrap_right` on a `Left` value")
     }
@@ -494,6 +511,7 @@ impl<L, R> Either<L, R> {
     ///
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
     #[track_caller]
+    #[inline]
     pub unsafe fn unwrap_right_unchecked(self) -> R {
         match self {
             // SAFETY: the safety contract must be upheld by the caller.
@@ -520,6 +538,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.left(), None);
     /// ```
+    #[inline]
     pub fn left(self) -> Option<L> {
         match self {
             Self::Left(left) => Some(left),
@@ -548,6 +567,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [`left_and_then`]: Either::left_and_then
+    #[inline]
     pub fn left_and<T>(self, other: Either<T, R>) -> Either<T, R> {
         match self {
             Self::Left(_) => other,
@@ -572,6 +592,7 @@ impl<L, R> Either<L, R> {
     /// let x: Either<u8, char> = Either::Right('c');
     /// assert_eq!(x.left_and_then(left_to_string), Either::Right('c'));
     /// ```
+    #[inline]
     pub fn left_and_then<F, T>(self, f: F) -> Either<T, R>
     where
         F: FnOnce(L) -> Either<T, R>,
@@ -596,6 +617,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Left(1);
     /// assert_eq!(value.right(), None);
     /// ```
+    #[inline]
     pub fn right(self) -> Option<R> {
         match self {
             Self::Left(_) => None,
@@ -624,6 +646,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [`right_and_then`]: Either::right_and_then
+    #[inline]
     pub fn right_and<T>(self, other: Either<L, T>) -> Either<L, T> {
         match self {
             Self::Left(left) => Left(left),
@@ -651,6 +674,7 @@ impl<L, R> Either<L, R> {
     /// let x: Either<u8, char> = Either::Left(1);
     /// assert_eq!(x.right_and_then(right_to_string), Either::Left(1));
     /// ```
+    #[inline]
     pub fn right_and_then<F, T>(self, f: F) -> Either<L, T>
     where
         F: FnOnce(R) -> Either<L, T>,
@@ -775,6 +799,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(value.flip(), Either::Left('c'));
     /// ```
     #[must_use]
+    #[inline]
     pub fn flip(self) -> Either<R, L> {
         match self {
             Self::Left(left) => Right(left),
@@ -802,6 +827,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.bimap(map_left, map_right), Either::Right(99));
     /// ```
+    #[inline]
     pub fn bimap<F, G, T, U>(self, f: F, g: G) -> Either<T, U>
     where
         F: FnOnce(L) -> T,
@@ -828,6 +854,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.map_left(map_left), Either::Right('c'));
     /// ```
+    #[inline]
     pub fn map_left<F, T>(self, f: F) -> Either<T, R>
     where
         F: FnOnce(L) -> T,
@@ -860,6 +887,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [`map_left_or_else`]: Either::map_left_or_else
+    #[inline]
     pub fn map_left_or<F, T>(self, default: T, f: F) -> T
     where
         F: FnOnce(L) -> T,
@@ -885,6 +913,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [default value]: Default::default
+    #[inline]
     pub fn map_left_or_default<F, T>(self, f: F) -> T
     where
         F: FnOnce(L) -> T,
@@ -915,6 +944,7 @@ impl<L, R> Either<L, R> {
     ///     1.to_string()
     /// );
     /// ```
+    #[inline]
     pub fn map_left_or_else<D, F, T>(self, default: D, f: F) -> T
     where
         F: FnOnce(L) -> T,
@@ -941,6 +971,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Left(1);
     /// assert_eq!(value.map_right(map_right), Either::Left(1));
     /// ```
+    #[inline]
     pub fn map_right<F, T>(self, f: F) -> Either<L, T>
     where
         F: FnOnce(R) -> T,
@@ -973,6 +1004,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [`map_right_or_else`]: Either::map_right_or_else
+    #[inline]
     pub fn map_right_or<F, T>(self, default: T, f: F) -> T
     where
         F: FnOnce(R) -> T,
@@ -998,6 +1030,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [default value]: Default::default
+    #[inline]
     pub fn map_right_or_default<F, T>(self, f: F) -> T
     where
         F: FnOnce(R) -> T,
@@ -1028,6 +1061,7 @@ impl<L, R> Either<L, R> {
     ///     String::from("right")
     /// );
     /// ```
+    #[inline]
     pub fn map_right_or_else<D, F, T>(self, default: D, f: F) -> T
     where
         F: FnOnce(R) -> T,
@@ -1061,6 +1095,7 @@ impl<L, R> Either<L, R> {
     ///     .expect_right("should be a right value");
     /// assert_eq!(right, 'c');
     /// ```
+    #[inline]
     pub fn biinspect<F, G>(self, f: F, g: G) -> Self
     where
         for<'a> F: Fn(&'a L),
@@ -1095,6 +1130,7 @@ impl<L, R> Either<L, R> {
     ///     .expect_right("should be a right value");
     /// assert_eq!(right, 'c');
     /// ```
+    #[inline]
     pub fn inspect_left<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a L),
@@ -1128,6 +1164,7 @@ impl<L, R> Either<L, R> {
     ///     .expect_left("should be a left value");
     /// assert_eq!(left, 1);
     /// ```
+    #[inline]
     pub fn inspect_right<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a R),
@@ -1172,6 +1209,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [`biapply_with`]: Either::biapply_with
+    #[inline]
     pub fn biapply<F, G>(self, mut f: F, mut g: G)
     where
         F: FnMut(L),
@@ -1203,6 +1241,7 @@ impl<L, R> Either<L, R> {
     /// ```
     ///
     /// [`flip`]: Either::flip
+    #[inline]
     pub fn biapply_with<F, G, Acc>(self, acc: Acc, mut f: F, mut g: G)
     where
         F: FnMut(Acc, L),
@@ -1231,6 +1270,7 @@ impl<L, R> Either<L, R> {
     /// value.apply_left(|l| left.push(l));
     /// assert_eq!(left.is_empty(), true);
     /// ```
+    #[inline]
     pub fn apply_left<F>(self, mut f: F)
     where
         F: FnMut(L),
@@ -1258,6 +1298,7 @@ impl<L, R> Either<L, R> {
     /// value.apply_right(|r| right.push(r));
     /// assert_eq!(right.is_empty(), true);
     /// ```
+    #[inline]
     pub fn apply_right<F>(self, mut f: F)
     where
         F: FnMut(R),
@@ -1288,6 +1329,7 @@ impl<L, R> Either<L, R> {
     ///     "c".to_owned()
     /// );
     /// ```
+    #[inline]
     pub fn bireduce<F, G, T>(self, f: F, g: G) -> T
     where
         F: FnOnce(L) -> T,
@@ -1313,6 +1355,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Left(1);
     /// assert_eq!(value.reduce_left(|r| r as u8), 1);
     /// ```
+    #[inline]
     pub fn reduce_left<F>(self, f: F) -> L
     where
         F: FnOnce(R) -> L,
@@ -1337,6 +1380,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Left(0);
     /// assert_eq!(value.reduce_right(|l| l as char), '\0');
     /// ```
+    #[inline]
     pub fn reduce_right<F>(self, f: F) -> R
     where
         F: FnOnce(L) -> R,
@@ -1366,6 +1410,7 @@ impl<L, R> Either<L, R> {
     ///
     /// [convention]: ./index.html#conventions-and-edge-cases
     #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn ok(self) -> Result<R, L> {
         match self {
             Self::Left(left) => Err(left),
@@ -1398,6 +1443,7 @@ impl<L, R> Either<L, R> {
     /// [`ok_or_else`]: Either::ok_or_else
     /// [convention]: ./index.html#conventions-and-edge-cases
     #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn ok_or<E>(self, error: E) -> Result<R, E> {
         self.ok_or_else(|| error)
     }
@@ -1430,6 +1476,7 @@ impl<L, R> Either<L, R> {
     /// [`ok_or_else`]: Either::ok_or_else
     /// [convention]: ./index.html#conventions-and-edge-cases
     #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn ok_or_else<F, E>(self, error: F) -> Result<R, E>
     where
         F: FnOnce() -> E,
@@ -1454,6 +1501,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.or(2, 'm'), (2, 'c'));
     /// ```
+    #[inline]
     pub fn or(self, left: L, right: R) -> (L, R) {
         match self {
             Self::Left(left) => (left, right),
@@ -1475,6 +1523,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.or_default(), (0, 'c'));
     /// ```
+    #[inline]
     pub fn or_default(self) -> (L, R)
     where
         L: Default,
@@ -1500,6 +1549,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.or_else(|| 1 + 1, || char::from(100)), (2, 'c'));
     /// ```
+    #[inline]
     pub fn or_else<F, G>(self, f: F, g: G) -> (L, R)
     where
         F: FnOnce() -> L,
@@ -1524,6 +1574,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.inject_left(1), EitherOrBoth::Both(1, 'c'));
     /// ```
+    #[inline]
     pub fn inject_left(self, left: L) -> EitherOrBoth<L, R> {
         match self {
             Self::Left(_) => EitherOrBoth::Left(left),
@@ -1544,6 +1595,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Left(1);
     /// assert_eq!(value.inject_right('m'), EitherOrBoth::Both(1, 'm'));
     /// ```
+    #[inline]
     pub fn inject_right(self, right: R) -> EitherOrBoth<L, R> {
         match self {
             Self::Left(left) => EitherOrBoth::Both(left, right),
@@ -1565,6 +1617,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.into_left(|r| r as u8), Either::Left(99));
     /// ```
+    #[inline]
     pub fn into_left<F>(self, f: F) -> Self
     where
         F: FnOnce(R) -> L,
@@ -1589,6 +1642,7 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Left(0);
     /// assert_eq!(value.into_right(|l| l as char), Either::Right('\0'));
     /// ```
+    #[inline]
     pub fn into_right<F>(self, f: F) -> Self
     where
         F: FnOnce(L) -> R,
@@ -1620,6 +1674,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(old, None);
     /// assert_eq!(value, Either::Right('c'));
     /// ```
+    #[inline]
     pub fn replace_left(&mut self, value: L) -> Option<L> {
         match self {
             Self::Left(left) => Some(mem::replace(left, value)),
@@ -1644,6 +1699,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(old, None);
     /// assert_eq!(value, Either::Left(1));
     /// ```
+    #[inline]
     pub fn replace_right(&mut self, value: R) -> Option<R> {
         match self {
             Self::Right(right) => Some(mem::replace(right, value)),
@@ -1671,6 +1727,7 @@ impl<T> Either<T, T> {
     ///
     /// assert_eq!(both, vec!['c', 'a']);
     /// ```
+    #[inline]
     pub fn apply<F>(self, mut f: F)
     where
         F: FnMut(T),
@@ -1704,6 +1761,7 @@ impl<T> Either<T, T> {
     ///
     /// assert_eq!(right, 'a');
     /// ```
+    #[inline]
     pub fn inspect<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a T),
@@ -1733,6 +1791,7 @@ impl<T> Either<T, T> {
     /// assert_eq!(iter.next(), Some(&'c'));
     /// assert_eq!(iter.next(), None);
     /// ```
+    #[inline]
     pub fn iter(&self) -> IterEither<'_, T> {
         IterEither::new(self)
     }
@@ -1754,6 +1813,7 @@ impl<T> Either<T, T> {
     /// assert_eq!(iter.next(), Some(&mut 'c'));
     /// assert_eq!(iter.next(), None);
     /// ```
+    #[inline]
     pub fn iter_mut(&mut self) -> IterMutEither<'_, T> {
         IterMutEither::new(self)
     }
@@ -1843,6 +1903,7 @@ impl<T> Either<T, T> {
     /// let value: Either<char> = Either::Right('a');
     /// assert_eq!(value.map(|c| c.to_string()), Either::Right("a".to_owned()));
     /// ```
+    #[inline]
     pub fn map<F, U>(self, f: F) -> Either<U, U>
     where
         F: FnOnce(T) -> U,
@@ -1866,6 +1927,7 @@ impl<T> Either<T, T> {
     /// let value: Either<u8> = Either::Right(2);
     /// assert_eq!(value.reduce(), 2);
     /// ```
+    #[inline]
     pub fn reduce(self) -> T {
         match self {
             Self::Left(left) => left,
@@ -1887,6 +1949,7 @@ impl<T> Either<T, T> {
     /// let value: Either<u8> = Either::Right(2);
     /// assert_eq!(value.reduce_map(|v| v + 1), 3);
     /// ```
+    #[inline]
     pub fn reduce_map<F, U>(self, f: F) -> U
     where
         F: FnOnce(T) -> U,
@@ -2083,6 +2146,7 @@ impl<L, R> Either<Option<L>, Option<R>> {
     /// ```
     ///
     /// [`Options`]: Option
+    #[inline]
     pub fn transpose(self) -> Option<Either<L, R>> {
         match self {
             Self::Left(left) => left.map(Left),
@@ -2111,6 +2175,7 @@ impl<L, R, E1, E2> Either<Result<L, E1>, Result<R, E2>> {
     ///
     /// [`Results`]: Result
     #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn transpose(self) -> Result<Either<L, R>, Either<E1, E2>> {
         match self {
             Self::Left(left) => match left {
@@ -2145,6 +2210,7 @@ impl<L, R, E> Either<Result<L, E>, Result<R, E>> {
     ///
     /// [`Results`]: Result
     #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn transpose_err(self) -> Result<Either<L, R>, E> {
         match self {
             Self::Left(left) => left.map(Left),
@@ -2173,6 +2239,7 @@ impl<T, E1, E2> Either<Result<T, E1>, Result<T, E2>> {
     ///
     /// [`Results`]: Result
     #[allow(clippy::missing_errors_doc)]
+    #[inline]
     pub fn transpose_ok(self) -> Result<T, Either<E1, E2>> {
         match self {
             Self::Left(left) => left.map_err(Left),
