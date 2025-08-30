@@ -6,7 +6,7 @@ rust-version = "1.89.0"
 publish = false
 
 [dev-dependencies]
-either-or-both = { version = "0.2.0", path = ".." }
+either-or-both = { version = "0.3.0", path = ".." }
 iai-callgrind = "0.16.1"
 
 [[bench]]
