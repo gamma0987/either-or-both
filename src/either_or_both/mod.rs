@@ -1831,7 +1831,10 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(value.map_right(map_right), EitherOrBoth::Left(1));
     /// ```
     #[inline]
-    pub fn map_right<T>(self, f: fn(R) -> T) -> EitherOrBoth<L, T> {
+    pub fn map_right<F, T>(self, f: F) -> EitherOrBoth<L, T>
+    where
+        F: FnOnce(R) -> T,
+    {
         map_each!(self; l, r => l, f(r))
     }
 

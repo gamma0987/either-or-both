@@ -17,6 +17,10 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+* ([#19](https://github.com/gamma0987/either-or-both/pull/19)): Make
+  `EitherOrBoth::map_right` signature consistent with
+  `EitherOrBoth::map_left` and general enough.
+
 ## [0.3.0] - 2025-08-30
 
 ### Added
