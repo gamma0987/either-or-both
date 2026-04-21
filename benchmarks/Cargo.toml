@@ -7,12 +7,12 @@ publish = false
 
 [dev-dependencies]
 either-or-both = { version = "0.3.0", path = ".." }
-iai-callgrind = "0.16.1"
+gungraun = { version = "0.18" }
 
 [[bench]]
 harness = false
-name = "iai_callgrind"
-path = "benches/iai_callgrind.rs"
+name = "gungraun"
+path = "benches/gungraun.rs"
 
 [[bench]]
 harness = false

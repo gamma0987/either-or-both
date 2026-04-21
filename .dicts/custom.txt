@@ -1,6 +1,3 @@
-EitherOrBoths
-Eithers
-Justfile
 biapply
 bicollect
 biconsume
@@ -19,10 +16,14 @@ coreutils
 docsrs
 dotgraph
 dotgraphs
+EitherOrBoths
+Eithers
 grcov
+gungraun
 hashset
 indexmap
 indexset
+Justfile
 msrv
 pathbuf
 peekable
