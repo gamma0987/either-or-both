@@ -3,7 +3,7 @@
 use core::hint::black_box;
 
 use either_or_both::EitherOrBoth;
-use iai_callgrind::{library_benchmark, library_benchmark_group, main};
+use gungraun::prelude::*;
 
 fn setup_iter(either_or_both: &EitherOrBoth<i32>) -> impl Iterator<Item = &i32> {
     either_or_both.iter()

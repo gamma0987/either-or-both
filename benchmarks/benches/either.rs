@@ -3,7 +3,7 @@
 use std::fmt::Write;
 
 use either_or_both::Either;
-use iai_callgrind::{library_benchmark, library_benchmark_group, main};
+use gungraun::prelude::*;
 
 #[library_benchmark]
 #[bench::left(args = [Either::Left(String::new()), "some"])]
