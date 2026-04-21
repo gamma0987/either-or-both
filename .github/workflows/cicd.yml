@@ -70,13 +70,8 @@ jobs:
       - uses: dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt
-      - uses: taiki-e/install-action@cargo-binstall
       - uses: taiki-e/install-action@just
-      - run: cargo binstall --no-confirm --no-symlinks taplo-cli
-      # Using the rust-cache action here to also cache the binaries. Especially
-      # taplo-cli is slow to build
-      - name: Cache/Restore rust cache
-        uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@taplo
       - run: just check-fmt-all
 
   base:
