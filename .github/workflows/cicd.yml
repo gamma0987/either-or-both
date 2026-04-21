@@ -19,22 +19,16 @@ jobs:
   deny:
     name: Check dependencies
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        checks:
+          - "--deny warnings advisories"
+          - bans licenses sources
     steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@1.63.0
-      - name: Cache/Restore cargo registry
-        uses: actions/cache@v4
+      - uses: actions/checkout@v6
+      - uses: EmbarkStudios/cargo-deny-action@v2
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: deny-cargo-registry
-      - uses: taiki-e/install-action@cargo-deny
-      - uses: taiki-e/install-action@just
-      - name: Check advisories
-        run: just args='--deny warnings' deny advisories
-      - name: Check bans licenses sources
-        run: just deny bans licenses sources
+          command: check ${{ matrix.checks }}
 
   minimal_versions:
     name: Check minimal version requirements of dependencies
