@@ -729,7 +729,7 @@ fn biapply(
 #[case::right(right_variant(), vec![RIGHT_VALUE as u8])]
 fn biapply_with(#[case] either_or_both: EitherOrBoth<u8, char>, #[case] expected: Vec<u8>) {
     let mut both = vec![];
-    either_or_both.biapply_with(&mut both, |acc, l| acc.push(l), |acc, r| acc.push(r as u8));
+    either_or_both.biapply_with(&mut both, Vec::push, |acc, r| acc.push(r as u8));
 
     assert_eq!(both, expected);
 }
