@@ -11,7 +11,7 @@ jobs:
     name: Publish to crates.io
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - name: Publish either-or-both
         run: cargo publish -p either-or-both --token ${{ secrets.CRATES_GITHUB_TOKEN }}
