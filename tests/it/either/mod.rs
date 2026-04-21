@@ -467,11 +467,7 @@ fn biapply(
 #[case::right(Right('c'), vec![99])]
 fn biapply_with(#[case] either: Either<i32, char>, #[case] expected: Vec<i32>) {
     let mut items = vec![];
-    either.biapply_with(
-        &mut items,
-        |acc, l| acc.push(l),
-        |acc, r| acc.push(r as i32),
-    );
+    either.biapply_with(&mut items, Vec::push, |acc, r| acc.push(r as i32));
 
     assert_eq!(items, expected);
 }
