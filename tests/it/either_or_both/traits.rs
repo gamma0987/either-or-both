@@ -2,6 +2,7 @@
 
 #![allow(clippy::type_complexity)]
 
+use core::cmp::Ordering;
 #[cfg(feature = "std")]
 use std::collections::{HashMap, HashSet};
 
@@ -331,5 +332,33 @@ fn try_from_tuple_when_error() {
     assert_eq!(
         EitherOrBoth::<u8, char>::try_from((None, None)).unwrap_err(),
         TryFromOptionsError
+    );
+}
+
+#[rstest]
+#[case::left_when_equal(Left(1), Left(1), Ordering::Equal)]
+#[case::left_when_less(Left(1), Left(2), Ordering::Less)]
+#[case::left_when_greater(Left(2), Left(1), Ordering::Greater)]
+#[case::left_and_both(Left(1), Both(1, 2), Ordering::Less)]
+#[case::left_and_right(Left(1), Right(1), Ordering::Less)]
+#[case::right_when_equal(Right(1), Right(1), Ordering::Equal)]
+#[case::right_when_less(Right(1), Right(2), Ordering::Less)]
+#[case::right_when_greater(Right(2), Right(1), Ordering::Greater)]
+#[case::right_and_both(Right(1), Both(1, 2), Ordering::Greater)]
+#[case::right_and_left(Right(1), Left(1), Ordering::Greater)]
+#[case::both_when_equal(Both(1, 2), Both(1, 2), Ordering::Equal)]
+#[case::both_when_left_is_less(Both(1, 2), Both(2, 2), Ordering::Less)]
+#[case::both_when_right_is_less(Both(1, 1), Both(1, 2), Ordering::Less)]
+#[case::both_and_left(Both(1, 2), Left(1), Ordering::Greater)]
+#[case::both_and_right(Both(1, 2), Right(1), Ordering::Less)]
+fn impl_ord(#[case] a: EitherOrBoth<u8>, #[case] b: EitherOrBoth<u8>, #[case] expected: Ordering) {
+    assert_eq!(a.cmp(&b), expected);
+}
+
+#[test]
+fn impl_partial_ord() {
+    assert_eq!(
+        EitherOrBoth::<u8>::Left(1u8).partial_cmp(&EitherOrBoth::Left(2)),
+        Some(Ordering::Less)
     );
 }
