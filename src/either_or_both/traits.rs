@@ -36,9 +36,11 @@ macro_rules! collect {
 }
 
 use core::cmp::Ordering;
+use core::fmt::Display;
 #[cfg(feature = "std")]
 use std::{
     collections::{HashMap, HashSet},
+    error::Error,
     vec::Vec,
 };
 
@@ -856,11 +858,186 @@ where
 // From/TryFrom/... implementations
 ////////////////////////////////////////////////////////////////////////////////
 
+#[cfg(feature = "std")]
+impl<L, R> EitherOrBoth<L, R>
+where
+    L: Error,
+    R: Error,
+{
+    /// Returns both error sources as a pair, complementing [`Error::source`]
+    ///
+    /// Since [`Error::source`] returns only the left source from the `Both` variant this
+    /// method can be used to retrieve both sources, if any.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use core::fmt::{Display, Formatter, Result};
+    /// use std::error::Error;
+    ///
+    /// use either_or_both::EitherOrBoth;
+    ///
+    /// #[derive(Debug)]
+    /// struct SuperError {};
+    /// impl Error for SuperError {};
+    /// impl Display for SuperError {
+    ///     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+    ///         f.write_str("super error")
+    ///     }
+    /// }
+    ///
+    /// #[derive(Debug)]
+    /// struct ErrLeft {
+    ///     source: Option<SuperError>,
+    /// };
+    /// impl Display for ErrLeft {
+    ///     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+    ///         f.write_str("left")
+    ///     }
+    /// }
+    /// impl Error for ErrLeft {
+    ///     fn source(&self) -> Option<&(dyn Error + 'static)> {
+    ///         self.source.as_ref().map(|e| e as &dyn Error)
+    ///     }
+    /// }
+    ///
+    /// #[derive(Debug)]
+    /// struct ErrRight {
+    ///     source: Option<SuperError>,
+    /// };
+    /// impl Display for ErrRight {
+    ///     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+    ///         f.write_str("right")
+    ///     }
+    /// }
+    /// impl Error for ErrRight {
+    ///     fn source(&self) -> Option<&(dyn Error + 'static)> {
+    ///         self.source.as_ref().map(|e| e as &dyn Error)
+    ///     }
+    /// }
+    ///
+    /// let left: EitherOrBoth<ErrLeft, ErrRight> = EitherOrBoth::Left(ErrLeft { source: None });
+    /// assert!(matches!(left.error_sources(), (None, None)));
+    ///
+    /// let right: EitherOrBoth<ErrLeft, ErrRight> = EitherOrBoth::Right(ErrRight {
+    ///     source: Some(SuperError {}),
+    /// });
+    /// assert!(matches!(right.error_sources(), (None, Some(_))));
+    ///
+    /// let both: EitherOrBoth<ErrLeft, ErrRight> = EitherOrBoth::Both(
+    ///     ErrLeft { source: None },
+    ///     ErrRight {
+    ///         source: Some(SuperError {}),
+    ///     },
+    /// );
+    /// assert!(matches!(both.error_sources(), (None, Some(_))));
+    /// ```
+    ///
+    /// [`Error::source`]: std::error::Error::source
+    pub fn error_sources(
+        &self,
+    ) -> (
+        Option<&(dyn Error + 'static)>,
+        Option<&(dyn Error + 'static)>,
+    ) {
+        match self {
+            Self::Left(l) => (l.source(), None),
+            Self::Right(r) => (None, r.source()),
+            Self::Both(l, r) => (l.source(), r.source()),
+        }
+    }
+}
+
+impl<L, R> Display for EitherOrBoth<L, R>
+where
+    L: Display,
+    R: Display,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Both(l, r) => write!(f, "{l}\n{r}"),
+            Self::Left(l) => l.fmt(f),
+            Self::Right(r) => r.fmt(f),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+impl<L, R> Error for EitherOrBoth<L, R>
+where
+    L: Error,
+    R: Error,
+{
+    /// Returns the lower-level source of this `EitherOrBoth` error, if any
+    ///
+    /// In case there are two error sources from the `Both` variant, the left source takes
+    /// precedence. If you need both error sources use [`EitherOrBoth::error_sources`] instead.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use core::fmt::{Display, Formatter, Result};
+    /// use std::error::Error;
+    ///
+    /// use either_or_both::EitherOrBoth;
+    ///
+    /// #[derive(Debug)]
+    /// struct SuperError {}
+    /// impl Error for SuperError {}
+    /// impl Display for SuperError {
+    ///     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+    ///         f.write_str("super error")
+    ///     }
+    /// }
+    ///
+    /// #[derive(Debug)]
+    /// struct SomeError {
+    ///     source: Option<SuperError>,
+    /// };
+    /// impl Display for SomeError {
+    ///     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+    ///         f.write_str("some error")
+    ///     }
+    /// }
+    /// impl Error for SomeError {
+    ///     fn source(&self) -> Option<&(dyn Error + 'static)> {
+    ///         self.source.as_ref().map(|e| e as &dyn Error)
+    ///     }
+    /// }
+    ///
+    /// let left: EitherOrBoth<SomeError> = EitherOrBoth::Left(SomeError { source: None });
+    /// assert!(matches!(left.source(), None));
+    ///
+    /// let right: EitherOrBoth<SomeError> = EitherOrBoth::Right(SomeError {
+    ///     source: Some(SuperError {}),
+    /// });
+    /// assert!(matches!(right.source(), Some(_)));
+    ///
+    /// // Since left has no source, this method returns None even if the right error has a source
+    /// let both: EitherOrBoth<SomeError> = EitherOrBoth::Both(
+    ///     SomeError { source: None },
+    ///     SomeError {
+    ///         source: Some(SuperError {}),
+    ///     },
+    /// );
+    /// assert!(matches!(both.source(), None));
+    /// ```
+    ///
+    /// [`Error::source`]: std::error::Error::source
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Right(r) => r.source(),
+            Self::Left(l) | Self::Both(l, _) => l.source(),
+        }
+    }
+}
+
 impl<L, R> Ord for EitherOrBoth<L, R>
 where
     L: Ord,
     R: Ord,
 {
+    // TODO: DOCS
     fn cmp(&self, other: &Self) -> Ordering {
         // The implementation of Left < Both < Right
         match (self, other) {
@@ -878,6 +1055,7 @@ where
     L: Ord,
     R: Ord,
 {
+    // TODO: DOCS
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }

@@ -183,6 +183,7 @@ where
     L: Ord,
     R: Ord,
 {
+    // TODO: DOCS
     fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
             (Self::Left(a), Self::Left(b)) => a.cmp(b),
@@ -198,6 +199,7 @@ where
     L: Ord,
     R: Ord,
 {
+    // TODO: DOCS
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }

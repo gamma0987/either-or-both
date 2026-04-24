@@ -15,6 +15,34 @@ use indexmap::{IndexMap, IndexSet};
 use rstest::rstest;
 
 #[cfg(feature = "std")]
+#[derive(Debug)]
+struct SuperError;
+#[cfg(feature = "std")]
+impl std::error::Error for SuperError {}
+#[cfg(feature = "std")]
+impl core::fmt::Display for SuperError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_str("super error")
+    }
+}
+
+#[cfg(feature = "std")]
+#[derive(Debug)]
+struct SomeError(Option<SuperError>);
+#[cfg(feature = "std")]
+impl core::fmt::Display for SomeError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_str("some error")
+    }
+}
+#[cfg(feature = "std")]
+impl std::error::Error for SomeError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        self.0.as_ref().map(|e| e as &dyn std::error::Error)
+    }
+}
+
+#[cfg(feature = "std")]
 #[rstest]
 #[case::both_empty(vec![], Both(vec![], vec![]))]
 #[case::both_and_both(vec![Both(1, 'c'), Both(2, 'm')], Both(vec![1, 2], vec!['c', 'm']))]
@@ -361,4 +389,73 @@ fn impl_partial_ord() {
         EitherOrBoth::<u8>::Left(1u8).partial_cmp(&EitherOrBoth::Left(2)),
         Some(Ordering::Less)
     );
+}
+
+#[rstest]
+#[case::left(Left(1), "1")]
+#[case::right(Right(1), "1")]
+#[case::both(Both(1, 2), "1\n2")]
+fn impl_display(#[case] either_or_both: EitherOrBoth<u8>, #[case] expected: &str) {
+    assert_eq!(either_or_both.to_string(), expected);
+}
+
+#[cfg(feature = "std")]
+#[rstest]
+#[case::left(Left(SomeError(Some(SuperError {  }))), Some(SuperError {}))]
+#[case::right(Right(SomeError(Some(SuperError {  }))), Some(SuperError {}))]
+#[case::both_when_left_is_some_right_is_none(
+    Both(SomeError(Some(SuperError {  })), SomeError(None)),
+    Some(SuperError {})
+)]
+#[case::both_when_left_is_none_right_is_some(
+    Both(SomeError(None), SomeError(Some(SuperError {}))),
+    None
+)]
+fn impl_error(
+    #[case] either_or_both: EitherOrBoth<SomeError>,
+    #[case] expected: Option<SuperError>,
+) {
+    use std::error::Error;
+
+    match (either_or_both.source(), expected) {
+        (Some(_), None) => panic!("Expected no source but found one"),
+        (None, Some(_)) => panic!("Expected a source but found none"),
+        (None, None) | (Some(_), Some(_)) => {}
+    }
+}
+
+#[cfg(feature = "std")]
+#[rstest]
+#[case::left_no_source(Left(SomeError(None)), (None, None))]
+#[case::left_with_source(Left(SomeError(Some(SuperError {}))), (Some(SuperError {}), None))]
+#[case::right_no_source(Right(SomeError(None)), (None, None))]
+#[case::right_with_source(Right(SomeError(Some(SuperError {}))), (None, Some(SuperError {})))]
+#[case::both_no_sources(Both(SomeError(None), SomeError(None)), (None, None))]
+#[case::both_left_source_only(
+    Both(SomeError(Some(SuperError {})), SomeError(None)),
+    (Some(SuperError {}), None)
+)]
+#[case::both_right_source_only(
+    Both(SomeError(None), SomeError(Some(SuperError {}))),
+    (None, Some(SuperError {}))
+)]
+#[case::both_both_sources(
+    Both(SomeError(Some(SuperError {})), SomeError(Some(SuperError {}))),
+    (Some(SuperError {}), Some(SuperError {}))
+)]
+fn error_sources(
+    #[case] either_or_both: EitherOrBoth<SomeError>,
+    #[case] expected: (Option<SuperError>, Option<SuperError>),
+) {
+    let (left, right) = either_or_both.error_sources();
+    match (left, expected.0) {
+        (Some(_), None) => panic!("expected no left source but found one"),
+        (None, Some(_)) => panic!("expected a left source but found none"),
+        (None, None) | (Some(_), Some(_)) => {}
+    }
+    match (right, expected.1) {
+        (Some(_), None) => panic!("expected no right source but found one"),
+        (None, Some(_)) => panic!("expected a right source but found none"),
+        (None, None) | (Some(_), Some(_)) => {}
+    }
 }
