@@ -419,7 +419,7 @@ fn unwrap_only_left_unchecked() {
 
 #[rstest]
 #[case::both(both_variant())]
-#[should_panic = "Called EitherOrBoth::unwrap_right` on a `Left` value"]
+#[should_panic = "Called `EitherOrBoth::unwrap_right` on a `Left` value"]
 #[case::left(left_variant())]
 #[case::right(right_variant())]
 fn unwrap_right(#[case] either_or_both: EitherOrBoth<u8, char>) {
@@ -435,9 +435,9 @@ fn unwrap_right_unchecked() {
 }
 
 #[rstest]
-#[should_panic = "Called EitherOrBoth::unwrap_only_right` on a `Both` or `Left` value"]
+#[should_panic = "Called `EitherOrBoth::unwrap_only_right` on a `Both` or `Left` value"]
 #[case::both(both_variant())]
-#[should_panic = "Called EitherOrBoth::unwrap_only_right` on a `Both` or `Left` value"]
+#[should_panic = "Called `EitherOrBoth::unwrap_only_right` on a `Both` or `Left` value"]
 #[case::left(left_variant())]
 #[case::right(right_variant())]
 fn unwrap_only_right(#[case] either_or_both: EitherOrBoth<u8, char>) {
