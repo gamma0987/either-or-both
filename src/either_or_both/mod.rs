@@ -1218,6 +1218,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(x.both_and(y), EitherOrBoth::Right('c'));
     /// ```
     #[inline]
+    #[must_use]
     pub fn both_and(self, other: Self) -> Self {
         match self {
             Self::Both(_, _) => other,
@@ -1247,6 +1248,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(x.both_and_then(apply_to_both), EitherOrBoth::Right('c'));
     /// ```
     #[inline]
+    #[must_use]
     pub fn both_and_then<F>(self, f: F) -> Self
     where
         F: FnOnce(L, R) -> Self,
@@ -1308,6 +1310,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(x.left_and(y), EitherOrBoth::Right('c'));
     /// ```
     #[inline]
+    #[must_use]
     pub fn left_and<T>(self, other: EitherOrBoth<T, R>) -> EitherOrBoth<T, R> {
         match self {
             Self::Left(_) | Self::Both(_, _) => other,
@@ -1342,6 +1345,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(x.left_and_then(left_to_string), EitherOrBoth::Right('c'));
     /// ```
     #[inline]
+    #[must_use]
     pub fn left_and_then<F, T>(self, f: F) -> EitherOrBoth<T, R>
     where
         F: FnOnce(L) -> EitherOrBoth<T, R>,
@@ -1427,6 +1431,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(x.right_and(y), EitherOrBoth::Left(1));
     /// ```
     #[inline]
+    #[must_use]
     pub fn right_and<T>(self, other: EitherOrBoth<L, T>) -> EitherOrBoth<L, T> {
         match self {
             Self::Right(_) | Self::Both(_, _) => other,
@@ -1461,6 +1466,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(x.right_and_then(right_to_string), EitherOrBoth::Left(1));
     /// ```
     #[inline]
+    #[must_use]
     pub fn right_and_then<F, T>(self, f: F) -> EitherOrBoth<L, T>
     where
         F: FnOnce(R) -> EitherOrBoth<L, T>,
@@ -1511,6 +1517,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Right('c');
     /// assert_eq!(value.unzip(), (None, Some('c')));
     /// ```
+    #[must_use]
     pub fn unzip(self) -> (Option<L>, Option<R>) {
         match self {
             Self::Both(left, right) => (Some(left), Some(right)),
@@ -1632,8 +1639,8 @@ impl<L, R> EitherOrBoth<L, R> {
     /// let value: EitherOrBoth<u8, char> = EitherOrBoth::Left(1);
     /// assert_eq!(value.flip(), EitherOrBoth::Right(1));
     /// ```
-    #[must_use]
     #[inline]
+    #[must_use]
     pub fn flip(self) -> EitherOrBoth<R, L> {
         match self {
             Self::Both(left, right) => Both(right, left),
@@ -1730,6 +1737,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// [`map_left_or_else`]: EitherOrBoth::map_left_or_else
     #[inline]
+    #[must_use]
     pub fn map_left_or<F, T>(self, default: T, f: F) -> T
     where
         F: FnOnce(L) -> T,
@@ -1863,6 +1871,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// [`map_right_or_else`]: EitherOrBoth::map_right_or_else
     #[inline]
+    #[must_use]
     pub fn map_right_or<U, F>(self, default: U, f: F) -> U
     where
         F: FnOnce(R) -> U,
@@ -1974,6 +1983,7 @@ impl<L, R> EitherOrBoth<L, R> {
     ///
     /// [`flip`]: EitherOrBoth::flip
     #[inline]
+    #[must_use]
     pub fn biinspect<F, G>(self, f: F, g: G) -> Self
     where
         for<'a> F: Fn(&'a L),
@@ -2015,6 +2025,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(right, 'c');
     /// ```
     #[inline]
+    #[must_use]
     pub fn inspect_left<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a L),
@@ -2051,6 +2062,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(left, 1);
     /// ```
     #[inline]
+    #[must_use]
     pub fn inspect_right<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a R),
@@ -2472,6 +2484,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(value.or(2, 'm'), (2, 'c'));
     /// ```
     #[inline]
+    #[must_use]
     pub fn or(self, left: L, right: R) -> (L, R) {
         match self {
             Self::Both(left, right) => (left, right),
@@ -2558,6 +2571,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(value.into_left(|r| r as u8), EitherOrBoth::Left(99));
     /// ```
     #[inline]
+    #[must_use]
     pub fn into_left<F>(self, f: F) -> Self
     where
         F: FnOnce(R) -> L,
@@ -2587,6 +2601,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(value.into_right(|l| l as char), EitherOrBoth::Right('\0'));
     /// ```
     #[inline]
+    #[must_use]
     pub fn into_right<F>(self, f: F) -> Self
     where
         F: FnOnce(L) -> R,
@@ -2930,6 +2945,7 @@ impl<L, R> EitherOrBoth<L, R> {
     /// assert_eq!(old, EitherOrBoth::Right('c'));
     /// assert_eq!(value, EitherOrBoth::Right('m'));
     /// ```
+    #[allow(clippy::return_self_not_must_use)]
     #[inline]
     pub fn replace_any(&mut self, left: L, right: R) -> Self {
         map_each!(self; l, r => mem::replace(l, left), mem::replace(r, right))
@@ -3063,6 +3079,7 @@ impl<T> EitherOrBoth<T, T> {
     ///
     /// [`flip`]: EitherOrBoth::flip
     #[inline]
+    #[must_use]
     pub fn inspect<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a T),
@@ -3421,6 +3438,7 @@ impl<L1, L2, R1, R2> EitherOrBoth<(L1, R1), (L2, R2)> {
     ///     (EitherOrBoth::Right(-2), EitherOrBoth::Right(10))
     /// );
     /// ```
+    #[must_use]
     pub fn transpose(self) -> (EitherOrBoth<L1, L2>, EitherOrBoth<R1, R2>) {
         match self {
             Self::Both((l1, r1), (l2, r2)) => (Both(l1, l2), Both(r1, r2)),
@@ -3457,6 +3475,7 @@ impl<L, R1, R2> EitherOrBoth<(L, R1), (L, R2)> {
     ///     (2, EitherOrBoth::Right(-10))
     /// );
     /// ```
+    #[must_use]
     pub fn transpose_left<F>(self, f: F) -> (L, EitherOrBoth<R1, R2>)
     where
         F: FnOnce(L, L) -> L,
@@ -3496,6 +3515,7 @@ impl<L1, L2, R> EitherOrBoth<(L1, R), (L2, R)> {
     ///     (EitherOrBoth::Right(-2), 'a')
     /// );
     /// ```
+    #[must_use]
     pub fn transpose_right<F>(self, f: F) -> (EitherOrBoth<L1, L2>, R)
     where
         F: FnOnce(R, R) -> R,
@@ -3535,6 +3555,7 @@ impl<L, R> EitherOrBoth<Option<L>, Option<R>> {
     ///
     /// [`Options`]: Option
     /// [convention]: ./index.html#conventions-and-edge-cases
+    #[must_use]
     pub fn transpose(self) -> Option<EitherOrBoth<L, R>> {
         match self {
             Self::Both(left, right) => match (left, right) {
