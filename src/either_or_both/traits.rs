@@ -35,6 +35,7 @@ macro_rules! collect {
     }};
 }
 
+use core::cmp::Ordering;
 #[cfg(feature = "std")]
 use std::{
     collections::{HashMap, HashSet},
@@ -852,8 +853,35 @@ where
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// From/TryFrom implementations
+// From/TryFrom/... implementations
 ////////////////////////////////////////////////////////////////////////////////
+
+impl<L, R> Ord for EitherOrBoth<L, R>
+where
+    L: Ord,
+    R: Ord,
+{
+    fn cmp(&self, other: &Self) -> Ordering {
+        // The implementation of Left < Both < Right
+        match (self, other) {
+            (Self::Left(a), Self::Left(b)) => a.cmp(b),
+            (Self::Left(_), _) | (Self::Both(_, _), Self::Right(_)) => Ordering::Less,
+            (Self::Both(l1, r1), Self::Both(l2, r2)) => l1.cmp(l2).then(r1.cmp(r2)),
+            (Self::Right(a), Self::Right(b)) => a.cmp(b),
+            (Self::Both(_, _), Self::Left(_)) | (Self::Right(_), _) => Ordering::Greater,
+        }
+    }
+}
+
+impl<L, R> PartialOrd for EitherOrBoth<L, R>
+where
+    L: Ord,
+    R: Ord,
+{
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
 
 #[cfg(feature = "either")]
 impl<L, R> From<Either<L, R>> for EitherOrBoth<L, R> {

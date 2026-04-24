@@ -4,6 +4,7 @@ mod iter;
 #[cfg(feature = "std")]
 mod std_tests;
 
+use core::cmp::Ordering;
 use core::fmt::Write;
 use core::future::Future;
 use core::pin::Pin;
@@ -793,4 +794,25 @@ impl Future for FutureTest {
 async fn impl_future(#[case] either: Either<FutureTest>) {
     let r = either.await;
     assert_eq!(r, 1);
+}
+
+#[rstest]
+#[case::left_when_equal(Left(1), Left(1), Ordering::Equal)]
+#[case::left_when_less(Left(1), Left(2), Ordering::Less)]
+#[case::left_when_greater(Left(2), Left(1), Ordering::Greater)]
+#[case::left_and_right(Left(1), Right(1), Ordering::Less)]
+#[case::right_and_left(Right(1), Left(1), Ordering::Greater)]
+#[case::right_when_equal(Right(1), Right(1), Ordering::Equal)]
+#[case::right_when_less(Right(1), Right(2), Ordering::Less)]
+#[case::right_when_greater(Right(2), Right(1), Ordering::Greater)]
+fn impl_ord(#[case] a: Either<u8>, #[case] b: Either<u8>, #[case] expected: Ordering) {
+    assert_eq!(a.cmp(&b), expected);
+}
+
+#[test]
+fn impl_partial_ord() {
+    assert_eq!(
+        Either::<u8>::Left(1u8).partial_cmp(&Either::Left(2)),
+        Some(Ordering::Less)
+    );
 }

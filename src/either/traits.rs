@@ -1,5 +1,6 @@
 //! The traits implemented for `Either`
 
+use core::cmp::Ordering;
 use core::fmt::{self, Display};
 use core::future::Future;
 use core::ops::{Deref, DerefMut};
@@ -174,6 +175,31 @@ impl<'a, T> IntoIterator for &'a mut Either<T> {
 
     fn into_iter(self) -> Self::IntoIter {
         IterMutEither::new(self)
+    }
+}
+
+impl<L, R> Ord for Either<L, R>
+where
+    L: Ord,
+    R: Ord,
+{
+    fn cmp(&self, other: &Self) -> Ordering {
+        match (self, other) {
+            (Self::Left(a), Self::Left(b)) => a.cmp(b),
+            (Self::Left(_), Self::Right(_)) => Ordering::Less,
+            (Self::Right(a), Self::Right(b)) => a.cmp(b),
+            (Self::Right(_), Self::Left(_)) => Ordering::Greater,
+        }
+    }
+}
+
+impl<L, R> PartialOrd for Either<L, R>
+where
+    L: Ord,
+    R: Ord,
+{
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
