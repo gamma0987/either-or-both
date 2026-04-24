@@ -1048,7 +1048,7 @@ impl<L, R> EitherOrBoth<L, R> {
     #[track_caller]
     #[inline]
     pub fn unwrap_right(self) -> R {
-        self.expect_right("Called EitherOrBoth::unwrap_right` on a `Left` value")
+        self.expect_right("Called `EitherOrBoth::unwrap_right` on a `Left` value")
     }
 
     /// Returns the contained right value of a [`Right`] or [`Both`] variant consuming
@@ -1122,7 +1122,9 @@ impl<L, R> EitherOrBoth<L, R> {
     #[track_caller]
     #[inline]
     pub fn unwrap_only_right(self) -> R {
-        self.expect_only_right("Called EitherOrBoth::unwrap_only_right` on a `Both` or `Left` value")
+        self.expect_only_right(
+            "Called `EitherOrBoth::unwrap_only_right` on a `Both` or `Left` value",
+        )
     }
 
     /// Returns the contained [`Right`] value consuming `self`, without checking that the
