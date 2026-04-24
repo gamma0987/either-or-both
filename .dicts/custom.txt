@@ -37,6 +37,7 @@ rfold
 rstest
 rustc
 rustdoc
+rustdocflags
 rustflags
 rustls
 rustsec

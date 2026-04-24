@@ -74,6 +74,23 @@ jobs:
       - uses: taiki-e/install-action@taplo
       - run: just check-fmt-all
 
+  docs:
+    needs: [deny, minimal_versions, format]
+    name: Docs/ubuntu-latest
+    runs-on: ubuntu-latest
+    env:
+      DOCS_RS: "1"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: Swatinem/rust-cache@v2
+      - name: Run doc tests
+        run: cargo test --all-features --doc
+      - name: Check docs.rs build
+        run: cargo rustdoc --all-features --config 'build.rustdocflags=["--cfg", "docsrs"]' -- --deny warnings
+      - name: Check Documentation
+        run: cargo doc --all-features --no-deps --document-private-items
+
   base:
     needs: [deny, minimal_versions, format]
     name: Build, check and test
