@@ -580,6 +580,7 @@ impl<L, R> Either<L, R> {
     ///
     /// [`left_and_then`]: Either::left_and_then
     #[inline]
+    #[must_use]
     pub fn left_and<T>(self, other: Either<T, R>) -> Either<T, R> {
         match self {
             Self::Left(_) => other,
@@ -605,6 +606,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(x.left_and_then(left_to_string), Either::Right('c'));
     /// ```
     #[inline]
+    #[must_use]
     pub fn left_and_then<F, T>(self, f: F) -> Either<T, R>
     where
         F: FnOnce(L) -> Either<T, R>,
@@ -659,6 +661,7 @@ impl<L, R> Either<L, R> {
     ///
     /// [`right_and_then`]: Either::right_and_then
     #[inline]
+    #[must_use]
     pub fn right_and<T>(self, other: Either<L, T>) -> Either<L, T> {
         match self {
             Self::Left(left) => Left(left),
@@ -687,6 +690,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(x.right_and_then(right_to_string), Either::Left(1));
     /// ```
     #[inline]
+    #[must_use]
     pub fn right_and_then<F, T>(self, f: F) -> Either<L, T>
     where
         F: FnOnce(R) -> Either<L, T>,
@@ -810,8 +814,8 @@ impl<L, R> Either<L, R> {
     /// let value: Either<u8, char> = Either::Right('c');
     /// assert_eq!(value.flip(), Either::Left('c'));
     /// ```
-    #[must_use]
     #[inline]
+    #[must_use]
     pub fn flip(self) -> Either<R, L> {
         match self {
             Self::Left(left) => Right(left),
@@ -1017,6 +1021,7 @@ impl<L, R> Either<L, R> {
     ///
     /// [`map_right_or_else`]: Either::map_right_or_else
     #[inline]
+    #[must_use]
     pub fn map_right_or<F, T>(self, default: T, f: F) -> T
     where
         F: FnOnce(R) -> T,
@@ -1108,6 +1113,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(right, 'c');
     /// ```
     #[inline]
+    #[must_use]
     pub fn biinspect<F, G>(self, f: F, g: G) -> Self
     where
         for<'a> F: Fn(&'a L),
@@ -1143,6 +1149,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(right, 'c');
     /// ```
     #[inline]
+    #[must_use]
     pub fn inspect_left<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a L),
@@ -1177,6 +1184,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(left, 1);
     /// ```
     #[inline]
+    #[must_use]
     pub fn inspect_right<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a R),
@@ -1342,6 +1350,7 @@ impl<L, R> Either<L, R> {
     /// );
     /// ```
     #[inline]
+    #[must_use]
     pub fn bireduce<F, G, T>(self, f: F, g: G) -> T
     where
         F: FnOnce(L) -> T,
@@ -1368,6 +1377,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(value.reduce_left(|r| r as u8), 1);
     /// ```
     #[inline]
+    #[must_use]
     pub fn reduce_left<F>(self, f: F) -> L
     where
         F: FnOnce(R) -> L,
@@ -1393,6 +1403,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(value.reduce_right(|l| l as char), '\0');
     /// ```
     #[inline]
+    #[must_use]
     pub fn reduce_right<F>(self, f: F) -> R
     where
         F: FnOnce(L) -> R,
@@ -1514,6 +1525,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(value.or(2, 'm'), (2, 'c'));
     /// ```
     #[inline]
+    #[must_use]
     pub fn or(self, left: L, right: R) -> (L, R) {
         match self {
             Self::Left(left) => (left, right),
@@ -1587,6 +1599,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(value.inject_left(1), EitherOrBoth::Both(1, 'c'));
     /// ```
     #[inline]
+    #[must_use]
     pub fn inject_left(self, left: L) -> EitherOrBoth<L, R> {
         match self {
             Self::Left(_) => EitherOrBoth::Left(left),
@@ -1608,6 +1621,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(value.inject_right('m'), EitherOrBoth::Both(1, 'm'));
     /// ```
     #[inline]
+    #[must_use]
     pub fn inject_right(self, right: R) -> EitherOrBoth<L, R> {
         match self {
             Self::Left(left) => EitherOrBoth::Both(left, right),
@@ -1630,6 +1644,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(value.into_left(|r| r as u8), Either::Left(99));
     /// ```
     #[inline]
+    #[must_use]
     pub fn into_left<F>(self, f: F) -> Self
     where
         F: FnOnce(R) -> L,
@@ -1655,6 +1670,7 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(value.into_right(|l| l as char), Either::Right('\0'));
     /// ```
     #[inline]
+    #[must_use]
     pub fn into_right<F>(self, f: F) -> Self
     where
         F: FnOnce(L) -> R,
@@ -1774,6 +1790,7 @@ impl<T> Either<T, T> {
     /// assert_eq!(right, 'a');
     /// ```
     #[inline]
+    #[must_use]
     pub fn inspect<F>(self, f: F) -> Self
     where
         for<'a> F: Fn(&'a T),
@@ -1940,6 +1957,7 @@ impl<T> Either<T, T> {
     /// assert_eq!(value.reduce(), 2);
     /// ```
     #[inline]
+    #[must_use]
     pub fn reduce(self) -> T {
         match self {
             Self::Left(left) => left,
@@ -2085,6 +2103,7 @@ impl<L1, L2, R1, R2> Either<(L1, R1), (L2, R2)> {
     /// let value: Either<(u8, char), (i32, u64)> = Either::Right((-2, 10));
     /// assert_eq!(value.transpose(), (Either::Right(-2), Either::Right(10)));
     /// ```
+    #[must_use]
     pub fn transpose(self) -> (Either<L1, L2>, Either<R1, R2>) {
         match self {
             Self::Left((l1, r1)) => (Left(l1), Left(r1)),
@@ -2108,6 +2127,7 @@ impl<L, R, T> Either<(T, L), (T, R)> {
     /// let value: Either<(u8, char), (u8, i32)> = Either::Right((2, -10));
     /// assert_eq!(value.transpose_left(), (2, Either::Right(-10)));
     /// ```
+    #[must_use]
     pub fn transpose_left(self) -> (T, Either<L, R>) {
         match self {
             Self::Left((target, left)) => (target, Left(left)),
@@ -2131,6 +2151,7 @@ impl<L, R, T> Either<(L, T), (R, T)> {
     /// let value: Either<(u8, char), (i32, char)> = Either::Right((-2, 'a'));
     /// assert_eq!(value.transpose_right(), (Either::Right(-2), 'a'));
     /// ```
+    #[must_use]
     pub fn transpose_right(self) -> (Either<L, R>, T) {
         match self {
             Self::Left((left, target)) => (Left(left), target),
@@ -2159,6 +2180,7 @@ impl<L, R> Either<Option<L>, Option<R>> {
     ///
     /// [`Options`]: Option
     #[inline]
+    #[must_use]
     pub fn transpose(self) -> Option<Either<L, R>> {
         match self {
             Self::Left(left) => left.map(Left),
