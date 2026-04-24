@@ -1205,10 +1205,10 @@ impl<L, R> Either<L, R> {
     /// assert_eq!(left, vec![1]);
     /// ```
     ///
-    /// The following example will not compile with the error: "cannot borrow `both` as
-    /// mutable more than once at a time".
+    /// The following example will not compile with the error: "cannot borrow `both` as mutable
+    /// more than once at a time".
     ///
-    /// If you need to apply a function that requires mutable access to both elements
+    /// If you need to apply a function that requires mutable access a single element
     /// simultaneously, consider using [`biapply_with`] instead.
     ///
     /// ```compile_fail
@@ -1216,7 +1216,7 @@ impl<L, R> Either<L, R> {
     ///
     /// let mut both = vec![];
     ///
-    /// let value: Either<u8, char> = Either::Both(1, 'c');
+    /// let value: Either<u8, char> = Either::Left(1);
     /// value.biapply(|l| both.push(l), |r| both.push(r as u8));
     /// ```
     ///
