@@ -310,7 +310,7 @@
 //!
 //! assert_eq!(either_or_both, EitherOrBoth::Both(vec![2], vec![1]));
 //! ```
-//!
+//! 
 //! ## Trait implementations
 //!
 //! Both [`Either`] and [`EitherOrBoth`] derive [`Debug`], [`PartialEq`], [`Eq`],
