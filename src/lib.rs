@@ -62,13 +62,6 @@
 //! * [`as_pin_mut`] converts from [`Pin<&mut EitherOrBoth<L, R>>`][EitherOrBoth] to
 //!   [`EitherOrBoth<Pin<&mut L>, Pin<&mut R>>`][EitherOrBoth]
 //!
-//! [`as_deref`]: EitherOrBoth::as_deref
-//! [`as_deref_mut`]: EitherOrBoth::as_deref_mut
-//! [`as_mut`]: EitherOrBoth::as_mut
-//! [`as_pin_mut`]: EitherOrBoth::as_pin_mut
-//! [`as_pin_ref`]: EitherOrBoth::as_pin_ref
-//! [`as_ref`]: EitherOrBoth::as_ref
-//!
 //! ## Extracting the contained values
 //!
 //! These methods extract the contained value in an [`EitherOrBoth<L, R>`] or [`Either<L,
@@ -98,23 +91,6 @@
 //! * [`unwrap_only_right_unchecked`] produces *[undefined behavior]* if the variant is `Left`
 //!   or `Both`
 //!
-//! [`expect_both`]: EitherOrBoth::expect_both
-//! [`unwrap_both`]: EitherOrBoth::unwrap_both
-//! [`unwrap_both_unchecked`]: EitherOrBoth::unwrap_both_unchecked
-//! [`expect_left`]: EitherOrBoth::expect_left
-//! [`unwrap_left`]: EitherOrBoth::unwrap_left
-//! [`unwrap_left_unchecked`]: EitherOrBoth::unwrap_left_unchecked
-//! [`expect_right`]: EitherOrBoth::expect_right
-//! [`unwrap_right`]: EitherOrBoth::unwrap_right
-//! [`unwrap_right_unchecked`]: EitherOrBoth::unwrap_right_unchecked
-//! [`expect_only_left`]: EitherOrBoth::expect_left
-//! [`unwrap_only_left`]: EitherOrBoth::unwrap_left
-//! [`unwrap_only_left_unchecked`]: EitherOrBoth::unwrap_left_unchecked
-//! [`expect_only_right`]: EitherOrBoth::expect_right
-//! [`unwrap_only_right`]: EitherOrBoth::unwrap_right
-//! [`unwrap_only_right_unchecked`]: EitherOrBoth::unwrap_right_unchecked
-//! [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
-//!
 //! Non-panicking methods, optionally extract the contained values:
 //!
 //! * [`left`] returns `Some` with the left value if present otherwise `None`
@@ -125,24 +101,11 @@
 //! value if only `Left` and `Some` with the right value if only `Right`. Finally,
 //! [`unzip`] produces a 2-tuple of [`Options`][Option] containing both values if present.
 //!
-//! [`both`]: EitherOrBoth::both
-//! [`left`]: EitherOrBoth::left
-//! [`only_left`]: EitherOrBoth::only_left
-//! [`right`]: EitherOrBoth::right
-//! [`only_right`]: EitherOrBoth::only_right
-//! [`unzip`]: EitherOrBoth::unzip
-//!
 //! The [`left_and`], [`right_and`] methods take another [`EitherOrBoth`] or [`Either`] as
 //! input and produce an [`EitherOrBoth`] or [`Either`] as output.
 //!
-//! [`left_and`]: EitherOrBoth::left_and
-//! [`right_and`]: EitherOrBoth::right_and
-//!
 //! Accordingly, [`left_and_then`], [`right_and_then`] methods evaluate lazily by taking a
 //! function as input.
-//!
-//! [`left_and_then`]: EitherOrBoth::left_and_then
-//! [`right_and_then`]: EitherOrBoth::right_and_then
 //!
 //! The following non-panicking methods extract the contained value of an
 //! [`EitherOrBoth<L, R>`] and [`Either<L, R>`] by providing default values or methods if
@@ -155,10 +118,6 @@
 //! * [`or_else`] returns a tuple computing the missing left or right values with a given
 //!   function.
 //!
-//! [`or`]: EitherOrBoth::or
-//! [`or_default`]: EitherOrBoth::or_default
-//! [`or_else`]: EitherOrBoth::or_else
-//!
 //! Reducing methods extract the contained value into a single value, potentially
 //! converting it to a different type `T`, rather than returning a tuple:
 //!
@@ -167,16 +126,10 @@
 //! * [`reduce_right`] extracts the `R` value, otherwise applies a given function converting
 //!   the `L` value to a `R` value
 //!
-//! [`reduce_left`]: EitherOrBoth::reduce_left
-//! [`reduce_right`]: EitherOrBoth::reduce_right
-//!
 //! Other reductions work differently for [`EitherOrBoth`] and [`Either`]. With [`Either`]
 //!
 //! * [`bireduce`] applies the given functions converting the `L` and `R` to a type `T`. The
 //!   uniform type version of [`bireduce`] is named [`reduce`].
-//!
-//! [`bireduce`]: Either::bireduce
-//! [`reduce`]: Either::reduce
 //!
 //! [`EitherOrBoth<L, R>`] doesn't have a single `bireduce` method, but instead two
 //! methods:
@@ -188,9 +141,6 @@
 //!
 //! There is a uniform type version [`EitherOrBoth::reduce`], which extracts `Left` or
 //! `Right`, otherwise it applies a function reducing `Both` to a single value.
-//!
-//! [`reduce_map_left`]: EitherOrBoth::reduce_map_left
-//! [`reduce_map_right`]: EitherOrBoth::reduce_map_right
 //!
 //! ## Conversions
 //!
@@ -205,9 +155,6 @@
 //! * [`into_right`] converts a `Left` or `Both` variant into a `Right` variant by applying a
 //!   provided conversion function to the `Left` value if necessary
 //!
-//! [`into_left`]: EitherOrBoth::into_left
-//! [`into_right`]: EitherOrBoth::into_right
-//!
 //! ## Transforming contained values
 //!
 //! The methods below convert to a [`Result`] as described in the [convention]:
@@ -219,30 +166,12 @@
 //! * [`ok_or_else`] transforms [`Right(v)`] to [`Ok(v)`] and a left value to [`Err`] using the
 //!   provided function.
 //!
-//! [`ok`]: Either::ok
-//! [`ok_or`]: Either::ok_or
-//! [`ok_or_else`]: Either::ok_or
-//! [`Left`]: Either::Left
-//! [`Left(v)`]: Either::Left
-//! [`Right(v)`]: Either::Right
-//! [`Ok(v)`]: Result::Ok
-//! [`Err(v)`]: Result::Err
-//! [`Err(l)`]: Result::Err
-//! [`Err(r)`]: Result::Err
-//! [`Both(l, r)`]: EitherOrBoth::Both
-//! [convention]: #conventions-and-edge-cases
-//!
 //! These methods transform the inner values to other types using provided functions:
 //!
 //! * [`bimap`] transforms [`EitherOrBoth<L, R>`] to [`EitherOrBoth<T, U>`]
 //! * [`map_left`] transforms [`EitherOrBoth<L, R>`] to [`EitherOrBoth<T, R>`]
 //! * [`map_right`] transforms [`EitherOrBoth<L, R>`] to [`EitherOrBoth<L, U>`]
 //! * [`map`] transforms [`EitherOrBoth<T, T>`] to [`EitherOrBoth<U, U>`]
-//!
-//! [`bimap`]: EitherOrBoth::bimap
-//! [`map_left`]: EitherOrBoth::map_left
-//! [`map_right`]: EitherOrBoth::map_right
-//! [`map`]: EitherOrBoth::map
 //!
 //! These methods transform [`EitherOrBoth<L, R>`] to a value of a possibly different type
 //! `T`:
@@ -256,13 +185,6 @@
 //!
 //! The [`map_right_or`], [`map_right_or_else`] and [`map_right_or_default`] methods are
 //! the equivalent methods applying a provided function to the right value.
-//!
-//! [`map_left_or`]: EitherOrBoth::map_left_or
-//! [`map_left_or_default`]: EitherOrBoth::map_left_or_default
-//! [`map_left_or_else`]: EitherOrBoth::map_left_or_else
-//! [`map_right_or`]: EitherOrBoth::map_right_or
-//! [`map_right_or_default`]: EitherOrBoth::map_right_or_default
-//! [`map_right_or_else`]: EitherOrBoth::map_right_or_else
 //!
 //! Swapping an [`EitherOrBoth`] or [`Either`] of an inner value to the inner value of an
 //! [`EitherOrBoth`] or [`Either`] is possible with [`transpose`] if the inner values are
@@ -281,12 +203,6 @@
 //! [`transpose_err`] for [`Result`] and [`transpose_left`] and [`transpose_right`] for
 //! tuples.
 //!
-//! [`transpose`]: EitherOrBoth::transpose
-//! [`transpose_left`]: EitherOrBoth::transpose_left
-//! [`transpose_right`]: EitherOrBoth::transpose_right
-//! [`transpose_ok`]: EitherOrBoth::transpose_ok
-//! [`transpose_err`]: EitherOrBoth::transpose_err
-//!
 //! ## Consumers
 //!
 //! These methods apply a method to the contained values and the mutable environment
@@ -302,12 +218,6 @@
 //! * [`apply_right`] applies the provided function to the contained right value
 //! * [`apply`] is the uniform type method equivalent to [`biapply`]
 //!
-//! [`biapply`]: EitherOrBoth::biapply
-//! [`biapply_with`]: EitherOrBoth::biapply_with
-//! [`apply_left`]: EitherOrBoth::apply_left
-//! [`apply_right`]: EitherOrBoth::apply_right
-//! [`apply`]: EitherOrBoth::apply
-//!
 //! These methods are lighter versions, consuming the [`EitherOrBoth`] or [`Either`] then
 //! apply functions to the contained values by reference and eventually returning the
 //! [`EitherOrBoth`] or [`Either`] again.
@@ -317,11 +227,6 @@
 //! * [`inspect_left`] applies the provided function to the contained left value
 //! * [`inspect_right`] applies the provided function to the contained right value
 //! * [`inspect`] is the uniform type method equivalent to [`biinspect`]
-//!
-//! [`biinspect`]: EitherOrBoth::biinspect
-//! [`inspect_left`]: EitherOrBoth::inspect_left
-//! [`inspect_right`]: EitherOrBoth::inspect_right
-//! [`inspect`]: EitherOrBoth::inspect
 //!
 //! ## Iterating
 //!
@@ -347,10 +252,6 @@
 //! * [`iter_chain`] produces immutable references of type `&T` of the chained iterators
 //! * [`iter_chain_mut`] produces mutable references of type `&mut T` of the chained iterators
 //!
-//! [`into_iter_chain`]: EitherOrBoth::into_iter_chain
-//! [`iter_chain`]: EitherOrBoth::iter_chain
-//! [`iter_chain_mut`]: EitherOrBoth::iter_chain_mut
-//!
 //! If the types are not uniform iterating over [`EitherOrBoth`] can be achieved if the
 //! inner types implement [`IntoIterator`]. Instead of [`EitherOrBoth<Iterator<Item = L>,
 //! Iterator<Item = R>>`][EitherOrBoth] the iterators are swapped [`Iterator<Item =
@@ -359,10 +260,6 @@
 //! * [`into_iter_swap`] consumes the [`EitherOrBoth`]
 //! * [`iter_swap`] produces immutable references of [`EitherOrBoth<&L, &R>`]
 //! * [`iter_swap_mut`] produces mutable references of [`EitherOrBoth<&mut L, &mut R>`]
-//!
-//! [`into_iter_swap`]: EitherOrBoth::into_iter_swap
-//! [`iter_swap`]: EitherOrBoth::iter_swap
-//! [`iter_swap_mut`]: EitherOrBoth::iter_swap_mut
 //!
 //! ### Iterating over [`Either`]
 //!
@@ -453,14 +350,14 @@
 //! * [`Deref`] and [`DerefMut`] delegate to the inner value, with
 //!   [`Deref::Target`] set to `R::Target`
 //! * [`Extend<A>`] delegates to the inner collection's [`Extend`] implementation
-//! * [`fmt::Write`] delegates to the inner value's [`Write`] implementation
+//! * [`Write`][FmtWrite] delegates to the inner value's [`Write`][FmtWrite] implementation
 //!
 //! [`Either`] also implements [`Future`] when both inner types are futures with the
 //! same output type, polling whichever side is present.
 //!
 //! ### I/O traits
 //!
-//! [`Either`] implements [`Read`], [`Write`], [`BufRead`], and [`Seek`] by delegating to
+//! [`Either`] implements [`Read`], [`Write`][IoWrite], [`BufRead`], and [`Seek`] by delegating to
 //! the inner value's implementation.
 //!
 //! ### Conversions from tuples and Result
@@ -481,46 +378,6 @@
 //!
 //! [`EitherOrBoth`] also implements [`From<Either<L, R>>`][EitherOrBoth-From-Either].
 //!
-//! [`Debug`]: core::fmt::Debug
-//! [`PartialEq`]: core::cmp::PartialEq
-//! [`Eq`]: core::cmp::Eq
-//! [`Clone`]: core::clone::Clone
-//! [`Copy`]: core::marker::Copy
-//! [`Hash`]: core::hash::Hash
-//! [`Ord`]: core::cmp::Ord
-//! [`PartialOrd`]: core::cmp::PartialOrd
-//! [`Display`]: core::fmt::Display
-//! [`Error`]: std::error::Error
-//! [`AsRef<T>`]: core::convert::AsRef
-//! [`AsMut<T>`]: core::convert::AsMut
-//! [`AsRef`]: core::convert::AsRef
-//! [`AsMut`]: core::convert::AsMut
-//! [`Deref`]: core::ops::Deref
-//! [`DerefMut`]: core::ops::DerefMut
-//! [`Deref::Target`]: core::ops::Deref::Target
-//! [`Extend<A>`]: core::iter::Extend
-//! [`Extend`]: core::iter::Extend
-//! [`Write`]: core::fmt::Write
-//! [`fmt::Write`]: core::fmt::Write
-//! [`Future`]: core::future::Future
-//! [`Read`]: std::io::Read
-//! [`Write`]: std::io::Write
-//! [`BufRead`]: std::io::BufRead
-//! [`Seek`]: std::io::Seek
-//! [Either-From]: Either#impl-From<Result<R,+L>>-for-Either<L,+R>
-//! [Either-From-ref]: Either#impl-From<&'a+Either<L,+R>>-for-Either<&'a+L,+&'a+R>
-//! [Either-From-ref-mut]: Either#impl-From<&'a+mut+Either<L,+R>>-for-Either<&'a+mut+L,+&'a+mut+R>
-//! [EitherOrBoth-From-tuple]: EitherOrBoth#impl-From<(L,+R)>-for-EitherOrBoth<L,+R>
-//! [EitherOrBoth-From-tuple-opt-left]: EitherOrBoth#impl-From<(Option<L>,+R)>-for-EitherOrBoth<L,+R>
-//! [EitherOrBoth-From-tuple-opt-right]: EitherOrBoth#impl-From<(L,+Option<R>)>-for-EitherOrBoth<L,+R>
-//! [EitherOrBoth-TryFrom]: EitherOrBoth#impl-TryFrom<(Option<L>,+Option<R>)>-for-EitherOrBoth<L,+R>
-//! [EitherOrBoth-From-Either]: EitherOrBoth#impl-From<Either<L,+R>>-for-EitherOrBoth<L,+R>
-//! [`TryFromOptionsError`]: crate::TryFromOptionsError
-//! [`Some`]: Option::Some
-//! [`None`]: Option::None
-//! [`Ok`]: Result::Ok
-//! [`Err`]: Result::Err
-//!
 //! ## Modifying in-place
 //!
 //! Both enums support replacing the left or right values:
@@ -531,10 +388,6 @@
 //!
 //! [`replace_any`] is special to [`EitherOrBoth`] and replaces all values returning the old
 //! [`EitherOrBoth`].
-//!
-//! [`replace_left`]: EitherOrBoth::replace_left
-//! [`replace_right`]: EitherOrBoth::replace_right
-//! [`replace_any`]: EitherOrBoth::replace_any
 //!
 //! Insertion is supported for [`EitherOrBoth`] and these methods return a mutable reference to the
 //! contained value:
@@ -550,12 +403,138 @@
 //! * [`right_or_insert_with`]: returns a mutable reference to the right value or if `Left`, inserts
 //!   a lazily computed right value converting `self` to a `Both` value
 //!
+//! [Either-From-ref-mut]: Either#impl-From<&'a+mut+Either<L,+R>>-for-Either<&'a+mut+L,+&'a+mut+R>
+//! [Either-From-ref]: Either#impl-From<&'a+Either<L,+R>>-for-Either<&'a+L,+&'a+R>
+//! [Either-From]: Either#impl-From<Result<R,+L>>-for-Either<L,+R>
+//! [EitherOrBoth-From-Either]: EitherOrBoth#impl-From<Either<L,+R>>-for-EitherOrBoth<L,+R>
+//! [EitherOrBoth-From-tuple-opt-left]: EitherOrBoth#impl-From<(Option<L>,+R)>-for-EitherOrBoth<L,+R>
+//! [EitherOrBoth-From-tuple-opt-right]: EitherOrBoth#impl-From<(L,+Option<R>)>-for-EitherOrBoth<L,+R>
+//! [EitherOrBoth-From-tuple]: EitherOrBoth#impl-From<(L,+R)>-for-EitherOrBoth<L,+R>
+//! [EitherOrBoth-TryFrom]: EitherOrBoth#impl-TryFrom<(Option<L>,+Option<R>)>-for-EitherOrBoth<L,+R>
+//! [`AsMut<T>`]: core::convert::AsMut
+//! [`AsMut`]: core::convert::AsMut
+//! [`AsRef<T>`]: core::convert::AsRef
+//! [`AsRef`]: core::convert::AsRef
+//! [`Both(l, r)`]: EitherOrBoth::Both
+//! [`BufRead`]: std::io::BufRead
+//! [`Clone`]: core::clone::Clone
+//! [`Copy`]: core::marker::Copy
+//! [`Debug`]: core::fmt::Debug
+//! [`Deref::Target`]: core::ops::Deref::Target
+//! [`DerefMut`]: core::ops::DerefMut
+//! [`Deref`]: core::ops::Deref
+//! [`Display`]: core::fmt::Display
+//! [`Eq`]: core::cmp::Eq
+//! [`Err(l)`]: Result::Err
+//! [`Err(r)`]: Result::Err
+//! [`Err(v)`]: Result::Err
+//! [`Err`]: Result::Err
+//! [`Error`]: std::error::Error
+//! [`Extend<A>`]: core::iter::Extend
+//! [`Extend`]: core::iter::Extend
+//! [`Future`]: core::future::Future
+//! [`Hash`]: core::hash::Hash
+//! [`Left(v)`]: Either::Left
+//! [`Left`]: Either::Left
+//! [`None`]: Option::None
+//! [`Ok(v)`]: Result::Ok
+//! [`Ok`]: Result::Ok
+//! [`Ord`]: core::cmp::Ord
+//! [`PartialEq`]: core::cmp::PartialEq
+//! [`PartialOrd`]: core::cmp::PartialOrd
+//! [`Read`]: std::io::Read
+//! [`Right(v)`]: Either::Right
+//! [`Seek`]: std::io::Seek
+//! [`Some`]: Option::Some
+//! [`TryFromOptionsError`]: crate::TryFromOptionsError
+//! [FmtWrite]: core::fmt::Write
+//! [IoWrite]: std::io::Write
+//! [`apply_left`]: EitherOrBoth::apply_left
+//! [`apply_right`]: EitherOrBoth::apply_right
+//! [`apply`]: EitherOrBoth::apply
+//! [`as_deref_mut`]: EitherOrBoth::as_deref_mut
+//! [`as_deref`]: EitherOrBoth::as_deref
+//! [`as_mut`]: EitherOrBoth::as_mut
+//! [`as_pin_mut`]: EitherOrBoth::as_pin_mut
+//! [`as_pin_ref`]: EitherOrBoth::as_pin_ref
+//! [`as_ref`]: EitherOrBoth::as_ref
+//! [`biapply_with`]: EitherOrBoth::biapply_with
+//! [`biapply`]: EitherOrBoth::biapply
+//! [`biinspect`]: EitherOrBoth::biinspect
+//! [`bimap`]: EitherOrBoth::bimap
+//! [`bireduce`]: Either::bireduce
+//! [`both`]: EitherOrBoth::both
+//! [`expect_both`]: EitherOrBoth::expect_both
+//! [`expect_left`]: EitherOrBoth::expect_left
+//! [`expect_only_left`]: EitherOrBoth::expect_left
+//! [`expect_only_right`]: EitherOrBoth::expect_right
+//! [`expect_right`]: EitherOrBoth::expect_right
 //! [`insert_left`]: EitherOrBoth::insert_left
 //! [`insert_right`]: EitherOrBoth::insert_right
-//! [`left_or_insert`]: EitherOrBoth::left_or_insert
+//! [`inspect_left`]: EitherOrBoth::inspect_left
+//! [`inspect_right`]: EitherOrBoth::inspect_right
+//! [`inspect`]: EitherOrBoth::inspect
+//! [`into_iter_chain`]: EitherOrBoth::into_iter_chain
+//! [`into_iter_swap`]: EitherOrBoth::into_iter_swap
+//! [`into_left`]: EitherOrBoth::into_left
+//! [`into_right`]: EitherOrBoth::into_right
+//! [`iter_chain_mut`]: EitherOrBoth::iter_chain_mut
+//! [`iter_chain`]: EitherOrBoth::iter_chain
+//! [`iter_swap_mut`]: EitherOrBoth::iter_swap_mut
+//! [`iter_swap`]: EitherOrBoth::iter_swap
+//! [`left_and_then`]: EitherOrBoth::left_and_then
+//! [`left_and`]: EitherOrBoth::left_and
 //! [`left_or_insert_with`]: EitherOrBoth::left_or_insert_with
-//! [`right_or_insert`]: EitherOrBoth::right_or_insert
+//! [`left_or_insert`]: EitherOrBoth::left_or_insert
+//! [`left`]: EitherOrBoth::left
+//! [`map_left_or_default`]: EitherOrBoth::map_left_or_default
+//! [`map_left_or_else`]: EitherOrBoth::map_left_or_else
+//! [`map_left_or`]: EitherOrBoth::map_left_or
+//! [`map_left`]: EitherOrBoth::map_left
+//! [`map_right_or_default`]: EitherOrBoth::map_right_or_default
+//! [`map_right_or_else`]: EitherOrBoth::map_right_or_else
+//! [`map_right_or`]: EitherOrBoth::map_right_or
+//! [`map_right`]: EitherOrBoth::map_right
+//! [`map`]: EitherOrBoth::map
+//! [`ok_or_else`]: Either::ok_or
+//! [`ok_or`]: Either::ok_or
+//! [`ok`]: Either::ok
+//! [`only_left`]: EitherOrBoth::only_left
+//! [`only_right`]: EitherOrBoth::only_right
+//! [`or_default`]: EitherOrBoth::or_default
+//! [`or_else`]: EitherOrBoth::or_else
+//! [`or`]: EitherOrBoth::or
+//! [`reduce_left`]: EitherOrBoth::reduce_left
+//! [`reduce_map_left`]: EitherOrBoth::reduce_map_left
+//! [`reduce_map_right`]: EitherOrBoth::reduce_map_right
+//! [`reduce_right`]: EitherOrBoth::reduce_right
+//! [`reduce`]: Either::reduce
+//! [`replace_any`]: EitherOrBoth::replace_any
+//! [`replace_left`]: EitherOrBoth::replace_left
+//! [`replace_right`]: EitherOrBoth::replace_right
+//! [`right_and_then`]: EitherOrBoth::right_and_then
+//! [`right_and`]: EitherOrBoth::right_and
 //! [`right_or_insert_with`]: EitherOrBoth::right_or_insert_with
+//! [`right_or_insert`]: EitherOrBoth::right_or_insert
+//! [`right`]: EitherOrBoth::right
+//! [`transpose_err`]: EitherOrBoth::transpose_err
+//! [`transpose_left`]: EitherOrBoth::transpose_left
+//! [`transpose_ok`]: EitherOrBoth::transpose_ok
+//! [`transpose_right`]: EitherOrBoth::transpose_right
+//! [`transpose`]: EitherOrBoth::transpose
+//! [`unwrap_both_unchecked`]: EitherOrBoth::unwrap_both_unchecked
+//! [`unwrap_both`]: EitherOrBoth::unwrap_both
+//! [`unwrap_left_unchecked`]: EitherOrBoth::unwrap_left_unchecked
+//! [`unwrap_left`]: EitherOrBoth::unwrap_left
+//! [`unwrap_only_left_unchecked`]: EitherOrBoth::unwrap_left_unchecked
+//! [`unwrap_only_left`]: EitherOrBoth::unwrap_left
+//! [`unwrap_only_right_unchecked`]: EitherOrBoth::unwrap_right_unchecked
+//! [`unwrap_only_right`]: EitherOrBoth::unwrap_right
+//! [`unwrap_right_unchecked`]: EitherOrBoth::unwrap_right_unchecked
+//! [`unwrap_right`]: EitherOrBoth::unwrap_right
+//! [`unzip`]: EitherOrBoth::unzip
+//! [convention]: #conventions-and-edge-cases
+//! [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
 
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
