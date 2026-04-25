@@ -41,10 +41,10 @@ use EitherOrBoth::*;
 #[cfg_attr(feature = "serde", allow(clippy::unsafe_derive_deserialize))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum EitherOrBoth<L, R = L> {
-    /// Represents a value from both sides
-    Both(L, R),
     /// Represents a value from the left side
     Left(L),
+    /// Represents a value from both sides
+    Both(L, R),
     /// Represents a value from the right side
     Right(R),
 }

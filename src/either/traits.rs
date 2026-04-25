@@ -183,7 +183,22 @@ where
     L: Ord,
     R: Ord,
 {
-    // TODO: DOCS
+    /// Compares two [`Either`] values using the ordering `Left < Right`.
+    ///
+    /// When both values are the same variant, their inner values are compared directly.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use either_or_both::Either;
+    ///
+    /// // Left is less than Right
+    /// assert!(Either::<u8, u8>::Left(5) < Either::Right(1));
+    ///
+    /// // Same variants compare inner values
+    /// assert!(Either::<u8, u8>::Left(1) < Either::Left(2));
+    /// assert!(Either::<u8, u8>::Right(1) < Either::Right(2));
+    /// ```
     fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
             (Self::Left(a), Self::Left(b)) => a.cmp(b),
@@ -199,7 +214,9 @@ where
     L: Ord,
     R: Ord,
 {
-    // TODO: DOCS
+    /// Compares two [`Either`] values using the same ordering as [`Ord::cmp`].
+    ///
+    /// [`Either`] always has a total ordering, so this always returns `Some`.
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
