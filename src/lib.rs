@@ -413,7 +413,114 @@
 //!
 //! assert_eq!(either_or_both, EitherOrBoth::Both(vec![2], vec![1]));
 //! ```
-//! 
+//!
+//! ## Trait implementations
+//!
+//! Both [`Either`] and [`EitherOrBoth`] derive [`Debug`], [`PartialEq`], [`Eq`],
+//! [`Clone`], [`Copy`], and [`Hash`].
+//!
+//! ### Comparison
+//!
+//! Both types implement [`Ord`] and [`PartialOrd`] with custom orderings that differ
+//! from a derived implementation:
+//!
+//! * [`Either`] orders [`Left`][Either::Left] before [`Right`][Either::Right]. When
+//!   both values are the same variant, their inner values are compared directly.
+//! * [`EitherOrBoth`] orders [`Left`][EitherOrBoth::Left] before
+//!   [`Both`][EitherOrBoth::Both] before [`Right`][EitherOrBoth::Right]. When both
+//!   values are the same variant, their inner values are compared directly. For the
+//!   [`Both`][EitherOrBoth::Both] variant, the left values are compared first, and only
+//!   if equal are the right values compared.
+//!
+//! ### Display and Error
+//!
+//! Both types implement [`Display`] by delegating to the inner value's [`Display`]
+//! implementation. For [`EitherOrBoth`], the [`Both`][EitherOrBoth::Both] variant
+//! formats both values separated by a newline.
+//!
+//! Both types implement [`Error`] when both inner types implement [`Error`]. For the
+//! [`Both`][EitherOrBoth::Both] variant of [`EitherOrBoth`], the left error's source
+//! takes precedence (see [convention]).
+//!
+//! ### Delegation traits
+//!
+//! [`Either`] implements several traits by delegating to whichever inner value is
+//! present, allowing [`Either`] to be used transparently where the inner type's trait
+//! is expected:
+//!
+//! * [`AsRef<T>`] and [`AsMut<T>`] delegate to the inner value's [`AsRef`] or [`AsMut`]
+//!   implementation
+//! * [`Deref`] and [`DerefMut`] delegate to the inner value, with
+//!   [`Deref::Target`] set to `R::Target`
+//! * [`Extend<A>`] delegates to the inner collection's [`Extend`] implementation
+//! * [`fmt::Write`] delegates to the inner value's [`Write`] implementation
+//!
+//! [`Either`] also implements [`Future`] when both inner types are futures with the
+//! same output type, polling whichever side is present.
+//!
+//! ### I/O traits
+//!
+//! [`Either`] implements [`Read`], [`Write`], [`BufRead`], and [`Seek`] by delegating to
+//! the inner value's implementation.
+//!
+//! ### Conversions from tuples and Result
+//!
+//! [`Either`] implements [`From<Result<R, L>>`][Either-From], converting [`Ok`] to
+//! [`Right`][Either::Right] and [`Err`] to [`Left`][Either::Left].
+//!
+//! [`EitherOrBoth`] implements several [`From`] conversions from tuples:
+//!
+//! * [`From<(L, R)>`][EitherOrBoth-From-tuple] always produces a [`Both`][EitherOrBoth::Both] variant
+//! * [`From<(Option<L>, R)>`][EitherOrBoth-From-tuple-opt-left] produces [`Both`][EitherOrBoth::Both] if
+//!   the left is [`Some`], otherwise [`Right`][EitherOrBoth::Right]
+//! * [`From<(L, Option<R>)>`][EitherOrBoth-From-tuple-opt-right] produces [`Both`][EitherOrBoth::Both] if
+//!   the right is [`Some`], otherwise [`Left`][EitherOrBoth::Left]
+//!
+//! Additionally, [`TryFrom<(Option<L>, Option<R>)>`][EitherOrBoth-TryFrom] is implemented for
+//! [`EitherOrBoth`], returning [`TryFromOptionsError`] if both options are [`None`].
+//!
+//! [`EitherOrBoth`] also implements [`From<Either<L, R>>`][EitherOrBoth-From-Either].
+//!
+//! [`Debug`]: core::fmt::Debug
+//! [`PartialEq`]: core::cmp::PartialEq
+//! [`Eq`]: core::cmp::Eq
+//! [`Clone`]: core::clone::Clone
+//! [`Copy`]: core::marker::Copy
+//! [`Hash`]: core::hash::Hash
+//! [`Ord`]: core::cmp::Ord
+//! [`PartialOrd`]: core::cmp::PartialOrd
+//! [`Display`]: core::fmt::Display
+//! [`Error`]: std::error::Error
+//! [`AsRef<T>`]: core::convert::AsRef
+//! [`AsMut<T>`]: core::convert::AsMut
+//! [`AsRef`]: core::convert::AsRef
+//! [`AsMut`]: core::convert::AsMut
+//! [`Deref`]: core::ops::Deref
+//! [`DerefMut`]: core::ops::DerefMut
+//! [`Deref::Target`]: core::ops::Deref::Target
+//! [`Extend<A>`]: core::iter::Extend
+//! [`Extend`]: core::iter::Extend
+//! [`Write`]: core::fmt::Write
+//! [`fmt::Write`]: core::fmt::Write
+//! [`Future`]: core::future::Future
+//! [`Read`]: std::io::Read
+//! [`Write`]: std::io::Write
+//! [`BufRead`]: std::io::BufRead
+//! [`Seek`]: std::io::Seek
+//! [Either-From]: Either#impl-From<Result<R,+L>>-for-Either<L,+R>
+//! [Either-From-ref]: Either#impl-From<&'a+Either<L,+R>>-for-Either<&'a+L,+&'a+R>
+//! [Either-From-ref-mut]: Either#impl-From<&'a+mut+Either<L,+R>>-for-Either<&'a+mut+L,+&'a+mut+R>
+//! [EitherOrBoth-From-tuple]: EitherOrBoth#impl-From<(L,+R)>-for-EitherOrBoth<L,+R>
+//! [EitherOrBoth-From-tuple-opt-left]: EitherOrBoth#impl-From<(Option<L>,+R)>-for-EitherOrBoth<L,+R>
+//! [EitherOrBoth-From-tuple-opt-right]: EitherOrBoth#impl-From<(L,+Option<R>)>-for-EitherOrBoth<L,+R>
+//! [EitherOrBoth-TryFrom]: EitherOrBoth#impl-TryFrom<(Option<L>,+Option<R>)>-for-EitherOrBoth<L,+R>
+//! [EitherOrBoth-From-Either]: EitherOrBoth#impl-From<Either<L,+R>>-for-EitherOrBoth<L,+R>
+//! [`TryFromOptionsError`]: crate::TryFromOptionsError
+//! [`Some`]: Option::Some
+//! [`None`]: Option::None
+//! [`Ok`]: Result::Ok
+//! [`Err`]: Result::Err
+//!
 //! ## Modifying in-place
 //!
 //! Both enums support replacing the left or right values:
