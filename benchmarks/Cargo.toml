@@ -7,7 +7,7 @@ publish = false
 
 [dev-dependencies]
 either-or-both = { version = "0.3.1", path = ".." }
-gungraun = { version = "0.18" }
+gungraun = { version = "0.19" }
 
 [[bench]]
 harness = false
