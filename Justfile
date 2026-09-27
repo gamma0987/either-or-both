@@ -16,9 +16,7 @@ cspell_bin := ```
     fi
     ```
 
-this_dir := `realpath .`
 args := ''
-msrv := '1.63.0'
 
 # A thorough build of all packages with `cargo hack` and the feature powerset (Uses: 'cargo-hack')
 [group('build')]
