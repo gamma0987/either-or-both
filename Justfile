@@ -16,14 +16,12 @@ cspell_bin := ```
     fi
     ```
 
-this_dir := `realpath .`
 args := ''
-msrv := '1.63.0'
 
 # A thorough build of all packages with `cargo hack` and the feature powerset (Uses: 'cargo-hack')
 [group('build')]
 build-hack:
-    cargo hack --workspace --feature-powerset build
+    cargo hack -p either-or-both --feature-powerset build
 
 # Check and fix format of rust files (Uses: 'cargo +nightly')
 [group('formatting')]
@@ -38,7 +36,7 @@ fmt-toml:
 # Check and fix format of json and yaml files (Uses: 'prettier' or 'npx prettier')
 [group('formatting')]
 fmt-prettier:
-   {{ prettier_bin }} --write '**/*.json' '**/*.yml' --ignore-path '.gitignore' --ignore-path '.prettierignore'
+    {{ prettier_bin }} --write '**/*.json' '**/*.yml' --ignore-path '.gitignore' --ignore-path '.prettierignore'
 
 # Run all fmt rules (Depends on: fmt, fmt-toml, fmt-prettier)
 [group('formatting')]
@@ -88,7 +86,6 @@ build package:
 build-docs:
     DOCS_RS=1 cargo doc --all-features --no-deps --workspace
 
-
 # Run all tests in a package. (Uses: 'cargo')
 [group('test')]
 test:
@@ -105,7 +102,7 @@ build-and-test-docs: build-docs test-doc
 
 [group('test')]
 test-hack:
-    cargo hack --workspace --feature-powerset test
+    cargo hack -p either-or-both --feature-powerset test
 
 # Generate the coverage of tests (Uses: 'cargo', 'grcov')
 [group('coverage')]
