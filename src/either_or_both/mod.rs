@@ -610,8 +610,8 @@ impl<L, R> EitherOrBoth<L, R> {
     #[must_use]
     #[inline]
     pub fn as_pin_mut(self: Pin<&mut Self>) -> EitherOrBoth<Pin<&mut L>, Pin<&mut R>> {
-        // SAFETY: `get_unchecked_mut` is never used to move the `EitherOrBoth` inside `self`. `x`
-        // is guaranteed to be pinned because it comes from `self` which is pinned.
+        // SAFETY: `get_unchecked_mut` is never used to move the `EitherOrBoth` inside `self`.
+        // `x` is guaranteed to be pinned because it comes from `self` which is pinned.
         unsafe {
             map_each!(
                 Pin::get_unchecked_mut(self); l, r => Pin::new_unchecked(l), Pin::new_unchecked(r)
@@ -2652,11 +2652,11 @@ impl<L, R> EitherOrBoth<L, R> {
                 old_left
             }
             Self::Right(right) => {
-                // SAFETY: The pointers are valid for reading and writing since they (right and self)
-                // comes from a reference. See other comments below.
+                // SAFETY: The pointers are valid for reading and writing since they (right and
+                // self) comes from a reference. See other comments below.
                 unsafe {
-                    // This bitwise copy is safe since we're about to overwrite all of self without
-                    // using `right` again.
+                    // This bitwise copy is safe since we're about to overwrite all of self
+                    // without using `right` again.
                     let right = ptr::read(right);
                     ptr::write(self, Self::Both(left, right));
                     // This is safe since we just filled the `Both` value
@@ -2701,11 +2701,11 @@ impl<L, R> EitherOrBoth<L, R> {
                 old_right
             }
             Self::Left(left) => {
-                // SAFETY: The pointers are valid for reading and writing since they (left and self)
-                // comes from a reference. See other comments below.
+                // SAFETY: The pointers are valid for reading and writing since they (left and
+                // self) comes from a reference. See other comments below.
                 unsafe {
-                    // This bitwise copy is safe since we're about to overwrite all of self without
-                    // using `left` again.
+                    // This bitwise copy is safe since we're about to overwrite all of self
+                    // without using `left` again.
                     let left = ptr::read(left);
                     ptr::write(self, Self::Both(left, right));
                     // This is safe since we just filled the `Both` value
